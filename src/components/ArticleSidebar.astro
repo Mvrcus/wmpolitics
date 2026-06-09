@@ -1,0 +1,23 @@
+---
+import RelatedArticles from './RelatedArticles.astro';
+import RelatedLegislators from './RelatedLegislators.astro';
+import NewsletterSignup from './NewsletterSignup.astro';
+import type { ArticleEntry } from '../lib/content';
+
+interface Props {
+	article: ArticleEntry;
+	showNewsletter?: boolean;
+}
+
+const { article, showNewsletter = true } = Astro.props;
+---
+
+<aside class="article-sidebar" aria-label="Article sidebar">
+	<RelatedLegislators article={article} />
+	<RelatedArticles slug={article.id} />
+	{showNewsletter && (
+		<section class="sidebar-block sidebar-newsletter">
+			<NewsletterSignup compact />
+		</section>
+	)}
+</aside>

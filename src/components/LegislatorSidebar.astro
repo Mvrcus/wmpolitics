@@ -1,0 +1,84 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import type { EditorialScores } from '../lib/scores';
+import { getCollection } from 'astro:content';
+import { sortLegislators, filterLegislatorsByStatus } from '../lib/legislators';
+import DimensionScores from './DimensionScores.astro';
+import ScoreMeter from './ScoreMeter.astro';
+import PublicVote from './PublicVote.astro';
+import LegislatorCard from './LegislatorCard.astro';
+import NewsletterSignup from './NewsletterSignup.astro';
+
+interface Props {
+	entry: CollectionEntry<'legislators'>;
+	editorialScores: EditorialScores;
+	showNewsletter?: boolean;
+}
+
+const { entry, editorialScores, showNewsletter = true } = Astro.props;
+const d = entry.data;
+
+const allLegislators = sortLegislators(
+	filterLegislatorsByStatus(await getCollection('legislators'), 'current'),
+);
+const otherLegislators = allLegislators.filter((l) => l.data.slug !== d.slug).slice(0, 4);
+---
+
+<aside class="legislator-sidebar" aria-label="Profile sidebar">
+	<details class="legislator-at-a-glance">
+		<summary class="legislator-at-a-glance-summary">At a glance</summary>
+		<div class="legislator-at-a-glance-body">
+			<section class="sidebar-block sidebar-scorecard" aria-labelledby="sidebar-editorial-heading">
+				<h2 id="sidebar-editorial-heading" class="sidebar-heading">Editorial score</h2>
+				<div class="sidebar-overall-score">
+					<ScoreMeter score={editorialScores.overall} label="Overall" size="compact" showValue={true} />
+				</div>
+				<DimensionScores scores={editorialScores} compact />
+			</section>
+
+			<section class="sidebar-block sidebar-vote">
+				<PublicVote
+					slug={d.slug}
+					legislatorName={d.name}
+					editorialOverall={editorialScores.overall}
+					compact
+				/>
+			</section>
+		</div>
+	</details>
+
+	{
+		d.servesHolland && (
+			<section class="sidebar-block sidebar-links">
+				<h2 class="sidebar-heading">Holland area</h2>
+				<p class="holland-hub-link">
+					<a href="/holland/">Holland &amp; Ottawa County hub →</a>
+				</p>
+			</section>
+		)
+	}
+
+	{
+		otherLegislators.length > 0 && (
+			<section class="sidebar-block" aria-labelledby="sidebar-legislators-heading">
+				<h2 id="sidebar-legislators-heading" class="sidebar-heading">Other profiles</h2>
+				<ul class="sidebar-legislator-list">
+					{otherLegislators.map((legislator) => (
+						<li>
+							<LegislatorCard legislator={legislator} />
+						</li>
+					))}
+				</ul>
+			</section>
+		)
+	}
+
+	{
+		showNewsletter && (
+			<section class="sidebar-block sidebar-newsletter">
+				<h2 class="sidebar-heading">Newsletter</h2>
+				<NewsletterSignup compact />
+			</section>
+		)
+	}
+</aside>

@@ -1,0 +1,93 @@
+---
+interface Props {
+	compact?: boolean;
+}
+
+const { compact = false } = Astro.props;
+const formId = `newsletter-${Math.random().toString(36).slice(2, 9)}`;
+---
+
+<form
+	class:list={["newsletter", { compact }]}
+	id={formId}
+	name="newsletter"
+	method="post"
+>
+	{!compact && (
+		<>
+			<h3>Stay in the loop</h3>
+			<p class="newsletter-copy">
+				New profiles and local policy breakdowns for Holland and West Michigan. No spam.
+			</p>
+		</>
+	)}
+	<div class="newsletter-fields">
+		<label class="sr-only" for={`${formId}-email`}>Email</label>
+		<input
+			type="email"
+			id={`${formId}-email`}
+			name="email"
+			required
+			placeholder="Email address"
+			autocomplete="email"
+		/>
+		<label class="sr-only" for={`${formId}-zip`}>ZIP code (optional)</label>
+		<input
+			type="text"
+			id={`${formId}-zip`}
+			name="zip"
+			placeholder="ZIP (optional)"
+			pattern="[0-9]{5}(-[0-9]{4})?"
+			maxlength="10"
+			autocomplete="postal-code"
+		/>
+		<button type="submit" class="btn">Subscribe</button>
+	</div>
+</form>
+
+<style>
+	.newsletter {
+		text-align: left;
+	}
+
+	.newsletter h3 {
+		margin-bottom: 0.5rem;
+	}
+
+	.newsletter-copy {
+		font-size: 1rem;
+		color: var(--color-muted);
+		margin-bottom: 1.25rem;
+		line-height: 1.5;
+	}
+
+	.newsletter-fields {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+		align-items: stretch;
+	}
+
+	.newsletter input[type="email"],
+	.newsletter input[type="text"] {
+		flex: 1 1 180px;
+		padding: 0.75rem 1rem;
+		border: 1px solid var(--color-border);
+		font-family: var(--font-sans);
+		font-size: 1rem;
+		background: var(--color-white);
+	}
+
+	.newsletter input:focus {
+		outline: 2px solid var(--color-black);
+		outline-offset: -2px;
+	}
+
+	.newsletter.compact .newsletter-fields {
+		flex-direction: column;
+	}
+
+	.newsletter.compact input[type="email"] {
+		flex: 1 1 auto;
+	}
+</style>

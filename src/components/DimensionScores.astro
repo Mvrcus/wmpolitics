@@ -1,0 +1,40 @@
+---
+import ScoreMeter from './ScoreMeter.astro';
+import type { EditorialScores } from '../lib/scores';
+import { SCORE_DIMENSIONS } from '../lib/scores';
+
+interface Props {
+	scores: EditorialScores;
+	title?: string;
+	subtitle?: string;
+	compact?: boolean;
+}
+
+const {
+	scores,
+	title = 'Editorial score',
+	subtitle = 'Site-computed from documented good points and concerns',
+	compact = false,
+} = Astro.props;
+---
+
+<section
+	class:list={['dimension-scores', compact && 'dimension-scores--compact']}
+	aria-labelledby={compact ? undefined : 'editorial-scores-heading'}
+>
+	{
+		!compact && (
+			<header class="dimension-scores-header">
+				<h2 id="editorial-scores-heading">{title}</h2>
+				<p class="dimension-scores-sub">{subtitle}</p>
+			</header>
+		)
+	}
+	<ul class="dimension-scores-grid">
+		{SCORE_DIMENSIONS.map(({ key, label }) => (
+			<li>
+				<ScoreMeter score={scores[key]} label={label} size="compact" />
+			</li>
+		))}
+	</ul>
+</section>

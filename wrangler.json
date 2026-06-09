@@ -7,6 +7,13 @@
 		"directory": "./dist",
 		"binding": "ASSETS"
 	},
+	"d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "wmpolitics-votes",
+      "database_id": "0eda37ee-e7b6-4710-92f7-5c921b094c6a"
+    }
+	],
 	"observability": {
 		"enabled": true
 	},

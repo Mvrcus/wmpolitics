@@ -1,0 +1,56 @@
+---
+import BaseHead from '../../../components/BaseHead.astro';
+import Header from '../../../components/Header.astro';
+import Footer from '../../../components/Footer.astro';
+import LegislatorCard from '../../../components/LegislatorCard.astro';
+import { SITE_TITLE } from '../../../consts';
+import { getPastLegislatorsBySeat } from '../../../lib/content';
+
+const groups = await getPastLegislatorsBySeat();
+const title = `Past officeholders | ${SITE_TITLE}`;
+const description =
+	'Former federal, state, and local officials who previously held seats affecting Holland and West Michigan.';
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<BaseHead title={title} description={description} />
+	</head>
+	<body>
+		<Header />
+		<main>
+			<header class="page-header">
+				<h1>Past officeholders</h1>
+				<p class="hero-lead">
+					Former elected officials grouped by seat. Each person has their own profile page.
+				</p>
+				<p class="hero-lead">
+					<a href="/legislators/">← Back to current officeholders</a>
+				</p>
+			</header>
+
+			{
+				groups.length === 0 ? (
+					<section class="section prose">
+						<p>No past profiles yet. See README for how to add them.</p>
+					</section>
+				) : (
+					groups.map(({ seatLabel, legislators }) => (
+						<section class="office-group">
+							<h2>{seatLabel}</h2>
+							<ul class="card-grid">
+								{legislators.map((leg) => (
+									<li>
+										<LegislatorCard legislator={leg} />
+									</li>
+								))}
+							</ul>
+						</section>
+					))
+				)
+			}
+		</main>
+		<Footer />
+	</body>
+</html>

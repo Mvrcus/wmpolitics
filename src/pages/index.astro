@@ -2,48 +2,183 @@
 import BaseHead from '../components/BaseHead.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
-import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
+import StructuredData from '../components/StructuredData.astro';
+import LegislatorCard from '../components/LegislatorCard.astro';
+import ArticleCard from '../components/ArticleCard.astro';
+import NewsletterSignup from '../components/NewsletterSignup.astro';
+import FormattedDate from '../components/FormattedDate.astro';
+import { SITE_TITLE, SITE_DESCRIPTION, SITE_URL } from '../consts';
+import { resolveEditorialScores } from '../lib/scores';
+import {
+	getFeaturedArticles,
+	getLatestArticles,
+	getHollandLegislators,
+	getLegislatorBySlug,
+} from '../lib/content';
+
+const featuredCandidates = await getFeaturedArticles();
+const allLatest = await getLatestArticles();
+const featuredArticle = featuredCandidates[0] ?? allLatest[0];
+const latestArticles = allLatest
+	.filter((a) => a.id !== featuredArticle?.id)
+	.slice(0, 3);
+
+const huizenga = await getLegislatorBySlug('bill-huizenga');
+const huizengaScores = huizenga ? resolveEditorialScores(huizenga) : null;
+const hollandLegislators = (await getHollandLegislators()).slice(0, 3);
 ---
 
 <!doctype html>
 <html lang="en">
 	<head>
 		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+		<link
+			rel="preload"
+			as="image"
+			type="image/jpeg"
+			href="/images/holland-home-hero-1024.jpg"
+			imagesrcset="/images/holland-home-hero-640.jpg 640w, /images/holland-home-hero-1024.jpg 1024w, /images/holland-home-hero-1600.jpg 1600w"
+			imagesizes="(min-width: 768px) min(100vw, 1200px), 100vw"
+			fetchpriority="high"
+		/>
+		<StructuredData
+			data={{
+				'@context': 'https://schema.org',
+				'@type': 'WebSite',
+				name: SITE_TITLE,
+				description: SITE_DESCRIPTION,
+				url: SITE_URL,
+				potentialAction: {
+					'@type': 'SearchAction',
+					target: `${SITE_URL}/legislators/`,
+					'query-input': 'required name=search_term_string',
+				},
+			}}
+		/>
 	</head>
 	<body>
 		<Header />
 		<main>
-			<h1>🧑‍🚀 Hello, Astronaut!</h1>
-			<p>
-				Welcome to the official <a href="https://astro.build/">Astro</a> blog starter template. This
-				template serves as a lightweight, minimally-styled starting point for anyone looking to build
-				a personal website, blog, or portfolio with Astro.
-			</p>
-			<p>
-				This template comes with a few integrations already configured in your
-				<code>astro.config.mjs</code> file. You can customize your setup with
-				<a href="https://astro.build/integrations">Astro Integrations</a> to add tools like Tailwind,
-				React, or Vue to your project.
-			</p>
-			<p>Here are a few ideas on how to get started with the template:</p>
-			<ul>
-				<li>Edit this page in <code>src/pages/index.astro</code></li>
-				<li>Edit the site header items in <code>src/components/Header.astro</code></li>
-				<li>Add your name to the footer in <code>src/components/Footer.astro</code></li>
-				<li>Check out the included blog posts in <code>src/content/blog/</code></li>
-				<li>Customize the blog post page layout in <code>src/layouts/BlogPost.astro</code></li>
-			</ul>
-			<p>
-				Have fun! If you get stuck, remember to <a href="https://docs.astro.build/"
-					>read the docs
-				</a> or <a href="https://astro.build/chat">join us on Discord</a> to ask questions.
-			</p>
-			<p>
-				Looking for a blog template with a bit more personality? Check out <a
-					href="https://github.com/Charca/astro-blog-template"
-					>astro-blog-template
-				</a> by <a href="https://twitter.com/Charca">Maxi Ferreira</a>.
-			</p>
+			{featuredArticle && (
+				<section class="featured-hero" aria-label="Featured story">
+					<figure class="featured-hero-image">
+						<img
+							src="/images/holland-home-hero-1024.jpg"
+							srcset="/images/holland-home-hero-640.jpg 640w, /images/holland-home-hero-1024.jpg 1024w, /images/holland-home-hero-1600.jpg 1600w"
+							sizes="(min-width: 768px) min(100vw, 1200px), 100vw"
+							alt="De Zwaan windmill and gardens in Holland, Michigan"
+							width={1600}
+							height={1191}
+							loading="eager"
+							decoding="async"
+							fetchpriority="high"
+						/>
+						<figcaption>
+							De Zwaan windmill, Holland — photo: Peter C in Toronto Canada,
+							<a href="https://commons.wikimedia.org/wiki/File:Holland_MI_16M_(3858254690).jpg" target="_blank" rel="noopener noreferrer">Wikimedia Commons</a> (CC BY 2.0)
+						</figcaption>
+					</figure>
+					<div class="featured-main">
+						{featuredArticle.data.category && (
+							<span class="category-label">{featuredArticle.data.category}</span>
+						)}
+						<h2>
+							<a href={`/updates/${featuredArticle.id}/`}>{featuredArticle.data.title}</a>
+						</h2>
+						<p class="featured-dek">{featuredArticle.data.description}</p>
+						<p class="featured-meta">
+							<FormattedDate date={featuredArticle.data.pubDate} />
+						</p>
+					</div>
+					{huizenga && (
+						<aside class="featured-side">
+							<p class="featured-side-label">Representing Holland</p>
+							<LegislatorCard legislator={huizenga} />
+						</aside>
+					)}
+				</section>
+			)}
+
+			{huizenga && huizengaScores && (
+				<section class="community-teaser tomato-tar-teaser" aria-labelledby="community-teaser-heading">
+					<div>
+						<h2 id="community-teaser-heading">Tar &amp; Feather Score</h2>
+						<p class="community-teaser-copy">
+							Feathers for strong service — tar &amp; feather when the town has had enough. One quick
+							vote on each profile; see how community scores compare to our editorial scorecard for{' '}
+							{huizenga.data.name}.
+						</p>
+						<div class="community-teaser-actions">
+							<a href={`/legislators/${huizenga.data.slug}/#community-vote`} class="btn">
+								Cast your score
+							</a>
+							<a href="/legislators/" class="btn btn-outline">
+								All profiles
+							</a>
+						</div>
+					</div>
+					<div class="community-teaser-meter tomato-tar-teaser-meter">
+						<p class="legislator-score-hero-label">Editorial — {huizenga.data.name}</p>
+						<p class="tomato-tar-teaser-score">
+							<strong>{huizengaScores.overall}</strong> / 5 overall
+						</p>
+						<p class="tomato-tar-teaser-versus">
+							Editorial: {huizengaScores.overall} · Community: vote on profile
+						</p>
+					</div>
+				</section>
+			)}
+
+			<section class="newsletter-block" id="newsletter">
+				<NewsletterSignup />
+			</section>
+
+			<section class="section">
+				<div class="section-header">
+					<h2>Latest</h2>
+					<a href="/updates/">All updates</a>
+				</div>
+				<ul class="article-grid article-grid--three">
+					{latestArticles.map((article) => (
+						<li>
+							<ArticleCard article={article} />
+						</li>
+					))}
+				</ul>
+			</section>
+
+			<section class="local-section">
+				<div class="section-header">
+					<h2>Holland & West Michigan</h2>
+					<a href="/holland/">Local reporting</a>
+				</div>
+				<p class="hero-lead" style="margin-bottom: 2rem;">
+					Who represents Holland and Ottawa County—from Congress to the county board—and how to
+					understand their records.
+				</p>
+				<ul class="card-grid card-grid--three">
+					{hollandLegislators.map((leg) => (
+						<li>
+							<LegislatorCard legislator={leg} />
+						</li>
+					))}
+				</ul>
+			</section>
+
+			<section class="section">
+				<div class="section-header">
+					<h2>Legislators</h2>
+					<a href="/legislators/">View all</a>
+				</div>
+				<p class="hero-lead" style="margin-bottom: 2rem;">
+					Balanced profiles: what supporters highlight and what critics raise, with sources you
+					can verify.
+				</p>
+				<div class="start-links">
+					<a href="/legislators/" class="btn">Browse profiles</a>
+					<a href="/about/" class="btn btn-outline">Our standards</a>
+				</div>
+			</section>
 		</main>
 		<Footer />
 	</body>

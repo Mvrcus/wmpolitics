@@ -1,0 +1,140 @@
+---
+import type { CollectionEntry } from "astro:content";
+import { formatTermRange, isCurrentLegislator } from "../lib/legislators";
+
+interface Props {
+	legislator: CollectionEntry<"legislators">;
+}
+
+const { legislator } = Astro.props;
+const { name, slug, office, district, party, summary, proximityRank, photo, termStart, termEnd } =
+	legislator.data;
+const isOfficialPortrait = slug === 'bill-huizenga';
+const isPast = !isCurrentLegislator(legislator);
+const termDisplay = formatTermRange(termStart, termEnd);
+
+const officeLabels: Record<string, string> = {
+	"us-house": "U.S. House",
+	"us-senate": "U.S. Senate",
+	"state-house": "State House",
+	"state-senate": "State Senate",
+	local: "Local",
+};
+
+const partyClass = party?.toLowerCase().includes("democrat")
+	? "party-d"
+	: party?.toLowerCase().includes("republican")
+		? "party-r"
+		: "";
+---
+
+<article class="legislator-card">
+	<a href={`/legislators/${slug}/`} class="legislator-card-link">
+		{photo && (
+			<figure class="legislator-card-photo">
+				<img
+					src={photo}
+					alt={
+						isOfficialPortrait
+							? `Official portrait of ${name}`
+							: `Representative imagery for ${name}`
+					}
+					width={120}
+					height={150}
+					loading="lazy"
+					decoding="async"
+				/>
+			</figure>
+		)}
+		<div class="card-meta">
+			<span class="category-label">{officeLabels[office] ?? office}</span>
+			{party && <span class:list={["category-label", partyClass]}>{party}</span>}
+			{isPast && <span class="category-label">Past</span>}
+			{proximityRank === 1 && <span class="category-label badge-holland">Holland area</span>}
+		</div>
+		<h3>{name}</h3>
+		<p class="district">
+			{district}
+			{termDisplay && <span class="term-range"> · {termDisplay}</span>}
+		</p>
+		<p class="summary">{summary}</p>
+		<span class="read-more">View profile</span>
+	</a>
+</article>
+
+<style>
+	.legislator-card {
+		border-top: 2px solid var(--color-black);
+		padding-top: 1.25rem;
+		height: 100%;
+	}
+
+	.legislator-card-link {
+		display: flex;
+		flex-direction: column;
+		height: 100%;
+		text-decoration: none;
+		color: inherit;
+	}
+
+	.legislator-card-photo {
+		margin: 0 0 1rem;
+		aspect-ratio: 4 / 5;
+		max-width: 7.5rem;
+		overflow: hidden;
+		border: 1px solid var(--color-border);
+	}
+
+	.legislator-card-photo img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		display: block;
+	}
+
+	.legislator-card-link:hover h3 {
+		color: var(--color-accent);
+	}
+
+	.card-meta {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.75rem;
+		margin-bottom: 0.5rem;
+	}
+
+	.legislator-card h3 {
+		font-size: clamp(1.25rem, 2vw, 1.5rem);
+		margin-bottom: 0.35rem;
+		transition: color 0.15s;
+	}
+
+	.district {
+		font-size: 0.8125rem;
+		color: var(--color-muted);
+		margin: 0 0 0.75rem;
+		text-transform: uppercase;
+		letter-spacing: 0.03em;
+	}
+
+	.summary {
+		font-size: 0.9375rem;
+		color: var(--color-muted);
+		line-height: 1.55;
+		flex-grow: 1;
+		margin: 0 0 1rem;
+	}
+
+	.read-more {
+		font-family: var(--font-sans);
+		font-size: 0.75rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.06em;
+		color: var(--color-black);
+	}
+
+	.legislator-card-link:hover .read-more {
+		color: var(--color-accent);
+	}
+</style>

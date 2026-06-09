@@ -1,21 +1,5 @@
 ---
-import { type CollectionEntry, getCollection } from 'astro:content';
-import BlogPost from '../../layouts/BlogPost.astro';
-import { render } from 'astro:content';
-
-export async function getStaticPaths() {
-	const posts = await getCollection('blog');
-	return posts.map((post) => ({
-		params: { slug: post.id },
-		props: post,
-	}));
-}
-type Props = CollectionEntry<'blog'>;
-
-const post = Astro.props;
-const { Content } = await render(post);
+const slug = Astro.params.slug;
+const path = Array.isArray(slug) ? slug.join("/") : slug;
+return Astro.redirect(`/updates/${path}/`, 301);
 ---
-
-<BlogPost {...post.data}>
-	<Content />
-</BlogPost>

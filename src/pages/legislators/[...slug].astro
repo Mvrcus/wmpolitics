@@ -1,0 +1,194 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseHead from '../../components/BaseHead.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import PerspectiveToggle from '../../components/PerspectiveToggle.astro';
+import StructuredData from '../../components/StructuredData.astro';
+import ArticleCard from '../../components/ArticleCard.astro';
+import LegislatorCard from '../../components/LegislatorCard.astro';
+import LegislatorSidebar from '../../components/LegislatorSidebar.astro';
+import { SITE_TITLE, SITE_URL } from '../../consts';
+import {
+	OFFICE_LABELS,
+	formatTermRange,
+	getCurrentHolderForSeat,
+	getPastHoldersForSeat,
+	isCurrentLegislator,
+	seatLabel,
+} from '../../lib/legislators';
+import { getArticlesForLegislator } from '../../lib/content';
+import { resolveEditorialScores } from '../../lib/scores';
+import CommunitySubmissions from '../../components/CommunitySubmissions.astro';
+import CommunitySubmissionForm from '../../components/CommunitySubmissionForm.astro';
+
+export async function getStaticPaths() {
+	const legislators = await getCollection('legislators');
+	return legislators.map((entry) => ({
+		params: { slug: entry.data.slug },
+		props: { entry },
+	}));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const d = entry.data;
+const coverage = await getArticlesForLegislator(d.slug);
+const editorialScores = resolveEditorialScores(entry);
+const pageTitle = `${d.name} | ${SITE_TITLE}`;
+const profileUrl = new URL(`/legislators/${d.slug}/`, SITE_URL).href;
+const allLegislators = await getCollection('legislators');
+const isCurrent = isCurrentLegislator(entry);
+const pastHolders = isCurrent ? getPastHoldersForSeat(allLegislators, d.seatSlug) : [];
+const currentHolder = !isCurrent ? getCurrentHolderForSeat(allLegislators, d.seatSlug) : undefined;
+const termDisplay = formatTermRange(d.termStart, d.termEnd);
+const label = seatLabel(entry);
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<BaseHead title={pageTitle} description={d.summary} image={d.photo} />
+		<StructuredData
+			data={{
+				'@context': 'https://schema.org',
+				'@type': 'Person',
+				name: d.name,
+				description: d.summary,
+				url: profileUrl,
+				...(d.party && {
+					affiliation: { '@type': 'Organization', name: `${d.party} Party` },
+				}),
+				jobTitle: OFFICE_LABELS[d.office] ?? d.office,
+			}}
+		/>
+	</head>
+	<body>
+		<Header />
+		<main class="article-page legislator-profile legislator-page--with-sidebar">
+			<div class="legislator-layout">
+				<header class="legislator-header">
+					{d.photo && (
+						<figure class="legislator-photo">
+							<img
+								src={d.photo}
+								alt={
+									d.slug === 'bill-huizenga'
+										? `Official portrait of ${d.name}, U.S. House of Representatives`
+										: `Representative imagery for ${d.name} (not an official portrait)`
+								}
+								width={400}
+								height={500}
+								loading="eager"
+								decoding="async"
+							/>
+						</figure>
+					)}
+					<div class="legislator-header-text">
+						<div class="card-meta">
+							<span class="category-label">{OFFICE_LABELS[d.office]}</span>
+							{d.party && <span class="category-label">{d.party}</span>}
+							{!isCurrent && <span class="category-label">Past officeholder</span>}
+							{d.servesHolland && <span class="category-label badge-holland">Serves Holland</span>}
+						</div>
+						<h1>{d.name}</h1>
+						<p class="article-meta">
+							{d.district}
+							{termDisplay && <span class="term-range"> · {termDisplay}</span>}
+						</p>
+					</div>
+				</header>
+
+				<LegislatorSidebar entry={entry} editorialScores={editorialScores} />
+
+				<div class="legislator-main">
+					<p class="hero-lead legislator-lead">{d.summary}</p>
+
+					<PerspectiveToggle name={d.name} goodPoints={d.goodPoints} concerns={d.concerns} />
+
+					<CommunitySubmissions slug={d.slug} />
+					<CommunitySubmissionForm slug={d.slug} legislatorName={d.name} />
+
+					<div class="prose profile-body">
+						<Content />
+					</div>
+
+					{
+						coverage.length > 0 && (
+							<section class="section legislator-coverage">
+								<div class="section-header">
+									<h2>Coverage</h2>
+								</div>
+								<ul class="article-grid">
+									{coverage.map((article) => (
+										<li>
+											<ArticleCard article={article} />
+										</li>
+									))}
+								</ul>
+							</section>
+						)
+					}
+
+					{
+						isCurrent && pastHolders.length > 0 && (
+							<section class="section legislator-seat-history">
+								<div class="section-header">
+									<h2>Previous officeholders</h2>
+								</div>
+								<p class="hero-lead">
+									Former representatives for {label}.
+								</p>
+								<ul class="card-grid">
+									{pastHolders.map((legislator) => (
+										<li>
+											<LegislatorCard legislator={legislator} />
+										</li>
+									))}
+								</ul>
+							</section>
+						)
+					}
+
+					{
+						!isCurrent && currentHolder && (
+							<section class="section legislator-seat-history">
+								<div class="section-header">
+									<h2>Current officeholder</h2>
+								</div>
+								<p class="hero-lead">
+									{label} is currently held by {currentHolder.data.name}.
+								</p>
+								<ul class="card-grid">
+									<li>
+										<LegislatorCard legislator={currentHolder} />
+									</li>
+								</ul>
+							</section>
+						)
+					}
+
+					{
+						d.sources && d.sources.length > 0 && (
+							<section class="section">
+								<div class="section-header">
+									<h2>Sources</h2>
+								</div>
+								<ul class="prose">
+									{d.sources.map((s) => (
+										<li>
+											<a href={s.url} target="_blank" rel="noopener noreferrer">
+												{s.label}
+											</a>
+										</li>
+									))}
+								</ul>
+							</section>
+						)
+					}
+				</div>
+			</div>
+		</main>
+		<Footer />
+	</body>
+</html>

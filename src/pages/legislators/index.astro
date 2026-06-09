@@ -1,0 +1,50 @@
+---
+import BaseHead from '../../components/BaseHead.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import LegislatorCard from '../../components/LegislatorCard.astro';
+import { SITE_TITLE } from '../../consts';
+import { getLegislatorsByOffice } from '../../lib/content';
+
+const groups = await getLegislatorsByOffice();
+const title = `Legislators | ${SITE_TITLE}`;
+const description = 'Profiles of federal, state, and local officials affecting Holland and West Michigan.';
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<BaseHead title={title} description={description} />
+	</head>
+	<body>
+		<Header />
+		<main>
+			<header class="page-header">
+				<h1>Legislators</h1>
+				<p class="hero-lead">
+					Current officeholders grouped by office. Holland-area representatives appear first
+					within each section.
+				</p>
+				<p class="hero-lead">
+					<a href="/legislators/past/">View past officeholders →</a>
+				</p>
+			</header>
+
+			{
+				groups.map(({ label, legislators }) => (
+					<section class="office-group">
+						<h2>{label}</h2>
+						<ul class="card-grid">
+							{legislators.map((leg) => (
+								<li>
+									<LegislatorCard legislator={leg} />
+								</li>
+							))}
+						</ul>
+					</section>
+				))
+			}
+		</main>
+		<Footer />
+	</body>
+</html>

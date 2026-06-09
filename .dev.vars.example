@@ -1,0 +1,9 @@
+# Copy to .dev.vars for local wrangler dev / astro preview
+# Cloudflare Turnstile test keys (always pass):
+# Site: 1x00000000000000000000AA
+# Secret: 1x0000000000000000000000000000000AA
+
+TURNSTILE_SECRET_KEY=1x0000000000000000000000000000000AA
+VOTE_HASH_SALT=local-dev-salt-change-in-production
+DEV_SKIP_TURNSTILE=false
+# ADMIN_SECRET is optional (approve/reject API routes are disabled; moderate via D1 SQL — see README)

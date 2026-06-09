@@ -1,0 +1,34 @@
+---
+import FormattedDate from './FormattedDate.astro';
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+	article: CollectionEntry<'articles'>;
+}
+
+const { article } = Astro.props;
+const { title, description, pubDate, category, heroImage } = article.data;
+---
+
+<article class="article-card">
+	<a href={`/updates/${article.id}/`} class="article-card-link">
+		{heroImage && (
+			<figure class="article-card-image">
+				<img
+					src={heroImage}
+					alt=""
+					width={400}
+					height={225}
+					loading="lazy"
+					decoding="async"
+				/>
+			</figure>
+		)}
+		{category && <span class="category-label">{category}</span>}
+		<h3>{title}</h3>
+		<p class="article-card-excerpt">{description}</p>
+		<p class="article-card-meta">
+			<FormattedDate date={pubDate} />
+		</p>
+	</a>
+</article>

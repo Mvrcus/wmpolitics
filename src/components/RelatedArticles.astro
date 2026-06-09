@@ -1,0 +1,30 @@
+---
+import ArticleCard from './ArticleCard.astro';
+import { getRelatedArticles } from '../lib/content';
+
+interface Props {
+	slug: string;
+	limit?: number;
+	heading?: string;
+}
+
+const { slug, limit = 3, heading = 'Related updates' } = Astro.props;
+const articles = await getRelatedArticles(slug, limit);
+---
+
+{
+	articles.length > 0 && (
+		<section class="sidebar-block" aria-labelledby={`related-articles-${slug}`}>
+			<h2 id={`related-articles-${slug}`} class="sidebar-heading">
+				{heading}
+			</h2>
+			<ul class="sidebar-article-list">
+				{articles.map((article) => (
+					<li>
+						<ArticleCard article={article} />
+					</li>
+				))}
+			</ul>
+		</section>
+	)
+}

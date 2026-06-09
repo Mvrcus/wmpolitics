@@ -1,0 +1,171 @@
+---
+interface Point {
+	title: string;
+	body: string;
+	source?: string;
+}
+
+interface Props {
+	name: string;
+	goodPoints: Point[];
+	concerns: Point[];
+}
+
+const { name, goodPoints, concerns } = Astro.props;
+const highlightCount = goodPoints.length;
+const concernCount = concerns.length;
+---
+
+<section class="perspective" data-perspective>
+	<p class="perspective-editorial-label">Editorial analysis (sourced)</p>
+	<div class="perspective-tabs-wrap">
+		<div
+			class="perspective-tabs"
+			role="tablist"
+			aria-label={`Perspectives on ${name}`}
+		>
+			<button
+				type="button"
+				role="tab"
+				id="tab-supporters"
+				aria-selected="true"
+				aria-controls="panel-supporters"
+				data-tab="supporters"
+				class="perspective-tab perspective-tab--supporters active"
+			>
+				<span class="perspective-tab-icon" aria-hidden="true">
+					<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+						<path d="M7 10v12" /><path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2a3.13 3.13 0 0 1 3 3.88Z" />
+					</svg>
+				</span>
+				<span class="perspective-tab-label">Supporter highlights</span>
+				<span class="perspective-tab-badge">{highlightCount} highlight{highlightCount === 1 ? '' : 's'}</span>
+			</button>
+			<button
+				type="button"
+				role="tab"
+				id="tab-critics"
+				aria-selected="false"
+				aria-controls="panel-critics"
+				data-tab="critics"
+				class="perspective-tab perspective-tab--critics"
+				tabindex="-1"
+			>
+				<span class="perspective-tab-icon" aria-hidden="true">
+					<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+						<path d="M17 14V2" /><path d="M9 18.12 10 14H4.17a2 2 0 0 1-1.92-2.56l2.33-8A2 2 0 0 1 6.5 2H20a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2.76a2 2 0 0 0-1.79 1.11L12 22a3.13 3.13 0 0 1-3-3.88Z" />
+					</svg>
+				</span>
+				<span class="perspective-tab-label">Critic concerns</span>
+				<span class="perspective-tab-badge">{concernCount} concern{concernCount === 1 ? '' : 's'}</span>
+			</button>
+		</div>
+		<p class="perspective-helper">
+			Tap to compare perspectives — West Michigan is politically mixed.
+		</p>
+	</div>
+
+	<div class="perspective-panels">
+		<div
+			id="panel-supporters"
+			role="tabpanel"
+			aria-labelledby="tab-supporters"
+			class="panel panel-supporters"
+		>
+			<ul class="point-list">
+				{
+					goodPoints.map((point) => (
+						<li>
+							<span class="point-badge point-badge--editorial">Verified by WM Politics</span>
+							<h3>{point.title}</h3>
+							<p>{point.body}</p>
+							{point.source && (
+								<p class="point-source">
+									<a href={point.source} target="_blank" rel="noopener noreferrer">
+										Source
+									</a>
+								</p>
+							)}
+						</li>
+					))
+				}
+			</ul>
+		</div>
+		<div
+			id="panel-critics"
+			role="tabpanel"
+			aria-labelledby="tab-critics"
+			class="panel panel-critics"
+			hidden
+		>
+			<ul class="point-list">
+				{
+					concerns.map((point) => (
+						<li>
+							<span class="point-badge point-badge--editorial">Verified by WM Politics</span>
+							<h3>{point.title}</h3>
+							<p>{point.body}</p>
+							{point.source && (
+								<p class="point-source">
+									<a href={point.source} target="_blank" rel="noopener noreferrer">
+										Source
+									</a>
+								</p>
+							)}
+						</li>
+					))
+				}
+			</ul>
+		</div>
+	</div>
+</section>
+
+<script>
+	function initPerspective(root: HTMLElement) {
+		const tabs = Array.from(root.querySelectorAll<HTMLButtonElement>('[role="tab"]'));
+		const supporters = root.querySelector('#panel-supporters') as HTMLElement;
+		const critics = root.querySelector('#panel-critics') as HTMLElement;
+
+		function activateTab(tab: HTMLButtonElement) {
+			const which = tab.dataset.tab;
+			tabs.forEach((t) => {
+				const selected = t === tab;
+				t.setAttribute('aria-selected', String(selected));
+				t.classList.toggle('active', selected);
+				t.tabIndex = selected ? 0 : -1;
+			});
+			supporters.hidden = which !== 'supporters';
+			critics.hidden = which !== 'critics';
+		}
+
+		tabs.forEach((tab) => {
+			tab.addEventListener('click', () => activateTab(tab));
+
+			tab.addEventListener('keydown', (e) => {
+				const idx = tabs.indexOf(tab);
+				let next = idx;
+
+				if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+					e.preventDefault();
+					next = (idx + 1) % tabs.length;
+				} else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+					e.preventDefault();
+					next = (idx - 1 + tabs.length) % tabs.length;
+				} else if (e.key === 'Home') {
+					e.preventDefault();
+					next = 0;
+				} else if (e.key === 'End') {
+					e.preventDefault();
+					next = tabs.length - 1;
+				} else {
+					return;
+				}
+
+				tabs[next].focus();
+				activateTab(tabs[next]);
+			});
+		});
+	}
+
+	document.querySelectorAll<HTMLElement>('[data-perspective]').forEach(initPerspective);
+</script>

@@ -1,0 +1,29 @@
+---
+import LegislatorCard from './LegislatorCard.astro';
+import { resolveArticleLegislators, type ArticleEntry } from '../lib/content';
+
+interface Props {
+	article: ArticleEntry;
+	heading?: string;
+}
+
+const { article, heading = 'In this story' } = Astro.props;
+const legislators = await resolveArticleLegislators(article);
+---
+
+{
+	legislators.length > 0 && (
+		<section class="sidebar-block" aria-labelledby={`related-legislators-${article.id}`}>
+			<h2 id={`related-legislators-${article.id}`} class="sidebar-heading">
+				{heading}
+			</h2>
+			<ul class="sidebar-legislator-list">
+				{legislators.map((legislator) => (
+					<li>
+						<LegislatorCard legislator={legislator} />
+					</li>
+				))}
+			</ul>
+		</section>
+	)
+}

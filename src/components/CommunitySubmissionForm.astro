@@ -1,0 +1,167 @@
+---
+interface Props {
+	slug: string;
+	legislatorName: string;
+}
+
+const { slug, legislatorName } = Astro.props;
+
+const siteKey =
+	import.meta.env.PUBLIC_TURNSTILE_SITE_KEY ?? '1x00000000000000000000AA';
+const submissionsEnabled =
+	import.meta.env.PUBLIC_VOTING_ENABLED !== 'false' &&
+	(Boolean(import.meta.env.PUBLIC_TURNSTILE_SITE_KEY) || import.meta.env.DEV);
+---
+
+<section
+	class="community-submit"
+	id="community-submit"
+	data-submit-root
+	data-slug={slug}
+	data-enabled={submissionsEnabled ? 'true' : 'false'}
+>
+	<header class="community-submit-header">
+		<h2>Share a concern or highlight</h2>
+		<p class="community-submit-lead">
+			Submissions appear in the unfiltered (pending) section on {legislatorName}'s profile until approved
+			in the database. One concern and one highlight per week from your device.
+		</p>
+	</header>
+
+	{submissionsEnabled ? (
+		<form class="community-submit-form" data-submit-form novalidate>
+			<fieldset class="community-submit-types">
+				<legend class="sr-only">Submission type</legend>
+				<label class="community-submit-type">
+					<input type="radio" name="submission_type" value="concern" required checked />
+					<span>Concern</span>
+				</label>
+				<label class="community-submit-type">
+					<input type="radio" name="submission_type" value="highlight" />
+					<span>Supporter highlight</span>
+				</label>
+			</fieldset>
+
+			<label class="community-submit-field">
+				<span>Title</span>
+				<input type="text" name="title" required maxlength="120" placeholder="Short headline" />
+			</label>
+
+			<label class="community-submit-field">
+				<span>Details</span>
+				<textarea name="body" required maxlength="2000" rows="4" placeholder="What should neighbors know?" />
+			</label>
+
+			<label class="community-submit-field">
+				<span>Source URL <em>(optional)</em></span>
+				<input type="url" name="source" placeholder="https://…" />
+			</label>
+
+			<div class="hp-field" aria-hidden="true">
+				<label for={`submit-hp-${slug}`}>Website</label>
+				<input type="text" id={`submit-hp-${slug}`} name="website" tabindex="-1" autocomplete="off" />
+			</div>
+
+			<div class="turnstile-wrap" data-submit-turnstile></div>
+
+			<p class="community-submit-status" data-submit-status role="status"></p>
+
+			<button type="submit" class="btn">Submit to community</button>
+		</form>
+	) : (
+		<p class="community-submit-unavailable">Community submissions are not available yet.</p>
+	)}
+</section>
+
+<script define:vars={{ slug, siteKey, siteKeySubmit: siteKey }}>
+	const root = document.querySelector(`[data-submit-root][data-slug="${slug}"]`);
+	if (!root || root.dataset.enabled !== 'true') return;
+
+	const form = root.querySelector('[data-submit-form]');
+	const statusEl = root.querySelector('[data-submit-status]');
+	const turnstileEl = root.querySelector('[data-submit-turnstile]');
+	let turnstileToken = '';
+
+	function setStatus(message, type = '') {
+		if (!statusEl) return;
+		statusEl.textContent = message;
+		statusEl.className = `community-submit-status${type ? ` community-submit-status--${type}` : ''}`;
+	}
+
+	function loadTurnstile() {
+		if (!turnstileEl) return;
+		const renderWidget = () => {
+			if (!window.turnstile) return;
+			window.turnstile.render(turnstileEl, {
+				sitekey: siteKeySubmit,
+				theme: 'light',
+				callback: (token) => {
+					turnstileToken = token;
+				},
+				'expired-callback': () => {
+					turnstileToken = '';
+				},
+			});
+		};
+		if (window.turnstile) {
+			renderWidget();
+			return;
+		}
+		const script = document.createElement('script');
+		script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
+		script.async = true;
+		script.onload = renderWidget;
+		document.head.appendChild(script);
+	}
+
+	loadTurnstile();
+
+	form?.addEventListener('submit', async (e) => {
+		e.preventDefault();
+		if (!form) return;
+
+		const fd = new FormData(form);
+		const payload = {
+			legislator_slug: slug,
+			submission_type: String(fd.get('submission_type')),
+			title: String(fd.get('title') ?? '').trim(),
+			body: String(fd.get('body') ?? '').trim(),
+			source: String(fd.get('source') ?? '').trim() || undefined,
+			turnstile_token: turnstileToken,
+			website: String(fd.get('website') ?? ''),
+		};
+
+		if (!payload.title || !payload.body) {
+			setStatus('Title and details are required.', 'error');
+			return;
+		}
+
+		if (!turnstileToken) {
+			setStatus('Complete the security check before submitting.', 'error');
+			return;
+		}
+
+		setStatus('Submitting…');
+
+		try {
+			const res = await fetch('/api/submit-concern', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(payload),
+			});
+			const data = await res.json();
+
+			if (res.ok) {
+				setStatus(data.message ?? 'Submission received.', 'success');
+				form.reset();
+				turnstileToken = '';
+				if (window.turnstile && turnstileEl) window.turnstile.reset(turnstileEl);
+				document.dispatchEvent(new CustomEvent('wmp:submissions-refresh', { detail: { slug } }));
+			} else {
+				setStatus(data.error ?? 'Could not submit.', 'error');
+			}
+		} catch {
+			setStatus('Network error. Please try again.', 'error');
+		}
+	});
+</script>

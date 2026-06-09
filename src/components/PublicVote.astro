@@ -1,0 +1,363 @@
+---
+interface Props {
+	slug: string;
+	legislatorName: string;
+	editorialOverall?: number;
+	compact?: boolean;
+}
+
+const { slug, legislatorName, editorialOverall, compact = false } = Astro.props;
+
+const siteKey =
+	import.meta.env.PUBLIC_TURNSTILE_SITE_KEY ?? '1x00000000000000000000AA';
+const votingEnabled =
+	import.meta.env.PUBLIC_VOTING_ENABLED !== 'false' &&
+	(Boolean(import.meta.env.PUBLIC_TURNSTILE_SITE_KEY) || import.meta.env.DEV);
+---
+
+<section
+	class:list={['public-vote', 'tomato-tar-vote', compact && 'public-vote--compact']}
+	id="community-vote"
+	data-vote-root
+	data-slug={slug}
+	data-voting-enabled={votingEnabled ? 'true' : 'false'}
+	data-editorial-overall={editorialOverall ?? ''}
+>
+	<header class="public-vote-header">
+		{
+			compact ? (
+				<h2 class="sidebar-heading">Tar &amp; Feather</h2>
+			) : (
+				<h2>Tar &amp; Feather Score</h2>
+			)
+		}
+		<p class="public-vote-lead">
+			{
+				compact ? (
+					<>One vote per profile — how is {legislatorName} doing?</>
+				) : (
+					<>
+						<em>Feathers for strong service — tar &amp; feather for a town ready to run them out.</em>{' '}
+						One vote per profile — how is {legislatorName} serving West Michigan?
+					</>
+				)
+			}
+		</p>
+	</header>
+
+	<div class="tomato-tar-chart-display" data-tomato-tar-display hidden>
+		<div class="tomato-tar-chart-canvas-wrap">
+			<canvas data-tomato-tar-chart aria-hidden="true"></canvas>
+			<div class="tomato-tar-chart-center" data-sentiment="">
+				<span class="tomato-tar-chart-score" data-tomato-tar-score>—</span>
+				<span class="tomato-tar-chart-unit">%</span>
+			</div>
+		</div>
+		<div class="tomato-tar-chart-meta">
+			<p class="tomato-tar-chart-label" data-tomato-tar-label>Feathered</p>
+			<p class="tomato-tar-chart-tagline" data-tomato-tar-tagline hidden></p>
+			<p class="tomato-tar-chart-count" data-vote-count></p>
+		</div>
+	</div>
+
+	{editorialOverall != null && (
+		<p class="tomato-tar-meter-compare" data-tomato-tar-compare>
+			Editorial: <strong>{editorialOverall}</strong>
+			<span aria-hidden="true"> · </span>
+			Community: <strong data-tomato-tar-compare-community>—</strong>
+		</p>
+	)}
+
+	{votingEnabled ? (
+		<form class="public-vote-form" data-vote-form novalidate>
+			<fieldset class="public-vote-fieldset">
+				<legend class="tomato-tar-vote-question">
+					How is {legislatorName} doing for West Michigan?
+				</legend>
+				<p class="tomato-tar-vote-hint">Tar on the left (shame), feather on the right (constituents are happy).</p>
+				<div class="tomato-tar-range">
+					<div class="tomato-tar-range-labels">
+						<span>Tar</span>
+						<span class="tomato-tar-range-value" data-range-value aria-live="polite">3</span>
+						<span>Feather</span>
+					</div>
+					<input
+						type="range"
+						id={`vote-${slug}-overall`}
+						name="overall"
+						min="1"
+						max="5"
+						step="1"
+						value="3"
+						required
+						aria-valuemin={1}
+						aria-valuemax={5}
+						aria-valuenow={3}
+						aria-label={`Tar and feather score for ${legislatorName} in West Michigan`}
+					/>
+				</div>
+			</fieldset>
+
+			<div class="hp-field" aria-hidden="true">
+				<label for={`vote-hp-${slug}`}>Website</label>
+				<input type="text" id={`vote-hp-${slug}`} name="website" tabindex="-1" autocomplete="off" />
+			</div>
+
+			<div class="turnstile-wrap" data-turnstile></div>
+
+			<p class="public-vote-status" data-vote-status role="status"></p>
+
+			<button type="submit" class="btn" data-vote-submit>
+				Submit your score
+			</button>
+		</form>
+	) : (
+		<p class="public-vote-unavailable">Community scoring is not available yet. Check back after launch.</p>
+	)}
+</section>
+
+<script define:vars={{ slug, siteKey, storageKey: `wmp-voted-${slug}` }}>
+	const root = document.querySelector(`[data-vote-root][data-slug="${slug}"]`);
+	if (!root) return;
+
+	const displayEl = root.querySelector('[data-tomato-tar-display]');
+	const scoreEl = root.querySelector('[data-tomato-tar-score]');
+	const labelEl = root.querySelector('[data-tomato-tar-label]');
+	const taglineEl = root.querySelector('[data-tomato-tar-tagline]');
+	const centerEl = root.querySelector('.tomato-tar-chart-center');
+	const countEl = root.querySelector('[data-vote-count]');
+	const compareCommunityEl = root.querySelector('[data-tomato-tar-compare-community]');
+
+	const chartColors = {
+		feathered: { fill: '#c41e3a', track: '#e8e8e8' },
+		mixed: { fill: '#7c6a0a', track: '#e8e8e8' },
+		tarred: { fill: '#1a1a1a', track: '#e8e8e8' },
+	};
+
+	let scoreChart = null;
+
+	function sentimentLabel(pct) {
+		if (pct >= 60) return 'Feathered';
+		if (pct >= 40) return 'Mixed';
+		return 'Tarred';
+	}
+
+	function sentimentClass(pct) {
+		if (pct >= 60) return 'feathered';
+		if (pct >= 40) return 'mixed';
+		return 'tarred';
+	}
+
+	function avgToPercent(avg) {
+		return Math.round(avg * 20);
+	}
+
+	async function ensureChart() {
+		if (scoreChart) return scoreChart;
+		const canvas = root.querySelector('[data-tomato-tar-chart]');
+		if (!canvas) return null;
+
+		const { Chart, ArcElement, DoughnutController } = await import('chart.js');
+		Chart.register(ArcElement, DoughnutController);
+
+		scoreChart = new Chart(canvas, {
+			type: 'doughnut',
+			data: {
+				datasets: [
+					{
+						data: [0, 100],
+						backgroundColor: [chartColors.feathered.fill, chartColors.feathered.track],
+						borderWidth: 0,
+					},
+				],
+			},
+			options: {
+				responsive: true,
+				maintainAspectRatio: false,
+				cutout: '72%',
+				circumference: 180,
+				rotation: -90,
+				plugins: {
+					legend: { display: false },
+					tooltip: { enabled: false },
+				},
+				animation: { duration: 400 },
+			},
+		});
+
+		return scoreChart;
+	}
+
+	async function renderCommunity(data) {
+		const { averages, count } = data;
+		const avg = averages?.overall ?? 0;
+
+		if (!count || !avg) {
+			if (displayEl) displayEl.hidden = true;
+			return;
+		}
+
+		const pct = avgToPercent(avg);
+		const label = sentimentLabel(pct);
+		const cls = sentimentClass(pct);
+		const colors = chartColors[cls];
+
+		if (displayEl) displayEl.hidden = false;
+		if (scoreEl) scoreEl.textContent = String(pct);
+		if (labelEl) {
+			labelEl.textContent = label;
+			labelEl.dataset.sentiment = cls;
+		}
+		if (centerEl) centerEl.dataset.sentiment = cls;
+		if (taglineEl) {
+			if (pct >= 60) {
+				taglineEl.textContent = 'Feathers, not tar';
+				taglineEl.hidden = false;
+			} else {
+				taglineEl.hidden = true;
+				taglineEl.textContent = '';
+			}
+		}
+		if (countEl) {
+			countEl.textContent = `${count} community vote${count === 1 ? '' : 's'}`;
+		}
+		if (compareCommunityEl) {
+			compareCommunityEl.textContent = `${pct}% ${label}`;
+		}
+
+		const chart = await ensureChart();
+		if (chart) {
+			chart.data.datasets[0].data = [pct, 100 - pct];
+			chart.data.datasets[0].backgroundColor = [colors.fill, colors.track];
+			chart.update();
+		}
+	}
+
+	async function loadAggregates() {
+		try {
+			const res = await fetch(`/api/votes/${slug}`);
+			if (!res.ok) return;
+			await renderCommunity(await res.json());
+		} catch {
+			/* ignore */
+		}
+	}
+
+	loadAggregates();
+
+	if (root.dataset.votingEnabled !== 'true') return;
+
+	const form = root.querySelector('[data-vote-form]');
+	const statusEl = root.querySelector('[data-vote-status]');
+	const submitBtn = root.querySelector('[data-vote-submit]');
+	const turnstileEl = root.querySelector('[data-turnstile]');
+	const rangeInput = root.querySelector('input[type="range"][name="overall"]');
+	const rangeValueEl = root.querySelector('[data-range-value]');
+
+	let turnstileToken = '';
+
+	function setStatus(message, type = '') {
+		if (!statusEl) return;
+		statusEl.textContent = message;
+		statusEl.className = `public-vote-status${type ? ` public-vote-status--${type}` : ''}`;
+	}
+
+	function updateRangeDisplay() {
+		if (!rangeInput || !rangeValueEl) return;
+		const value = rangeInput.value;
+		rangeValueEl.textContent = value;
+		rangeInput.setAttribute('aria-valuenow', value);
+	}
+
+	rangeInput?.addEventListener('input', updateRangeDisplay);
+	updateRangeDisplay();
+
+	function loadTurnstile() {
+		if (!turnstileEl) return;
+		const renderWidget = () => {
+			if (!window.turnstile) return;
+			window.turnstile.render(turnstileEl, {
+				sitekey: siteKey,
+				theme: 'light',
+				callback: (token) => {
+					turnstileToken = token;
+				},
+				'expired-callback': () => {
+					turnstileToken = '';
+				},
+			});
+		};
+		if (window.turnstile) {
+			renderWidget();
+			return;
+		}
+		const script = document.createElement('script');
+		script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
+		script.async = true;
+		script.onload = renderWidget;
+		document.head.appendChild(script);
+	}
+
+	if (localStorage.getItem(storageKey)) {
+		setStatus('You already voted on this profile from this device.', 'info');
+		if (submitBtn) submitBtn.disabled = true;
+	}
+
+	loadTurnstile();
+
+	form?.addEventListener('submit', async (e) => {
+		e.preventDefault();
+		if (!form || submitBtn?.disabled) return;
+
+		const fd = new FormData(form);
+		const overall = Number(fd.get('overall'));
+
+		if (!overall || overall < 1 || overall > 5) {
+			setStatus('Pick a rating on the tar-to-feather scale before submitting.', 'error');
+			return;
+		}
+
+		const payload = {
+			legislator_slug: slug,
+			overall,
+			turnstile_token: turnstileToken,
+			website: String(fd.get('website') ?? ''),
+		};
+
+		if (!turnstileToken) {
+			setStatus('Complete the security check before submitting.', 'error');
+			return;
+		}
+
+		submitBtn.disabled = true;
+		setStatus('Submitting…');
+
+		try {
+			const res = await fetch('/api/vote', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(payload),
+			});
+			const data = await res.json();
+
+			if (res.ok) {
+				localStorage.setItem(storageKey, new Date().toISOString());
+				setStatus(data.message ?? 'Thanks, your score was recorded.', 'success');
+				form.reset();
+				updateRangeDisplay();
+				turnstileToken = '';
+				if (window.turnstile && turnstileEl) window.turnstile.reset(turnstileEl);
+				await loadAggregates();
+			} else if (res.status === 409) {
+				localStorage.setItem(storageKey, new Date().toISOString());
+				setStatus(data.error ?? 'You have already voted on this profile.', 'error');
+			} else {
+				setStatus(data.error ?? 'Could not submit your score.', 'error');
+				submitBtn.disabled = false;
+			}
+		} catch {
+			setStatus('Network error. Please try again.', 'error');
+			submitBtn.disabled = false;
+		}
+	});
+</script>

@@ -1,0 +1,20 @@
+---
+interface Props {
+	score: number;
+	label?: string;
+	size?: 'default' | 'compact';
+	showValue?: boolean;
+}
+
+const { score, label, size = 'default', showValue = true } = Astro.props;
+const clamped = Math.min(100, Math.max(0, Math.round(score)));
+---
+
+<div class:list={['score-meter', size === 'compact' && 'score-meter--compact']}>
+	{label && <span class="score-meter-label">{label}</span>}
+	<div class="score-meter-track" role="meter" aria-valuenow={clamped} aria-valuemin={0} aria-valuemax={100} aria-label={label ?? 'Score'}>
+		<div class="score-meter-fill" style={`width: ${clamped}%`}></div>
+		<div class="score-meter-tick" style="left: 50%"></div>
+	</div>
+	{showValue && <span class="score-meter-value">{clamped}</span>}
+</div>

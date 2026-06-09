@@ -1,0 +1,213 @@
+---
+interface Props {
+	slug: string;
+}
+
+const { slug } = Astro.props;
+
+const siteKey =
+	import.meta.env.PUBLIC_TURNSTILE_SITE_KEY ?? '1x00000000000000000000AA';
+const enabled =
+	import.meta.env.PUBLIC_VOTING_ENABLED !== 'false' &&
+	(Boolean(import.meta.env.PUBLIC_TURNSTILE_SITE_KEY) || import.meta.env.DEV);
+---
+
+<section
+	class="community-submissions"
+	data-submissions-root
+	data-slug={slug}
+	data-enabled={enabled ? 'true' : 'false'}
+	aria-label="Community submissions"
+>
+	<div class="community-submissions-verified" data-submissions-verified hidden>
+		<div class="community-submissions-header">
+			<h2>Verified community</h2>
+			<span class="community-badge community-badge--verified">Approved</span>
+		</div>
+		<p class="community-submissions-note">
+			Submissions with <code>status = 'approved'</code> in D1. Approve by updating the database (see README).
+		</p>
+		<ul class="community-submission-list" data-verified-list></ul>
+	</div>
+
+	<div class="community-submissions-unfiltered" data-submissions-unfiltered hidden>
+		<div class="community-submissions-header">
+			<h2>Unfiltered community</h2>
+			<span class="community-badge community-badge--unverified">Pending</span>
+		</div>
+		<p class="community-submissions-note">
+			New submissions stay here with <code>status = 'pending'</code> until an editor approves them in D1.
+		</p>
+		<ul class="community-submission-list" data-unfiltered-list></ul>
+	</div>
+
+	<p class="community-submissions-empty" data-submissions-empty hidden>
+		No community submissions yet. Be the first to share a concern or highlight below.
+	</p>
+</section>
+
+<script define:vars={{ slug, siteKey }}>
+	const root = document.querySelector(`[data-submissions-root][data-slug="${slug}"]`);
+	if (!root) return;
+
+	const verifiedWrap = root.querySelector('[data-submissions-verified]');
+	const unfilteredWrap = root.querySelector('[data-submissions-unfiltered]');
+	const verifiedList = root.querySelector('[data-verified-list]');
+	const unfilteredList = root.querySelector('[data-unfiltered-list]');
+	const emptyEl = root.querySelector('[data-submissions-empty]');
+
+	let turnstileToken = '';
+	let turnstileWidgetId = null;
+	let pendingVoteId = null;
+
+	function typeLabel(type) {
+		return type === 'highlight' ? 'Highlight' : 'Concern';
+	}
+
+	function renderItem(item, verified) {
+		const li = document.createElement('li');
+		li.className = `community-submission-item community-submission-item--${item.submission_type}`;
+		li.dataset.submissionId = String(item.id);
+
+		const badge = verified
+			? '<span class="community-badge community-badge--verified">Approved</span>'
+			: '<span class="community-badge community-badge--unverified">Pending</span>';
+
+		const source = item.source
+			? `<p class="community-submission-source"><a href="${item.source}" target="_blank" rel="noopener noreferrer">Source</a></p>`
+			: '';
+
+		li.innerHTML = `
+			<div class="community-submission-item-head">
+				<span class="community-submission-type">${typeLabel(item.submission_type)}</span>
+				${badge}
+			</div>
+			<h3>${escapeHtml(item.title)}</h3>
+			<p>${escapeHtml(item.body)}</p>
+			${source}
+			<div class="community-submission-actions">
+				<button type="button" class="btn btn-outline btn-sm" data-agree-btn data-id="${item.id}">
+					Helpful (<span data-agree-count>${item.agree_count}</span>)
+				</button>
+			</div>
+		`;
+
+		li.querySelector('[data-agree-btn]')?.addEventListener('click', () => startAgreeVote(item.id));
+		return li;
+	}
+
+	function escapeHtml(text) {
+		const div = document.createElement('div');
+		div.textContent = text;
+		return div.innerHTML;
+	}
+
+	function renderLists(data) {
+		const { approved = [], unfiltered = [] } = data;
+		if (verifiedList) verifiedList.replaceChildren();
+		if (unfilteredList) unfilteredList.replaceChildren();
+
+		approved.forEach((item) => verifiedList?.appendChild(renderItem(item, true)));
+		unfiltered.forEach((item) => unfilteredList?.appendChild(renderItem(item, false)));
+
+		const hasVerified = approved.length > 0;
+		const hasUnfiltered = unfiltered.length > 0;
+
+		if (verifiedWrap) verifiedWrap.hidden = !hasVerified;
+		if (unfilteredWrap) unfilteredWrap.hidden = !hasUnfiltered;
+		if (emptyEl) emptyEl.hidden = hasVerified || hasUnfiltered;
+	}
+
+	async function loadSubmissions() {
+		try {
+			const res = await fetch(`/api/submissions/${slug}`);
+			if (!res.ok) return;
+			renderLists(await res.json());
+		} catch {
+			/* ignore */
+		}
+	}
+
+	function ensureTurnstileModal() {
+		let modal = document.getElementById('submission-vote-turnstile');
+		if (modal) return modal;
+
+		modal = document.createElement('div');
+		modal.id = 'submission-vote-turnstile';
+		modal.className = 'submission-vote-modal';
+		modal.hidden = true;
+		modal.innerHTML = `
+			<div class="submission-vote-modal-inner">
+				<p>Confirm you're human to mark this helpful.</p>
+				<div data-vote-turnstile></div>
+				<button type="button" class="btn btn-outline btn-sm" data-vote-cancel>Cancel</button>
+			</div>
+		`;
+		document.body.appendChild(modal);
+		modal.querySelector('[data-vote-cancel]')?.addEventListener('click', () => {
+			modal.hidden = true;
+			pendingVoteId = null;
+		});
+		return modal;
+	}
+
+	function startAgreeVote(submissionId) {
+		if (root.dataset.enabled !== 'true') return;
+		pendingVoteId = submissionId;
+		const modal = ensureTurnstileModal();
+		modal.hidden = false;
+		const el = modal.querySelector('[data-vote-turnstile]');
+		if (!el || !window.turnstile) return;
+
+		if (turnstileWidgetId != null) {
+			window.turnstile.reset(turnstileWidgetId);
+		} else {
+			turnstileWidgetId = window.turnstile.render(el, {
+				sitekey: siteKey,
+				theme: 'light',
+				callback: (token) => {
+					turnstileToken = token;
+					submitAgreeVote();
+				},
+			});
+		}
+	}
+
+	async function submitAgreeVote() {
+		if (!pendingVoteId || !turnstileToken) return;
+
+		try {
+			const res = await fetch('/api/submission-vote', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					submission_id: pendingVoteId,
+					turnstile_token: turnstileToken,
+				}),
+			});
+			const data = await res.json();
+			if (res.ok) {
+				const btn = root.querySelector(`[data-id="${pendingVoteId}"] [data-agree-count]`);
+				if (btn) btn.textContent = String(data.agree_count);
+				document.getElementById('submission-vote-turnstile').hidden = true;
+			}
+			turnstileToken = '';
+			pendingVoteId = null;
+		} catch {
+			/* ignore */
+		}
+	}
+
+	loadSubmissions();
+
+	document.addEventListener('wmp:submissions-refresh', (e) => {
+		if (e.detail?.slug === slug) loadSubmissions();
+	});
+
+	if (!window.turnstile) {
+		const script = document.createElement('script');
+		script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
+		script.async = true;
+		document.head.appendChild(script);
+	}
+</script>
