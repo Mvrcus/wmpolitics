@@ -10,7 +10,7 @@ party: Nonpartisan
 photo: /images/nathan-bocks.jpg
 photoIsOfficial: true
 servesHolland: true
-proximityRank: 7
+proximityRank: 17
 summary: >-
   Mayor of Holland since 2019. Re-elected November 2025 to a fourth two-year term
   with about 73% of the vote. Also presides over the seven-member city council.

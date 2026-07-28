@@ -10,7 +10,7 @@ party: Republican
 photo: /images/nancy-deboer.jpg
 photoIsOfficial: true
 servesHolland: true
-proximityRank: 2
+proximityRank: 5
 summary: >-
   State representative for the greater Holland area since 2023. Former Holland
   mayor and city council member. Chairs the House Education and Workforce Committee.

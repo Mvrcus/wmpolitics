@@ -12,7 +12,7 @@ party: Democrat
 photo: /images/gretchen-whitmer.jpg
 photoIsOfficial: true
 servesHolland: true
-proximityRank: 8
+proximityRank: 4
 summary: >-
   Governor of Michigan since 2019, now in her second and final term (term-limited,
   ending January 2027). The governor signs or vetoes every state law that reaches

@@ -10,7 +10,7 @@ party: Republican
 photo: /images/jacob-bonnema.jpg
 photoIsOfficial: true
 servesHolland: true
-proximityRank: 6
+proximityRank: 11
 summary: >-
   Ottawa County commissioner for District 4 since 2023. Re-elected November 2024
   with about 62% of the vote. Covers Zeeland, Zeeland Charter Township, and four

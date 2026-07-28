@@ -2,19 +2,20 @@
 name: Mark Huizenga
 slug: mark-huizenga
 office: state-senate
-district: "Michigan Senate District 30 (Ottawa & Kent)"
+district: "Michigan Senate District 30 (Kent County — Walker & Grand Rapids area)"
 seatSlug: mi-state-senate-30
 seatLabel: State Senate District 30
 status: current
 party: Republican
 photo: /images/mark-huizenga.jpg
 photoIsOfficial: true
-servesHolland: true
-proximityRank: 3
+servesHolland: false
+proximityRank: 19
 summary: >-
-  State senator for District 30, covering parts of Ottawa and Kent counties including
-  areas west of Grand Rapids. Not related to U.S. Rep. Bill Huizenga. Won a narrow
-  2022 race and faces a competitive 2026 cycle.
+  State senator for District 30, a Kent County seat covering Walker and communities
+  west of Grand Rapids. Under the 2022 maps this district does not include Holland —
+  Holland's state senator is Roger Victory (District 31). Not related to U.S. Rep.
+  Bill Huizenga. Won a narrow 2022 race and faces a competitive 2026 cycle.
 editorialScores:
   accessibility: 78
   policyAlignment: 55
@@ -30,7 +31,7 @@ goodPoints:
   - title: Health policy committee role
     body: >-
       Minority vice chair on Finance and member of Health Policy and Human Services,
-      positioning him on Medicaid and provider-regulation debates affecting Ottawa County.
+      positioning him on Medicaid and provider-regulation debates affecting West Michigan.
     source: https://ballotpedia.org/Mark_Huizenga
   - title: Constituent office accessibility
     body: >-
@@ -42,7 +43,7 @@ concerns:
     body: >-
       Defeated David LaGrand by 405 votes in 2022. Democrats Carol Glanville and
       Richard Kreuzer are seeking the 2026 nomination, making this a likely battleground
-      that could shift policy attention away from Ottawa-specific issues.
+      that could shift policy attention away from district-specific issues.
     source: https://michiganadvance.com/briefs/kreuzer-launches-campaign-for-michigans-30th-senate-district/
   - title: Senate GOP minority constraints
     body: >-
@@ -56,4 +57,4 @@ sources:
     url: https://ballotpedia.org/Michigan_State_Senate_District_30
 ---
 
-Mark Huizenga (R-Walker) represents Senate District 30. Ottawa County communities including Holland interact with his office on state law, not federal casework.
+Mark Huizenga (R-Walker) represents Senate District 30, a Kent County district in the Walker and west-Grand Rapids area. Under the 2022 redistricting maps, Holland is not in his district — Holland's state senator is Roger Victory (District 31).
