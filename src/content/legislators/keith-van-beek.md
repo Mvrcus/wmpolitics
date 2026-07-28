@@ -6,6 +6,8 @@ district: "City of Holland — City Manager (appointed)"
 seatSlug: holland-city-manager
 seatLabel: Holland City Manager
 status: current
+photo: /images/keith-van-beek.jpg
+photoIsOfficial: true
 termStart: 2018
 servesHolland: true
 proximityRank: 18

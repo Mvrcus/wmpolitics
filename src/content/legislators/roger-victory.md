@@ -8,6 +8,8 @@ seatLabel: Michigan Senate District 31
 status: current
 termStart: 2019
 party: Republican
+photo: /images/roger-victory.jpg
+photoIsOfficial: true
 servesHolland: true
 proximityRank: 7
 summary: >-

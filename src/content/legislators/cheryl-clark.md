@@ -8,6 +8,8 @@ seatLabel: Ottawa County Treasurer
 status: current
 termStart: 2023
 party: Republican
+photo: /images/cheryl-clark.jpg
+photoIsOfficial: true
 servesHolland: true
 proximityRank: 16
 summary: >-

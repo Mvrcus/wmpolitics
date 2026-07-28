@@ -6,6 +6,8 @@ district: "Ottawa County Prosecuting Attorney (countywide)"
 seatSlug: ottawa-county-prosecutor
 seatLabel: Ottawa County Prosecuting Attorney
 status: current
+photo: /images/sarah-matwiejczyk.jpg
+photoIsOfficial: true
 servesHolland: true
 proximityRank: 14
 summary: >-
