@@ -31,7 +31,6 @@ All images are stored locally under `/images/`. Sources and licenses:
 | `jacob-bonnema.jpg` | Jacob Bonnema profile & cards | [Ottawa County Board — District 4](https://boards.miottawa.org/commissioner/district-4/) official 2025-term headshot | Same Ottawa County terms as above |
 
 Only the Whitmer photo carries a true free license (public domain). The rest are official government headshots used for civic/editorial purposes with source credit — standard practice for official portraits, but if the site ever runs ads or otherwise becomes commercial, request written permission (Ottawa County explicitly requires it for commercial use) or replace those images. `civic-placeholder.jpg` is retained as a fallback for any future officials without a usable portrait.
-Official portraits for state and local officials were not used where a clear public-domain headshot was unavailable; placeholder imagery is labeled in alt text on profile pages.
 
 ## Party symbol watermarks
 
