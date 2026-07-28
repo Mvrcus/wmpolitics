@@ -1,0 +1,196 @@
+/* Currency / pamphlet theme for the Start Here learning section.
+   Loaded only by /learn/ pages; every rule is scoped under body.cp-paper. */
+
+.cp-paper {
+	--cp-green: #1e4d38;
+	--cp-green-dark: #143427;
+	--cp-ink: #1c2b23;
+	--cp-cream: #f6f0dd;
+	--cp-parchment: #eee5cb;
+	--cp-gold: #a3781e;
+	--cp-gold-bright: #c9a227;
+	--cp-seal-red: #9e2b25;
+
+	color: var(--cp-ink);
+	background-color: var(--cp-parchment);
+	/* Fine engraving cross-hatch, like the field of a banknote */
+	background-image: repeating-linear-gradient(
+			45deg,
+			rgba(30, 77, 56, 0.04) 0 1px,
+			transparent 1px 7px
+		),
+		repeating-linear-gradient(-45deg, rgba(30, 77, 56, 0.035) 0 1px, transparent 1px 7px),
+		radial-gradient(ellipse 90% 40% at 50% 0%, rgba(163, 120, 30, 0.08), transparent 70%);
+}
+
+/* ── Type & links ───────────────────────────────────────────── */
+
+.cp-paper main h1,
+.cp-paper main h2,
+.cp-paper main h3 {
+	color: var(--cp-green-dark);
+}
+
+.cp-paper main .hero-lead {
+	color: var(--cp-ink);
+	opacity: 0.85;
+}
+
+.cp-paper main a:not(.btn) {
+	color: var(--cp-seal-red);
+}
+
+.cp-paper main a:not(.btn):hover {
+	color: var(--cp-gold);
+}
+
+.cp-paper .page-header {
+	border-bottom: none;
+	text-align: center;
+}
+
+.cp-paper .page-header .hero-lead {
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.cp-paper .section-header {
+	border-bottom: 2px solid var(--cp-green);
+	position: relative;
+}
+
+.cp-paper .section-header::after {
+	content: '';
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: -5px;
+	border-bottom: 1px solid var(--cp-gold);
+}
+
+/* ── Ornaments ──────────────────────────────────────────────── */
+
+/* Small-caps engraved label, e.g. "CIVIC PRIMER · SERIES OF 2026" */
+.cp-kicker {
+	font-family: var(--font-sans);
+	font-size: 0.75rem;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.22em;
+	color: var(--cp-gold);
+	margin: 0 0 0.6rem;
+}
+
+/* Ornamental rule: ──── ✦ ✦ ✦ ──── */
+.cp-rule {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	justify-content: center;
+	color: var(--cp-gold);
+	font-size: 0.8rem;
+	letter-spacing: 0.5em;
+	text-indent: 0.5em; /* balance the letter-spacing tail */
+	margin: 1rem auto;
+	max-width: 26rem;
+}
+
+.cp-rule::before,
+.cp-rule::after {
+	content: '';
+	flex: 1;
+	border-top: 1px solid var(--cp-gold);
+	box-shadow: 0 2px 0 rgba(163, 120, 30, 0.35);
+}
+
+/* Engraved certificate panel: double frame + gold corner studs */
+.cp-frame {
+	position: relative;
+	border: 2px solid var(--cp-green);
+	background-color: var(--cp-cream);
+	background-image: radial-gradient(circle, var(--cp-gold) 0 2.5px, transparent 3px),
+		radial-gradient(circle, var(--cp-gold) 0 2.5px, transparent 3px),
+		radial-gradient(circle, var(--cp-gold) 0 2.5px, transparent 3px),
+		radial-gradient(circle, var(--cp-gold) 0 2.5px, transparent 3px);
+	background-size: 9px 9px;
+	background-repeat: no-repeat;
+	background-position: left 6px top 6px, right 6px top 6px, left 6px bottom 6px,
+		right 6px bottom 6px;
+	box-shadow: 5px 5px 0 rgba(20, 52, 39, 0.16);
+}
+
+.cp-frame::before {
+	content: '';
+	position: absolute;
+	inset: 4px;
+	border: 1px solid rgba(30, 77, 56, 0.5);
+	pointer-events: none;
+}
+
+/* Guilloche seal — the round engraved stamp on certificates */
+.cp-seal {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 4.25rem;
+	height: 4.25rem;
+	border-radius: 50%;
+	font-family: var(--font-serif);
+	font-weight: 700;
+	color: var(--cp-green-dark);
+	background-image: radial-gradient(circle, transparent 0 54%, var(--cp-green) 55% 59%, transparent 60%),
+		radial-gradient(circle, var(--cp-cream) 0 72%, transparent 73%),
+		repeating-conic-gradient(var(--cp-green) 0deg 5deg, var(--cp-cream) 5deg 10deg);
+	box-shadow: 0 0 0 2px var(--cp-cream), 0 0 0 3px var(--cp-green);
+}
+
+.cp-seal--gold {
+	color: var(--cp-green-dark);
+	background-image: radial-gradient(circle, transparent 0 54%, var(--cp-gold) 55% 59%, transparent 60%),
+		radial-gradient(circle, var(--cp-cream) 0 72%, transparent 73%),
+		repeating-conic-gradient(var(--cp-gold) 0deg 5deg, var(--cp-cream) 5deg 10deg);
+	box-shadow: 0 0 0 2px var(--cp-cream), 0 0 0 3px var(--cp-gold);
+}
+
+/* Ribbon banner label, clipped like a pamphlet sash */
+.cp-banner {
+	display: inline-block;
+	background: var(--cp-green);
+	color: var(--cp-cream);
+	font-family: var(--font-sans);
+	font-size: 0.7rem;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.16em;
+	padding: 0.35rem 1.4rem;
+	clip-path: polygon(0.6rem 0, calc(100% - 0.6rem) 0, 100% 50%, calc(100% - 0.6rem) 100%, 0.6rem 100%, 0 50%);
+}
+
+.cp-banner--gold {
+	background: var(--cp-gold);
+	color: #fff;
+}
+
+/* ── Buttons, recolored from the site's black to engraved green ── */
+
+.cp-paper .btn {
+	background: var(--cp-green);
+	border-color: var(--cp-green-dark);
+	box-shadow: 3px 3px 0 rgba(20, 52, 39, 0.25);
+}
+
+.cp-paper .btn:hover {
+	background: var(--cp-gold);
+	border-color: var(--cp-gold);
+}
+
+.cp-paper .btn-outline {
+	background: transparent;
+	color: var(--cp-green) !important;
+	border-color: var(--cp-green);
+}
+
+.cp-paper .btn-outline:hover {
+	background: var(--cp-green);
+	color: var(--cp-cream) !important;
+}

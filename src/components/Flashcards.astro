@@ -31,10 +31,10 @@ import { DECKS } from '../data/civics-cards';
 				<span class="fc-face fc-face--front">
 					<span class="fc-face-label">Prompt</span>
 					<span class="fc-front-text" data-front></span>
-					<span class="fc-flip-hint" aria-hidden="true">Tap to flip →</span>
+					<span class="fc-flip-hint" aria-hidden="true">✦ Tap to flip ✦</span>
 				</span>
 				<span class="fc-face fc-face--back">
-					<span class="fc-face-label">Answer</span>
+					<span class="fc-face-label fc-face-label--gold">Answer</span>
 					<span class="fc-back-text" data-back></span>
 					<span class="fc-hook" data-hook hidden></span>
 				</span>
@@ -56,7 +56,9 @@ import { DECKS } from '../data/civics-cards';
 			</div>
 		</div>
 
-		<div class="fc-summary" data-summary hidden>
+		<div class="fc-summary cp-frame" data-summary hidden>
+			<span class="cp-seal fc-summary-seal" aria-hidden="true">★</span>
+			<p class="fc-summary-kicker">Certificate of Completion</p>
 			<p class="fc-summary-headline" data-summary-headline></p>
 			<p class="fc-summary-detail" data-summary-detail></p>
 			<div class="fc-summary-buttons">
@@ -240,23 +242,26 @@ import { DECKS } from '../data/civics-cards';
 		flex: 1 1 10rem;
 		display: flex;
 		flex-direction: column;
-		align-items: flex-start;
+		align-items: center;
 		gap: 0.15rem;
-		padding: 0.65rem 0.9rem;
-		background: var(--color-white);
-		border: 2px solid var(--color-black);
+		padding: 0.7rem 0.9rem 0.55rem;
+		background: var(--cp-cream, #f6f0dd);
+		border: 2px solid var(--cp-green, #1e4d38);
+		border-top-width: 4px;
 		cursor: pointer;
 		font-family: var(--font-sans);
+		color: var(--cp-green-dark, #143427);
 		transition: background 0.15s;
 	}
 
 	.deck-tab:hover {
-		background: var(--color-surface);
+		background: var(--cp-parchment, #eee5cb);
 	}
 
 	.deck-tab.active {
-		background: var(--color-black);
-		color: var(--color-white);
+		background: var(--cp-green, #1e4d38);
+		color: var(--cp-cream, #f6f0dd);
+		border-top-color: var(--cp-gold-bright, #c9a227);
 	}
 
 	.deck-tab-label {
@@ -273,18 +278,21 @@ import { DECKS } from '../data/civics-cards';
 
 	.deck-blurb {
 		font-family: var(--font-sans);
-		color: var(--color-muted);
+		color: var(--cp-ink, #1c2b23);
+		opacity: 0.75;
 		font-size: 0.9rem;
+		text-align: center;
 		margin: 0 0 1.5rem;
 	}
 
 	.fc-progress {
 		font-family: var(--font-sans);
 		font-size: 0.8125rem;
-		font-weight: 600;
+		font-weight: 700;
 		text-transform: uppercase;
-		letter-spacing: 0.06em;
-		color: var(--color-muted);
+		letter-spacing: 0.14em;
+		color: var(--cp-gold, #a3781e);
+		text-align: center;
 		margin: 0 0 0.75rem;
 		min-height: 1.2em;
 	}
@@ -301,19 +309,33 @@ import { DECKS } from '../data/civics-cards';
 		text-align: left;
 		perspective: 1200px;
 		font: inherit;
-		color: inherit;
+		color: var(--cp-ink, #1c2b23);
 	}
 
+	/* Each face is styled like the face of a banknote: cream field with a fine
+	   cross-hatch, a double frame, and gold studs in the corners. */
 	.fc-face {
 		position: absolute;
 		inset: 0;
 		display: flex;
 		flex-direction: column;
 		gap: 0.75rem;
-		padding: 1.5rem;
-		background: var(--color-white);
-		border: 2px solid var(--color-black);
-		box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.12);
+		padding: 1.75rem;
+		background-color: var(--cp-cream, #f6f0dd);
+		background-image: radial-gradient(circle, var(--cp-gold, #a3781e) 0 2.5px, transparent 3px),
+			radial-gradient(circle, var(--cp-gold, #a3781e) 0 2.5px, transparent 3px),
+			radial-gradient(circle, var(--cp-gold, #a3781e) 0 2.5px, transparent 3px),
+			radial-gradient(circle, var(--cp-gold, #a3781e) 0 2.5px, transparent 3px),
+			repeating-linear-gradient(45deg, rgba(30, 77, 56, 0.04) 0 1px, transparent 1px 6px),
+			repeating-linear-gradient(-45deg, rgba(30, 77, 56, 0.04) 0 1px, transparent 1px 6px);
+		background-size: 9px 9px, 9px 9px, 9px 9px, 9px 9px, auto, auto;
+		background-repeat: no-repeat, no-repeat, no-repeat, no-repeat, repeat, repeat;
+		background-position: left 7px top 7px, right 7px top 7px, left 7px bottom 7px,
+			right 7px bottom 7px, 0 0, 0 0;
+		border: 2px solid var(--cp-green, #1e4d38);
+		outline: 1px solid rgba(30, 77, 56, 0.5);
+		outline-offset: -7px;
+		box-shadow: 6px 6px 0 rgba(20, 52, 39, 0.18);
 		backface-visibility: hidden;
 		transition: transform 0.5s;
 		overflow-y: auto;
@@ -326,11 +348,15 @@ import { DECKS } from '../data/civics-cards';
 	.fc-face--front {
 		transform: rotateY(0deg);
 		justify-content: center;
+		align-items: center;
+		text-align: center;
 	}
 
 	.fc-face--back {
 		transform: rotateY(-180deg);
-		background: var(--color-surface);
+		background-color: #ebecd9;
+		border-color: var(--cp-gold, #a3781e);
+		outline-color: rgba(163, 120, 30, 0.55);
 	}
 
 	.fc-card.flipped .fc-face--front {
@@ -347,13 +373,30 @@ import { DECKS } from '../data/civics-cards';
 		}
 	}
 
+	/* Sash-style label, like a ribbon across a pamphlet */
 	.fc-face-label {
+		align-self: center;
+		background: var(--cp-green, #1e4d38);
+		color: var(--cp-cream, #f6f0dd);
 		font-family: var(--font-sans);
 		font-size: 0.7rem;
 		font-weight: 700;
 		text-transform: uppercase;
-		letter-spacing: 0.1em;
-		color: var(--color-accent);
+		letter-spacing: 0.18em;
+		padding: 0.3rem 1.5rem;
+		clip-path: polygon(
+			0.6rem 0,
+			calc(100% - 0.6rem) 0,
+			100% 50%,
+			calc(100% - 0.6rem) 100%,
+			0.6rem 100%,
+			0 50%
+		);
+	}
+
+	.fc-face-label--gold {
+		background: var(--cp-gold, #a3781e);
+		color: #fff;
 	}
 
 	.fc-front-text {
@@ -361,13 +404,16 @@ import { DECKS } from '../data/civics-cards';
 		font-size: clamp(1.4rem, 4vw, 2rem);
 		font-weight: 700;
 		line-height: 1.2;
+		color: var(--cp-green-dark, #143427);
 	}
 
 	.fc-flip-hint {
 		margin-top: auto;
-		font-family: var(--font-sans);
-		font-size: 0.8125rem;
-		color: var(--color-muted);
+		font-family: var(--font-serif);
+		font-style: italic;
+		font-size: 0.85rem;
+		color: var(--cp-gold, #a3781e);
+		letter-spacing: 0.08em;
 	}
 
 	.fc-back-text {
@@ -379,12 +425,17 @@ import { DECKS } from '../data/civics-cards';
 	.fc-hook {
 		margin-top: auto;
 		padding-top: 0.75rem;
-		border-top: 1px solid var(--color-border);
+		border-top: 1px solid rgba(163, 120, 30, 0.5);
 		font-family: var(--font-sans);
 		font-size: 0.85rem;
 		line-height: 1.5;
-		color: var(--color-accent);
+		color: var(--cp-seal-red, #9e2b25);
 		font-weight: 600;
+	}
+
+	.fc-hook::before {
+		content: '☛ ';
+		color: var(--cp-gold, #a3781e);
 	}
 
 	.fc-judge {
@@ -397,7 +448,8 @@ import { DECKS } from '../data/civics-cards';
 		font-weight: 700;
 		font-size: 0.9rem;
 		text-transform: uppercase;
-		letter-spacing: 0.06em;
+		letter-spacing: 0.1em;
+		color: var(--cp-green-dark, #143427);
 		margin: 0 0 0.6rem;
 	}
 
@@ -411,7 +463,8 @@ import { DECKS } from '../data/civics-cards';
 	.fc-judge-note {
 		font-family: var(--font-sans);
 		font-size: 0.75rem;
-		color: var(--color-muted);
+		color: var(--cp-ink, #1c2b23);
+		opacity: 0.65;
 		margin: 0.6rem 0 0;
 	}
 
@@ -427,33 +480,48 @@ import { DECKS } from '../data/civics-cards';
 		font-family: var(--font-sans);
 		font-size: 0.8125rem;
 		font-weight: 600;
-		color: var(--color-muted);
+		color: var(--cp-gold, #a3781e);
 		cursor: pointer;
 		text-decoration: underline;
 	}
 
 	.fc-shuffle:hover {
-		color: var(--color-accent);
+		color: var(--cp-seal-red, #9e2b25);
 	}
 
+	/* End-of-deck panel styled as an engraved certificate (frame from .cp-frame) */
 	.fc-summary {
-		border: 2px solid var(--color-black);
-		background: var(--color-surface);
-		box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.12);
-		padding: 2rem 1.5rem;
+		padding: 2.25rem 1.5rem 2rem;
 		text-align: center;
+	}
+
+	.fc-summary-seal {
+		font-size: 1.5rem;
+		margin-bottom: 0.85rem;
+	}
+
+	.fc-summary-kicker {
+		font-family: var(--font-sans);
+		font-size: 0.7rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.22em;
+		color: var(--cp-gold, #a3781e);
+		margin: 0 0 0.5rem;
 	}
 
 	.fc-summary-headline {
 		font-family: var(--font-serif);
 		font-size: 1.5rem;
 		font-weight: 700;
+		color: var(--cp-green-dark, #143427);
 		margin: 0 0 0.5rem;
 	}
 
 	.fc-summary-detail {
 		font-family: var(--font-sans);
-		color: var(--color-muted);
+		color: var(--cp-ink, #1c2b23);
+		opacity: 0.75;
 		font-size: 0.95rem;
 		margin: 0 0 1.25rem;
 	}
@@ -467,9 +535,9 @@ import { DECKS } from '../data/civics-cards';
 
 	.fc-noscript {
 		font-family: var(--font-sans);
-		border: 2px solid var(--color-black);
+		border: 2px solid var(--cp-green, #1e4d38);
 		padding: 1rem;
-		background: var(--color-surface);
+		background: var(--cp-cream, #f6f0dd);
 	}
 
 	@media (max-width: 540px) {

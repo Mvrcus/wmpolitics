@@ -3,6 +3,7 @@ import BaseHead from '../../components/BaseHead.astro';
 import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
 import { SITE_TITLE } from '../../consts';
+import '../../styles/currency.css';
 
 const title = `Start Here | ${SITE_TITLE}`;
 const description =
@@ -69,12 +70,13 @@ const LAW_STEPS = [
 	<head>
 		<BaseHead title={title} description={description} />
 	</head>
-	<body>
+	<body class="cp-paper">
 		<Header />
 		<main>
 			<header class="page-header">
-				<p class="learn-kicker">No experience required</p>
+				<p class="cp-kicker">Civic Primer · Series of 2026 · No. 1</p>
 				<h1>New to politics? Start here.</h1>
+				<div class="cp-rule" aria-hidden="true">✦✦✦</div>
 				<p class="hero-lead">
 					No lectures, no jargon, and no assumption you’ve been following along. Ten minutes here
 					and the rest of this site — and honestly, the news — will make a lot more sense.
@@ -112,8 +114,8 @@ const LAW_STEPS = [
 				<div class="job-grid">
 					{
 						JOBS.map((job, i) => (
-							<article class="job-card">
-								<span class="job-num" aria-hidden="true">{i + 1}</span>
+							<article class="job-card cp-frame">
+								<span class="cp-seal cp-seal--gold job-seal" aria-hidden="true">{i + 1}</span>
 								<h3>{job.title}</h3>
 								<p>{job.text}</p>
 							</article>
@@ -133,8 +135,8 @@ const LAW_STEPS = [
 				<div class="chain-grid">
 					{
 						CHAINS.map((chain) => (
-							<article class="chain-card">
-								<h3>{chain.label}</h3>
+							<article class="chain-card cp-frame">
+								<h3><span class="cp-banner">{chain.label}</span></h3>
 								<ol>
 									{chain.steps.map((step) => (
 										<li>{step}</li>
@@ -168,16 +170,21 @@ const LAW_STEPS = [
 
 			<section class="section">
 				<div class="game-cta">
-					<p class="learn-kicker">Quiz yourself</p>
-					<h2>Think it stuck? Play the flashcards.</h2>
-					<p>
-						Three decks: <strong>the words</strong> you’ll see in headlines, <strong>history in a
-						flash</strong> — laws that changed everyday life — and <strong>people who
+					<span class="cta-corner cta-corner--tl" aria-hidden="true">36</span>
+					<span class="cta-corner cta-corner--tr" aria-hidden="true">36</span>
+					<span class="cta-corner cta-corner--bl" aria-hidden="true">36</span>
+					<span class="cta-corner cta-corner--br" aria-hidden="true">36</span>
+					<p class="cta-kicker">This pamphlet entitles the bearer to</p>
+					<h2>Three decks. Thirty-six cards.</h2>
+					<p class="cta-body">
+						<strong>The words</strong> you’ll see in headlines · <strong>history in a
+						flash</strong> — laws that changed everyday life · and <strong>people who
 						delivered</strong>, legislators (several from right here in West Michigan) remembered
 						for actually representing their neighbors. Flip a card, be honest about whether you
 						knew it, and the ones you miss come back around until they stick.
 					</p>
 					<a href="/learn/flashcards/" class="btn game-cta-btn">Play the flashcards →</a>
+					<p class="cta-motto" aria-hidden="true">✦ In an informed public we trust ✦</p>
 				</div>
 			</section>
 
@@ -211,16 +218,6 @@ const LAW_STEPS = [
 </html>
 
 <style>
-	.learn-kicker {
-		font-family: var(--font-sans);
-		font-size: 0.75rem;
-		font-weight: 700;
-		text-transform: uppercase;
-		letter-spacing: 0.1em;
-		color: var(--color-accent);
-		margin: 0 0 0.5rem;
-	}
-
 	.learn-section-lead {
 		margin-bottom: 2rem;
 	}
@@ -228,59 +225,44 @@ const LAW_STEPS = [
 	.job-grid {
 		display: grid;
 		grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
-		gap: 1rem;
+		gap: 1.25rem;
 	}
 
 	.job-card {
-		position: relative;
-		border: 2px solid var(--color-black);
-		background: var(--color-white);
-		padding: 1.25rem;
-		box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.1);
+		padding: 1.5rem 1.25rem 1.25rem;
 	}
 
-	.job-num {
-		font-family: var(--font-serif);
-		font-size: 2rem;
-		font-weight: 700;
-		color: var(--color-accent);
-		line-height: 1;
+	.job-seal {
+		font-size: 1.4rem;
 	}
 
 	.job-card h3 {
 		font-family: var(--font-serif);
 		font-size: 1.15rem;
-		margin: 0.5rem 0 0.5rem;
+		margin: 0.75rem 0 0.5rem;
 	}
 
 	.job-card p {
 		font-family: var(--font-sans);
 		font-size: 0.9rem;
 		line-height: 1.55;
-		color: var(--color-muted);
+		color: var(--cp-ink);
+		opacity: 0.8;
 		margin: 0;
 	}
 
 	.chain-grid {
 		display: grid;
 		grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
-		gap: 1rem;
+		gap: 1.25rem;
 	}
 
 	.chain-card {
-		border: 2px solid var(--color-black);
-		background: var(--color-surface);
-		padding: 1.25rem;
+		padding: 1.5rem 1.25rem 1.25rem;
 	}
 
 	.chain-card h3 {
-		font-family: var(--font-sans);
-		font-size: 0.8125rem;
-		font-weight: 700;
-		text-transform: uppercase;
-		letter-spacing: 0.06em;
-		margin: 0 0 0.85rem;
-		color: var(--color-accent);
+		margin: 0 0 1rem;
 	}
 
 	.chain-card ol {
@@ -309,10 +291,11 @@ const LAW_STEPS = [
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		background: var(--color-black);
-		color: var(--color-white);
+		background: var(--cp-green);
+		color: var(--cp-cream);
 		font-size: 0.7rem;
 		font-weight: 700;
+		border-radius: 50%;
 	}
 
 	.chain-card li:not(:last-child)::after {
@@ -322,7 +305,7 @@ const LAW_STEPS = [
 		top: 1.5rem;
 		bottom: 0.15rem;
 		width: 2px;
-		background: var(--color-border);
+		background: rgba(163, 120, 30, 0.45);
 	}
 
 	.chain-card li:last-child {
@@ -341,15 +324,15 @@ const LAW_STEPS = [
 		display: flex;
 		gap: 1rem;
 		padding: 1rem 0;
-		border-bottom: 1px solid var(--color-border);
+		border-bottom: 1px solid rgba(163, 120, 30, 0.5);
 	}
 
 	.law-step:first-child {
-		border-top: 2px solid var(--color-black);
+		border-top: 2px solid var(--cp-green);
 	}
 
 	.law-step:last-child {
-		border-bottom: 2px solid var(--color-black);
+		border-bottom: 2px solid var(--cp-green);
 	}
 
 	.law-step-num {
@@ -359,9 +342,12 @@ const LAW_STEPS = [
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		border: 2px solid var(--color-black);
+		border: 2px solid var(--cp-green);
+		border-radius: 50%;
+		background: var(--cp-cream);
 		font-family: var(--font-serif);
 		font-weight: 700;
+		color: var(--cp-green-dark);
 	}
 
 	.law-step h3 {
@@ -374,46 +360,91 @@ const LAW_STEPS = [
 		font-family: var(--font-sans);
 		font-size: 0.9rem;
 		line-height: 1.5;
-		color: var(--color-muted);
+		color: var(--cp-ink);
+		opacity: 0.8;
 		margin: 0;
 	}
 
+	/* The CTA styled as an engraved banknote */
 	.game-cta {
-		border: 2px solid var(--color-black);
-		background: var(--color-surface-dark, #111);
-		color: var(--color-white);
-		padding: 2.5rem clamp(1.25rem, 4vw, 3rem);
-		box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.15);
+		position: relative;
+		border: 3px double var(--cp-gold-bright);
+		outline: 2px solid var(--cp-green-dark);
+		background-color: var(--cp-green);
+		background-image: repeating-linear-gradient(
+				45deg,
+				rgba(246, 240, 221, 0.05) 0 1px,
+				transparent 1px 6px
+			),
+			repeating-linear-gradient(-45deg, rgba(246, 240, 221, 0.05) 0 1px, transparent 1px 6px),
+			radial-gradient(ellipse 70% 90% at 50% 50%, rgba(201, 162, 39, 0.14), transparent 75%);
+		color: var(--cp-cream);
+		padding: 3rem clamp(2.5rem, 6vw, 4rem);
+		text-align: center;
+		box-shadow: 6px 6px 0 rgba(20, 52, 39, 0.3);
+	}
+
+	.cta-corner {
+		position: absolute;
+		font-family: var(--font-serif);
+		font-weight: 700;
+		font-size: 1.5rem;
+		color: var(--cp-gold-bright);
+		line-height: 1;
+	}
+
+	.cta-corner--tl { top: 0.75rem; left: 1rem; }
+	.cta-corner--tr { top: 0.75rem; right: 1rem; }
+	.cta-corner--bl { bottom: 0.75rem; left: 1rem; }
+	.cta-corner--br { bottom: 0.75rem; right: 1rem; }
+
+	.cta-kicker {
+		font-family: var(--font-sans);
+		font-size: 0.75rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.22em;
+		color: var(--cp-gold-bright);
+		margin: 0 0 0.5rem;
 	}
 
 	.game-cta h2 {
 		font-family: var(--font-serif);
-		color: var(--color-white);
-		font-size: clamp(1.5rem, 4vw, 2.1rem);
-		margin: 0 0 0.75rem;
+		color: var(--cp-cream);
+		font-size: clamp(1.5rem, 4vw, 2.2rem);
+		margin: 0 0 0.85rem;
 	}
 
-	.game-cta p {
+	.cta-body {
 		font-family: var(--font-sans);
 		font-size: 0.95rem;
-		line-height: 1.6;
-		max-width: 46rem;
-		margin: 0 0 1.5rem;
-		color: rgba(255, 255, 255, 0.85);
+		line-height: 1.65;
+		max-width: 44rem;
+		margin: 0 auto 1.75rem;
+		color: rgba(246, 240, 221, 0.85);
 	}
 
-	.game-cta strong {
-		color: var(--color-white);
+	.cta-body strong {
+		color: var(--cp-gold-bright);
 	}
 
 	.game-cta-btn {
 		font-size: 1rem;
-		background: var(--color-accent);
-		border-color: var(--color-accent);
+		background: var(--cp-gold);
+		border-color: var(--cp-gold-bright);
 	}
 
 	.game-cta-btn:hover {
-		background: var(--color-white);
-		border-color: var(--color-white);
+		background: var(--cp-cream);
+		border-color: var(--cp-cream);
+	}
+
+	.cta-motto {
+		font-family: var(--font-serif);
+		font-style: italic;
+		font-size: 0.85rem;
+		color: rgba(246, 240, 221, 0.6);
+		letter-spacing: 0.08em;
+		margin: 1.5rem 0 0;
 	}
 </style>
