@@ -12,6 +12,7 @@ const formId = `newsletter-${Math.random().toString(36).slice(2, 9)}`;
 	id={formId}
 	name="newsletter"
 	method="post"
+	data-newsletter-form
 >
 	{!compact && (
 		<>
@@ -41,9 +42,70 @@ const formId = `newsletter-${Math.random().toString(36).slice(2, 9)}`;
 			maxlength="10"
 			autocomplete="postal-code"
 		/>
+		<input
+			type="text"
+			name="website"
+			class="newsletter-hp"
+			tabindex="-1"
+			autocomplete="off"
+			aria-hidden="true"
+		/>
 		<button type="submit" class="btn">Subscribe</button>
 	</div>
+	<p class="newsletter-status" data-newsletter-status role="status"></p>
 </form>
+
+<script>
+	function wireNewsletterForms() {
+		document
+			.querySelectorAll<HTMLFormElement>('[data-newsletter-form]')
+			.forEach((form) => {
+				if (form.dataset.wired === 'true') return;
+				form.dataset.wired = 'true';
+
+				const statusEl = form.querySelector<HTMLElement>('[data-newsletter-status]');
+				const setStatus = (message: string, type = '') => {
+					if (!statusEl) return;
+					statusEl.textContent = message;
+					statusEl.className = `newsletter-status${type ? ` newsletter-status--${type}` : ''}`;
+				};
+
+				form.addEventListener('submit', async (event) => {
+					event.preventDefault();
+					const data = new FormData(form);
+					const button = form.querySelector<HTMLButtonElement>('button[type="submit"]');
+					if (button) button.disabled = true;
+					setStatus('Signing you up…');
+
+					try {
+						const res = await fetch('/api/subscribe', {
+							method: 'POST',
+							headers: { 'Content-Type': 'application/json' },
+							body: JSON.stringify({
+								email: data.get('email'),
+								zip: data.get('zip'),
+								website: data.get('website'),
+								source: window.location.pathname,
+							}),
+						});
+						const payload = await res.json().catch(() => ({}));
+						if (res.ok) {
+							setStatus(payload.message ?? "You're on the list.", 'success');
+							form.reset();
+						} else {
+							setStatus(payload.error ?? 'Could not sign you up. Try again.', 'error');
+						}
+					} catch {
+						setStatus('Network error. Please try again.', 'error');
+					} finally {
+						if (button) button.disabled = false;
+					}
+				});
+			});
+	}
+
+	wireNewsletterForms();
+</script>
 
 <style>
 	.newsletter {
@@ -89,5 +151,28 @@ const formId = `newsletter-${Math.random().toString(36).slice(2, 9)}`;
 
 	.newsletter.compact input[type="email"] {
 		flex: 1 1 auto;
+	}
+
+	.newsletter-hp {
+		position: absolute !important;
+		left: -9999px;
+		width: 1px;
+		height: 1px;
+		opacity: 0;
+	}
+
+	.newsletter-status {
+		font-family: var(--font-sans);
+		font-size: 0.875rem;
+		margin: 0.75rem 0 0;
+		min-height: 1.2em;
+	}
+
+	.newsletter-status--success {
+		color: #1b6b2f;
+	}
+
+	.newsletter-status--error {
+		color: var(--color-accent, #c41e3a);
 	}
 </style>

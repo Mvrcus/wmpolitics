@@ -128,6 +128,6 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
 	return json({
 		ok: true,
-		message: 'Thanks — your submission is live in the unfiltered community section.',
+		message: 'Thanks — submissions are reviewed before publishing.',
 	});
 };

@@ -42,16 +42,12 @@ Any static assets, like images, can be placed in the `public/` directory.
 
 ## Community voting & submissions (D1 + Turnstile)
 
-Legislator profiles include editorial scorecards, **Tar & Feather Score** community ratings (high = feathered by constituents, low = tarred by the town), and user-submitted concerns/highlights backed by Cloudflare D1.
+Legislator profiles include editorial scorecards, **Constituent Pulse** community ratings (how well is this officeholder serving constituents), and user-submitted concerns/highlights backed by Cloudflare D1.
 
-1. Create a D1 database and set `database_id` in `wrangler.json`:
+1. Create a D1 database and set `database_id` in `wrangler.json`, then apply every file in `migrations/` in order:
    ```bash
    npx wrangler d1 create wmpolitics-votes
-   npx wrangler d1 execute wmpolitics-votes --file=./migrations/0001_votes.sql
-   npx wrangler d1 execute wmpolitics-votes --file=./migrations/0002_votes_index.sql
-   npx wrangler d1 execute wmpolitics-votes --file=./migrations/0003_submissions.sql
-   npx wrangler d1 execute wmpolitics-votes --file=./migrations/0004_submission_votes.sql
-   npx wrangler d1 execute wmpolitics-votes --file=./migrations/0005_submission_votes_index.sql
+   for f in migrations/*.sql; do npx wrangler d1 execute wmpolitics-votes --file="$f"; done
    ```
    (Each migration file must contain a single SQL statement; add `--local` for the dev database.)
 2. Copy `.dev.vars.example` → `.dev.vars` and `.env.example` → `.env` for local dev.
@@ -65,7 +61,7 @@ Test Turnstile keys (always pass): site `1x00000000000000000000AA`, secret `1x00
 
 ### Manual moderation (community submissions)
 
-Submissions are stored with `status = 'pending'` and shown in **Unfiltered community** until you approve them in D1. Approved rows (`status = 'approved'`) appear in **Verified community**. The HTTP approve/reject routes are disabled; use Wrangler or the Cloudflare dashboard.
+Submissions are stored with `status = 'pending'` and are **not shown publicly** until approved. Only rows with `status = 'approved'` appear on profiles (as "Community submissions — Reviewed"). The HTTP approve/reject routes are disabled; use Wrangler or the Cloudflare dashboard.
 
 List pending submissions:
 
@@ -106,9 +102,35 @@ Officeholders are managed as Markdown files in `src/content/legislators/`. **Cur
 2. Set `status: past`, the same `seatSlug` as the current holder, and optional term years.
 3. Rebuild — the past index is at `/legislators/past/` and current profiles link to previous holders automatically.
 
-### Future API hook
+## Track-record sync (Congress.gov + OpenStates)
 
-Congress.gov and Michigan's legislature publish member data, but neither offers a lightweight drop-in for “current vs past by seat” without extra mapping work. When/if you add sync, keep `seatSlug` as the join key and write `status` from the API into these same frontmatter fields (or generate the Markdown at build time).
+Profiles for legislators listed in `src/lib/track-record/roster.ts` get a **Track record** section: official roll-call votes, sponsored bills, and missed-vote %, synced weekly into D1 by a Cloudflare cron trigger (`0 11 * * 1`, Monday morning ET) and served from `/api/track-record/<slug>`. Legislators without an API feed (county board, mayor) get an honest empty state.
+
+Setup:
+
+1. Get free API keys: [Congress.gov](https://api.congress.gov/sign-up/) and [OpenStates](https://openstates.org/accounts/profile/).
+2. Apply migrations `0007`–`0011` (covered by the loop above) — or rely on the runtime `ensureTrackRecordSchema` bootstrap in dev.
+3. Set secrets: `wrangler secret put CONGRESS_GOV_API_KEY`, `OPENSTATES_API_KEY`, and `SYNC_TRIGGER_TOKEN` (any long random string, guards the manual trigger).
+4. Deploy, then backfill manually:
+   ```bash
+   curl -X POST https://wmpolitics.com/api/admin/sync \
+     -H "Content-Type: application/json" \
+     -H "Authorization: Bearer $SYNC_TRIGGER_TOKEN" -d '{}'
+   ```
+   (The `Content-Type: application/json` header is required — Astro's CSRF check rejects form-typed cross-site POSTs.)
+5. Local test: fill keys in `.dev.vars`, set `SYNC_DRY_RUN=true`, then
+   ```bash
+   npm run build && npx wrangler dev --test-scheduled
+   curl "http://127.0.0.1:8787/__scheduled?cron=0+11+*+*+1"
+   npx wrangler d1 execute wmpolitics-votes --local --command "SELECT source, status, items_upserted FROM sync_runs ORDER BY id DESC LIMIT 5"
+   ```
+   Set `SYNC_DRY_RUN=false` (or remove it) to write rows for real. Sync runs are audited in the `sync_runs` table; each run is idempotent (upserts) and stops politely on HTTP 429.
+
+Editorial **key votes**: add a `keyVotes` list to a legislator's frontmatter (`voteId` matching a synced `roll_call_votes.vote_id`, plus `title` and `note`) to pin framed votes above the raw feed. The mapping of profile slugs to bioguide / OpenStates identities lives in `src/lib/track-record/roster.ts` — when a new state legislator is profiled, add one roster line; state members are resolved by name at sync time, so no UUID copying.
+
+### Current vs past
+
+When extending the sync to seat history, keep `seatSlug` as the join key and write `status` from the API into the same frontmatter fields (or generate the Markdown at build time).
 
 ## 🧞 Commands
 

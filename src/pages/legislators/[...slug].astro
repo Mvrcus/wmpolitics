@@ -18,9 +18,12 @@ import {
 	seatLabel,
 } from '../../lib/legislators';
 import { getArticlesForLegislator } from '../../lib/content';
+import { partyInfo } from '../../lib/party';
 import { resolveEditorialScores } from '../../lib/scores';
 import CommunitySubmissions from '../../components/CommunitySubmissions.astro';
 import CommunitySubmissionForm from '../../components/CommunitySubmissionForm.astro';
+import TrackRecord from '../../components/TrackRecord.astro';
+import { rosterEntryForSlug } from '../../lib/track-record/roster';
 
 export async function getStaticPaths() {
 	const legislators = await getCollection('legislators');
@@ -43,6 +46,7 @@ const pastHolders = isCurrent ? getPastHoldersForSeat(allLegislators, d.seatSlug
 const currentHolder = !isCurrent ? getCurrentHolderForSeat(allLegislators, d.seatSlug) : undefined;
 const termDisplay = formatTermRange(d.termStart, d.termEnd);
 const label = seatLabel(entry);
+const partyIdentity = partyInfo(d.party);
 ---
 
 <!doctype html>
@@ -69,12 +73,17 @@ const label = seatLabel(entry);
 			<div class="legislator-layout">
 				<header class="legislator-header">
 					{d.photo && (
-						<figure class="legislator-photo">
+						<figure
+							class:list={[
+								'legislator-photo',
+								partyIdentity && `legislator-photo--${partyIdentity.key}`,
+							]}
+						>
 							<img
 								src={d.photo}
 								alt={
-									d.slug === 'bill-huizenga'
-										? `Official portrait of ${d.name}, U.S. House of Representatives`
+									d.photoIsOfficial
+										? `Official portrait of ${d.name}`
 										: `Representative imagery for ${d.name} (not an official portrait)`
 								}
 								width={400}
@@ -82,12 +91,30 @@ const label = seatLabel(entry);
 								loading="eager"
 								decoding="async"
 							/>
+							{partyIdentity && (
+								<span
+									class:list={['party-stamp', 'party-stamp--large', `party-stamp--${partyIdentity.key}`]}
+									aria-hidden="true"
+								>
+									{partyIdentity.abbrev}
+								</span>
+							)}
 						</figure>
 					)}
 					<div class="legislator-header-text">
 						<div class="card-meta">
 							<span class="category-label">{OFFICE_LABELS[d.office]}</span>
-							{d.party && <span class="category-label">{d.party}</span>}
+							{d.party && (
+								<span
+									class:list={[
+										'category-label',
+										partyIdentity?.key === 'democrat' && 'badge-party-d',
+										partyIdentity?.key === 'republican' && 'badge-party-r',
+									]}
+								>
+									{d.party}
+								</span>
+							)}
 							{!isCurrent && <span class="category-label">Past officeholder</span>}
 							{d.servesHolland && <span class="category-label badge-holland">Serves Holland</span>}
 						</div>
@@ -104,6 +131,17 @@ const label = seatLabel(entry);
 				<div class="legislator-main">
 					<p class="hero-lead legislator-lead">{d.summary}</p>
 
+					{
+						isCurrent && (
+							<TrackRecord
+								slug={d.slug}
+								legislatorName={d.name}
+								hasFeed={Boolean(rosterEntryForSlug(d.slug))}
+								keyVotes={d.keyVotes}
+							/>
+						)
+					}
+
 					<PerspectiveToggle name={d.name} goodPoints={d.goodPoints} concerns={d.concerns} />
 
 					<CommunitySubmissions slug={d.slug} />
@@ -114,18 +152,26 @@ const label = seatLabel(entry);
 					</div>
 
 					{
-						coverage.length > 0 && (
+						(coverage.length > 0 || isCurrent) && (
 							<section class="section legislator-coverage">
 								<div class="section-header">
 									<h2>Coverage</h2>
 								</div>
-								<ul class="article-grid">
-									{coverage.map((article) => (
-										<li>
-											<ArticleCard article={article} />
-										</li>
-									))}
-								</ul>
+								{coverage.length > 0 ? (
+									<ul class="article-grid">
+										{coverage.map((article) => (
+											<li>
+												<ArticleCard article={article} />
+											</li>
+										))}
+									</ul>
+								) : (
+									<p class="coverage-empty">
+										No articles yet — this profile needs sourced reporting. Have a tip or a
+										correction? Email{' '}
+										<a href="mailto:corrections@wmpolitics.com">corrections@wmpolitics.com</a>.
+									</p>
+								)}
 							</section>
 						)
 					}
@@ -169,20 +215,27 @@ const label = seatLabel(entry);
 					}
 
 					{
-						d.sources && d.sources.length > 0 && (
+						((d.sources && d.sources.length > 0) || isCurrent) && (
 							<section class="section">
 								<div class="section-header">
 									<h2>Sources</h2>
 								</div>
-								<ul class="prose">
-									{d.sources.map((s) => (
-										<li>
-											<a href={s.url} target="_blank" rel="noopener noreferrer">
-												{s.label}
-											</a>
-										</li>
-									))}
-								</ul>
+								{d.sources && d.sources.length > 0 ? (
+									<ul class="prose">
+										{d.sources.map((s) => (
+											<li>
+												<a href={s.url} target="_blank" rel="noopener noreferrer">
+													{s.label}
+												</a>
+											</li>
+										))}
+									</ul>
+								) : (
+									<p class="coverage-empty">
+										No source list yet — every claim on this profile should trace to a primary
+										source. This is a gap we're working to close.
+									</p>
+								)}
 							</section>
 						)
 					}

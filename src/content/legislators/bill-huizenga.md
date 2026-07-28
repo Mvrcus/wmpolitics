@@ -8,6 +8,7 @@ seatLabel: U.S. House MI-04
 status: current
 party: Republican
 photo: /images/bill-huizenga.jpg
+photoIsOfficial: true
 servesHolland: true
 proximityRank: 1
 summary: >-

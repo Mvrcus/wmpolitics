@@ -1,6 +1,7 @@
 ---
 import type { CollectionEntry } from "astro:content";
 import { formatTermRange, isCurrentLegislator } from "../lib/legislators";
+import { partyInfo } from "../lib/party";
 
 interface Props {
 	legislator: CollectionEntry<"legislators">;
@@ -9,26 +10,31 @@ interface Props {
 const { legislator } = Astro.props;
 const { name, slug, office, district, party, summary, proximityRank, photo, termStart, termEnd } =
 	legislator.data;
-const isOfficialPortrait = slug === 'bill-huizenga';
+const isOfficialPortrait = legislator.data.photoIsOfficial === true;
 const isPast = !isCurrentLegislator(legislator);
 const termDisplay = formatTermRange(termStart, termEnd);
 
 const officeLabels: Record<string, string> = {
 	"us-house": "U.S. House",
 	"us-senate": "U.S. Senate",
+	governor: "Governor",
 	"state-house": "State House",
 	"state-senate": "State Senate",
 	local: "Local",
 };
 
-const partyClass = party?.toLowerCase().includes("democrat")
-	? "party-d"
-	: party?.toLowerCase().includes("republican")
-		? "party-r"
-		: "";
+const partyIdentity = partyInfo(party);
+const partyBadgeClass =
+	partyIdentity?.key === 'democrat'
+		? 'badge-party-d'
+		: partyIdentity?.key === 'republican'
+			? 'badge-party-r'
+			: '';
 ---
 
-<article class="legislator-card">
+<article
+	class:list={['legislator-card', partyIdentity && `legislator-card--${partyIdentity.key}`]}
+>
 	<a href={`/legislators/${slug}/`} class="legislator-card-link">
 		{photo && (
 			<figure class="legislator-card-photo">
@@ -44,11 +50,19 @@ const partyClass = party?.toLowerCase().includes("democrat")
 					loading="lazy"
 					decoding="async"
 				/>
+				{partyIdentity && (
+					<span
+						class:list={['party-stamp', `party-stamp--${partyIdentity.key}`]}
+						aria-hidden="true"
+					>
+						{partyIdentity.abbrev}
+					</span>
+				)}
 			</figure>
 		)}
 		<div class="card-meta">
 			<span class="category-label">{officeLabels[office] ?? office}</span>
-			{party && <span class:list={["category-label", partyClass]}>{party}</span>}
+			{party && <span class:list={["category-label", partyBadgeClass]}>{party}</span>}
 			{isPast && <span class="category-label">Past</span>}
 			{proximityRank === 1 && <span class="category-label badge-holland">Holland area</span>}
 		</div>
@@ -69,6 +83,19 @@ const partyClass = party?.toLowerCase().includes("democrat")
 		height: 100%;
 	}
 
+	.legislator-card--republican {
+		border-top-color: var(--party-republican);
+	}
+
+	.legislator-card--democrat {
+		border-top-color: var(--party-democrat);
+	}
+
+	.legislator-card--nonpartisan,
+	.legislator-card--other {
+		border-top-color: var(--party-nonpartisan);
+	}
+
 	.legislator-card-link {
 		display: flex;
 		flex-direction: column;
@@ -78,6 +105,7 @@ const partyClass = party?.toLowerCase().includes("democrat")
 	}
 
 	.legislator-card-photo {
+		position: relative;
 		margin: 0 0 1rem;
 		aspect-ratio: 4 / 5;
 		max-width: 7.5rem;

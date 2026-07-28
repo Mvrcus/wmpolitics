@@ -5,8 +5,10 @@ import Footer from '../../components/Footer.astro';
 import LegislatorCard from '../../components/LegislatorCard.astro';
 import { SITE_TITLE } from '../../consts';
 import { getHollandLegislators } from '../../lib/content';
+import { groupLegislatorsByOffice } from '../../lib/legislators';
 
-const hollandLegislators = await getHollandLegislators();
+const grouped = groupLegislatorsByOffice(await getHollandLegislators());
+
 const title = `Holland & Ottawa County | ${SITE_TITLE}`;
 const description =
 	'Who represents Holland, Michigan—from city commissioner to Congress—and how to understand their records.';
@@ -20,72 +22,65 @@ const description =
 	<body>
 		<Header />
 		<main>
-			<figure class="page-hero-image">
-				<img
-					src="/images/holland-lighthouse.jpg"
-					alt="Holland Harbor Light (Big Red) on Lake Michigan"
-					width={792}
-					height={1008}
-					loading="eager"
-					decoding="async"
-				/>
-				<figcaption>
-					Holland Harbor Light (“Big Red”) — photo: Andrew Parodi,
-					<a href="https://commons.wikimedia.org/wiki/File:Holland_Harbor_Light_(Big_Red)_-_Holland,_Michigan.jpg" target="_blank" rel="noopener noreferrer">Wikimedia Commons</a> (CC BY-SA 3.0)
-				</figcaption>
-			</figure>
 			<header class="page-header">
-				<span class="category-label badge-holland">Local reporting</span>
-				<h1>Holland & Ottawa County</h1>
-				<p class="hero-lead">
-					Holland sits in Ottawa County with overlapping federal, state, and local districts.
-					Use this page to see who represents you and open balanced profiles.
-				</p>
+				<div class="holland-header-row">
+					<div class="holland-header-text">
+						<span class="category-label badge-holland">Local reporting</span>
+						<h1>Holland & Ottawa County</h1>
+						<p class="hero-lead">
+							Holland sits in Ottawa County with overlapping federal, state, and local districts.
+							Use this page to see who represents you and open balanced profiles.
+						</p>
+					</div>
+					<figure class="holland-hero-thumb">
+						<a
+							href="/images/holland-lighthouse.jpg"
+							target="_blank"
+							rel="noopener noreferrer"
+							title="Holland Harbor Light (Big Red) — click for the full photo"
+						>
+							<img
+								src="/images/holland-lighthouse.jpg"
+								alt="Holland Harbor Light (Big Red) on Lake Michigan — click to view full size"
+								width={152}
+								height={193}
+								loading="eager"
+								decoding="async"
+							/>
+						</a>
+						<figcaption>
+							“Big Red” — <a href="https://commons.wikimedia.org/wiki/File:Holland_Harbor_Light_(Big_Red)_-_Holland,_Michigan.jpg" target="_blank" rel="noopener noreferrer">A. Parodi, CC BY-SA 3.0</a>
+						</figcaption>
+					</figure>
+				</div>
 			</header>
-
-			<section class="section prose">
-				<h2>Your representation stack</h2>
-				<ul>
-					<li>
-						<strong>Federal:</strong> U.S. Rep. Bill Huizenga (MI-04) — casework, federal budgets,
-						Great Lakes funding
-					</li>
-					<li>
-						<strong>State House:</strong> Rep. Nancy DeBoer (District 86) — schools, state law
-						affecting Holland
-					</li>
-					<li>
-						<strong>State Senate:</strong> Sen. Mark Huizenga (District 30) — Ottawa/Kent state
-						policy
-					</li>
-					<li>
-						<strong>County:</strong> Commissioners Doug Zylstra (District 3, City of Holland),
-						Jordan Jorritsma (District 2, Holland Charter & Park Township), and Jacob Bonnema
-						(District 4, Zeeland & part of Holland Charter) on the Ottawa County Board
-					</li>
-					<li>
-						<strong>City:</strong> Mayor Nathan Bocks — Holland city government and council
-					</li>
-				</ul>
-				<p>
-					District lines change after redistricting. Verify your address on
-					<a href="https://www.michigan.gov/vote" target="_blank" rel="noopener noreferrer"
-						>Michigan Voter Information</a
-					> before contacting an office.
-				</p>
-			</section>
 
 			<section class="section">
 				<div class="section-header">
-					<h2>Representatives</h2>
+					<h2>Who represents Holland</h2>
+					<a href="/#power-ladder">See the power ladder</a>
 				</div>
-				<ul class="card-grid">
-					{hollandLegislators.map((leg) => (
-						<li>
-							<LegislatorCard legislator={leg} />
-						</li>
-					))}
-				</ul>
+				{
+					grouped.map((group) => (
+						<div class="holland-office-group">
+							<h3 class="who-represents-office">{group.label}</h3>
+							<ul class="card-grid">
+								{group.legislators.map((leg) => (
+									<li>
+										<LegislatorCard legislator={leg} />
+									</li>
+								))}
+							</ul>
+						</div>
+					))
+				}
+				<p class="who-represents-verify">
+					District lines change after redistricting. Verify your address on{' '}
+					<a href="https://www.michigan.gov/vote" target="_blank" rel="noopener noreferrer">
+						Michigan Voter Information
+					</a>
+					before contacting an office.
+				</p>
 			</section>
 		</main>
 		<Footer />

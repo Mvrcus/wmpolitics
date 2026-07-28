@@ -1,0 +1,27 @@
+{
+	"note": "Official past presidential results by county. This is history, not a forecast.",
+	"sources": [
+		{ "label": "2024 results (Wikipedia, from MI SOS certified totals)", "url": "https://en.wikipedia.org/wiki/2024_United_States_presidential_election_in_Michigan" },
+		{ "label": "2020 results (Wikipedia, from MI SOS certified totals)", "url": "https://en.wikipedia.org/wiki/2020_United_States_presidential_election_in_Michigan" }
+	],
+	"statewide": {
+		"p2020": { "repPct": 47.84, "demPct": 50.62 },
+		"p2024": { "repPct": 49.7, "demPct": 48.3 }
+	},
+	"counties": {
+		"ottawa": {
+			"name": "Ottawa County",
+			"lat": 42.95,
+			"lng": -86.05,
+			"p2020": { "rep": 100913, "dem": 64705, "total": 168713, "repPct": 59.81, "demPct": 38.35 },
+			"p2024": { "rep": 106133, "dem": 69653, "total": 178507, "repPct": 59.46, "demPct": 39.02 }
+		},
+		"allegan": {
+			"name": "Allegan County",
+			"lat": 42.59,
+			"lng": -85.89,
+			"p2020": { "rep": 41392, "dem": 24449, "total": 67195, "repPct": 61.6, "demPct": 36.39 },
+			"p2024": { "rep": 45206, "dem": 25637, "total": 71913, "repPct": 62.86, "demPct": 35.65 }
+		}
+	}
+}

@@ -28,10 +28,10 @@ export function ratingToPercent(avg: number): number {
 	return Math.round(avg * 20);
 }
 
-export function tarFeatherLabel(pct: number): 'Feathered' | 'Mixed' | 'Tarred' {
-	if (pct >= 60) return 'Feathered';
+export function tarFeatherLabel(pct: number): 'Serving well' | 'Mixed' | 'Falling short' {
+	if (pct >= 60) return 'Serving well';
 	if (pct >= 40) return 'Mixed';
-	return 'Tarred';
+	return 'Falling short';
 }
 
 export function tarFeatherClass(pct: number): 'feathered' | 'mixed' | 'tarred' {

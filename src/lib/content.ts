@@ -2,7 +2,6 @@ import {
 	getCollection,
 	getEntries,
 	type CollectionEntry,
-	type CollectionReference,
 } from "astro:content";
 import {
 	filterLegislatorsByStatus,
@@ -21,7 +20,11 @@ function sortArticlesByDate(a: ArticleEntry, b: ArticleEntry) {
 	return b.data.pubDate.valueOf() - a.data.pubDate.valueOf();
 }
 
-export function legislatorRefId(ref: CollectionReference<"legislators">): string {
+type LegislatorReference = NonNullable<
+	ArticleEntry["data"]["relatedLegislators"]
+>[number];
+
+export function legislatorRefId(ref: LegislatorReference): string {
 	const id = ref.id;
 	return id.includes("/") ? (id.split("/").pop() ?? id) : id;
 }

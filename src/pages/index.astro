@@ -3,18 +3,14 @@ import BaseHead from '../components/BaseHead.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import StructuredData from '../components/StructuredData.astro';
-import LegislatorCard from '../components/LegislatorCard.astro';
 import ArticleCard from '../components/ArticleCard.astro';
 import NewsletterSignup from '../components/NewsletterSignup.astro';
 import FormattedDate from '../components/FormattedDate.astro';
+import PowerLadder from '../components/PowerLadder.astro';
+import VotePicture from '../components/VotePicture.astro';
+import WhatChanged from '../components/WhatChanged.astro';
 import { SITE_TITLE, SITE_DESCRIPTION, SITE_URL } from '../consts';
-import { resolveEditorialScores } from '../lib/scores';
-import {
-	getFeaturedArticles,
-	getLatestArticles,
-	getHollandLegislators,
-	getLegislatorBySlug,
-} from '../lib/content';
+import { getFeaturedArticles, getLatestArticles } from '../lib/content';
 
 const featuredCandidates = await getFeaturedArticles();
 const allLatest = await getLatestArticles();
@@ -22,25 +18,12 @@ const featuredArticle = featuredCandidates[0] ?? allLatest[0];
 const latestArticles = allLatest
 	.filter((a) => a.id !== featuredArticle?.id)
 	.slice(0, 3);
-
-const huizenga = await getLegislatorBySlug('bill-huizenga');
-const huizengaScores = huizenga ? resolveEditorialScores(huizenga) : null;
-const hollandLegislators = (await getHollandLegislators()).slice(0, 3);
 ---
 
 <!doctype html>
 <html lang="en">
 	<head>
 		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
-		<link
-			rel="preload"
-			as="image"
-			type="image/jpeg"
-			href="/images/holland-home-hero-1024.jpg"
-			imagesrcset="/images/holland-home-hero-640.jpg 640w, /images/holland-home-hero-1024.jpg 1024w, /images/holland-home-hero-1600.jpg 1600w"
-			imagesizes="(min-width: 768px) min(100vw, 1200px), 100vw"
-			fetchpriority="high"
-		/>
 		<StructuredData
 			data={{
 				'@context': 'https://schema.org',
@@ -59,25 +42,47 @@ const hollandLegislators = (await getHollandLegislators()).slice(0, 3);
 	<body>
 		<Header />
 		<main>
+			<section class="home-intro" aria-label="What this site does">
+				<span class="cc-watermark cc-watermark--dem home-intro-watermark" aria-hidden="true"></span>
+				<span class="cc-watermark cc-watermark--rep home-intro-watermark" aria-hidden="true"></span>
+				<div class="home-intro-inner">
+				<h1 class="home-intro-title">Know who actually works for you.</h1>
+				<p class="home-intro-lead">
+					We keep a plain-English record of every officeholder serving Holland and Ottawa County —
+					what they control, what they've actually done, and whether it's serving this area.
+					Every claim sourced. No party spin.
+				</p>
+				<ul class="home-intro-points">
+					<li>
+						<strong>Who represents you</strong>
+						<span>from city hall to Washington</span>
+					</li>
+					<li>
+						<strong>Their real record</strong>
+						<span>votes, actions, and both sides of the story</span>
+					</li>
+					<li>
+						<strong>Your next chance to act</strong>
+						<span>elections, meetings, and how to be heard</span>
+					</li>
+				</ul>
+				<a class="home-intro-cue" href="#power-ladder">
+					Start at your own street
+					<span class="home-intro-arrow" aria-hidden="true">↓</span>
+				</a>
+				</div>
+			</section>
+
+			<PowerLadder />
+
+			<VotePicture />
+
+			<section class="section">
+				<WhatChanged />
+			</section>
+
 			{featuredArticle && (
-				<section class="featured-hero" aria-label="Featured story">
-					<figure class="featured-hero-image">
-						<img
-							src="/images/holland-home-hero-1024.jpg"
-							srcset="/images/holland-home-hero-640.jpg 640w, /images/holland-home-hero-1024.jpg 1024w, /images/holland-home-hero-1600.jpg 1600w"
-							sizes="(min-width: 768px) min(100vw, 1200px), 100vw"
-							alt="De Zwaan windmill and gardens in Holland, Michigan"
-							width={1600}
-							height={1191}
-							loading="eager"
-							decoding="async"
-							fetchpriority="high"
-						/>
-						<figcaption>
-							De Zwaan windmill, Holland — photo: Peter C in Toronto Canada,
-							<a href="https://commons.wikimedia.org/wiki/File:Holland_MI_16M_(3858254690).jpg" target="_blank" rel="noopener noreferrer">Wikimedia Commons</a> (CC BY 2.0)
-						</figcaption>
-					</figure>
+				<section class="featured-story" aria-label="Featured story">
 					<div class="featured-main">
 						{featuredArticle.data.category && (
 							<span class="category-label">{featuredArticle.data.category}</span>
@@ -88,42 +93,6 @@ const hollandLegislators = (await getHollandLegislators()).slice(0, 3);
 						<p class="featured-dek">{featuredArticle.data.description}</p>
 						<p class="featured-meta">
 							<FormattedDate date={featuredArticle.data.pubDate} />
-						</p>
-					</div>
-					{huizenga && (
-						<aside class="featured-side">
-							<p class="featured-side-label">Representing Holland</p>
-							<LegislatorCard legislator={huizenga} />
-						</aside>
-					)}
-				</section>
-			)}
-
-			{huizenga && huizengaScores && (
-				<section class="community-teaser tomato-tar-teaser" aria-labelledby="community-teaser-heading">
-					<div>
-						<h2 id="community-teaser-heading">Tar &amp; Feather Score</h2>
-						<p class="community-teaser-copy">
-							Feathers for strong service — tar &amp; feather when the town has had enough. One quick
-							vote on each profile; see how community scores compare to our editorial scorecard for{' '}
-							{huizenga.data.name}.
-						</p>
-						<div class="community-teaser-actions">
-							<a href={`/legislators/${huizenga.data.slug}/#community-vote`} class="btn">
-								Cast your score
-							</a>
-							<a href="/legislators/" class="btn btn-outline">
-								All profiles
-							</a>
-						</div>
-					</div>
-					<div class="community-teaser-meter tomato-tar-teaser-meter">
-						<p class="legislator-score-hero-label">Editorial — {huizenga.data.name}</p>
-						<p class="tomato-tar-teaser-score">
-							<strong>{huizengaScores.overall}</strong> / 5 overall
-						</p>
-						<p class="tomato-tar-teaser-versus">
-							Editorial: {huizengaScores.overall} · Community: vote on profile
 						</p>
 					</div>
 				</section>
@@ -147,24 +116,6 @@ const hollandLegislators = (await getHollandLegislators()).slice(0, 3);
 				</ul>
 			</section>
 
-			<section class="local-section">
-				<div class="section-header">
-					<h2>Holland & West Michigan</h2>
-					<a href="/holland/">Local reporting</a>
-				</div>
-				<p class="hero-lead" style="margin-bottom: 2rem;">
-					Who represents Holland and Ottawa County—from Congress to the county board—and how to
-					understand their records.
-				</p>
-				<ul class="card-grid card-grid--three">
-					{hollandLegislators.map((leg) => (
-						<li>
-							<LegislatorCard legislator={leg} />
-						</li>
-					))}
-				</ul>
-			</section>
-
 			<section class="section">
 				<div class="section-header">
 					<h2>Legislators</h2>
@@ -172,10 +123,12 @@ const hollandLegislators = (await getHollandLegislators()).slice(0, 3);
 				</div>
 				<p class="hero-lead" style="margin-bottom: 2rem;">
 					Balanced profiles: what supporters highlight and what critics raise, with sources you
-					can verify.
+					can verify. Every profile takes one community vote — see how your neighbors rate the
+					people who represent them.
 				</p>
 				<div class="start-links">
 					<a href="/legislators/" class="btn">Browse profiles</a>
+					<a href="/coverage/" class="btn btn-outline">Coverage dashboard</a>
 					<a href="/about/" class="btn btn-outline">Our standards</a>
 				</div>
 			</section>

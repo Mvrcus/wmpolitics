@@ -7,3 +7,13 @@ TURNSTILE_SECRET_KEY=1x0000000000000000000000000000000AA
 VOTE_HASH_SALT=local-dev-salt-change-in-production
 DEV_SKIP_TURNSTILE=false
 # ADMIN_SECRET is optional (approve/reject API routes are disabled; moderate via D1 SQL — see README)
+
+# Track-record sync (Phase: live legislative data)
+# Congress.gov key: free at https://api.congress.gov/sign-up/
+# OpenStates key: free at https://openstates.org/accounts/profile/
+CONGRESS_GOV_API_KEY=
+OPENSTATES_API_KEY=
+# Bearer token for POST /api/admin/sync (manual backfill). Any long random string.
+SYNC_TRIGGER_TOKEN=local-dev-sync-token
+# 'true' = fetch and log but write only the sync_runs audit row
+SYNC_DRY_RUN=true

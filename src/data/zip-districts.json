@@ -1,0 +1,49 @@
+{
+	"49423": {
+		"slugs": ["bill-huizenga", "nancy-deboer", "mark-huizenga", "doug-zylstra", "nathan-bocks"],
+		"split": true,
+		"note": "Parts of 49423 fall outside the City of Holland (Allegan County side), where county board seats differ."
+	},
+	"49422": {
+		"slugs": ["bill-huizenga", "nancy-deboer", "mark-huizenga", "doug-zylstra", "nathan-bocks"],
+		"split": true,
+		"note": "PO-box ZIP for Holland — county board seat depends on your street address."
+	},
+	"49424": {
+		"slugs": [
+			"bill-huizenga",
+			"nancy-deboer",
+			"mark-huizenga",
+			"jordan-jorritsma",
+			"jacob-bonnema",
+			"nathan-bocks"
+		],
+		"split": true,
+		"note": "49424 spans Holland Charter and Park townships plus part of the city — your county commissioner depends on your street."
+	},
+	"49434": {
+		"slugs": ["bill-huizenga", "nancy-deboer", "mark-huizenga", "jordan-jorritsma"],
+		"split": false,
+		"note": null
+	},
+	"49464": {
+		"slugs": ["bill-huizenga", "mark-huizenga", "jacob-bonnema", "nancy-deboer"],
+		"split": true,
+		"note": "Zeeland-area state house lines shifted in redistricting — verify your district before contacting an office."
+	},
+	"49460": {
+		"slugs": ["bill-huizenga", "mark-huizenga"],
+		"split": true,
+		"note": "West Olive's county commissioner district isn't profiled on this site yet."
+	},
+	"49417": {
+		"slugs": ["bill-huizenga"],
+		"split": true,
+		"note": "Grand Haven is at the edge of our coverage area — federal profile applies; state and county profiles are coming."
+	},
+	"49456": {
+		"slugs": ["bill-huizenga"],
+		"split": true,
+		"note": "Spring Lake is at the edge of our coverage area — federal profile applies; state and county profiles are coming."
+	}
+}

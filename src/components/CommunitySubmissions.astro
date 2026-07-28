@@ -21,24 +21,13 @@ const enabled =
 >
 	<div class="community-submissions-verified" data-submissions-verified hidden>
 		<div class="community-submissions-header">
-			<h2>Verified community</h2>
-			<span class="community-badge community-badge--verified">Approved</span>
+			<h2>Community submissions</h2>
+			<span class="community-badge community-badge--verified">Reviewed</span>
 		</div>
 		<p class="community-submissions-note">
-			Submissions with <code>status = 'approved'</code> in D1. Approve by updating the database (see README).
+			Submissions from readers, published after editorial review.
 		</p>
 		<ul class="community-submission-list" data-verified-list></ul>
-	</div>
-
-	<div class="community-submissions-unfiltered" data-submissions-unfiltered hidden>
-		<div class="community-submissions-header">
-			<h2>Unfiltered community</h2>
-			<span class="community-badge community-badge--unverified">Pending</span>
-		</div>
-		<p class="community-submissions-note">
-			New submissions stay here with <code>status = 'pending'</code> until an editor approves them in D1.
-		</p>
-		<ul class="community-submission-list" data-unfiltered-list></ul>
 	</div>
 
 	<p class="community-submissions-empty" data-submissions-empty hidden>
@@ -51,9 +40,7 @@ const enabled =
 	if (!root) return;
 
 	const verifiedWrap = root.querySelector('[data-submissions-verified]');
-	const unfilteredWrap = root.querySelector('[data-submissions-unfiltered]');
 	const verifiedList = root.querySelector('[data-verified-list]');
-	const unfilteredList = root.querySelector('[data-unfiltered-list]');
 	const emptyEl = root.querySelector('[data-submissions-empty]');
 
 	let turnstileToken = '';
@@ -64,14 +51,12 @@ const enabled =
 		return type === 'highlight' ? 'Highlight' : 'Concern';
 	}
 
-	function renderItem(item, verified) {
+	function renderItem(item) {
 		const li = document.createElement('li');
 		li.className = `community-submission-item community-submission-item--${item.submission_type}`;
 		li.dataset.submissionId = String(item.id);
 
-		const badge = verified
-			? '<span class="community-badge community-badge--verified">Approved</span>'
-			: '<span class="community-badge community-badge--unverified">Pending</span>';
+		const badge = '<span class="community-badge community-badge--verified">Reviewed</span>';
 
 		const source = item.source
 			? `<p class="community-submission-source"><a href="${item.source}" target="_blank" rel="noopener noreferrer">Source</a></p>`
@@ -103,19 +88,15 @@ const enabled =
 	}
 
 	function renderLists(data) {
-		const { approved = [], unfiltered = [] } = data;
+		const { approved = [] } = data;
 		if (verifiedList) verifiedList.replaceChildren();
-		if (unfilteredList) unfilteredList.replaceChildren();
 
-		approved.forEach((item) => verifiedList?.appendChild(renderItem(item, true)));
-		unfiltered.forEach((item) => unfilteredList?.appendChild(renderItem(item, false)));
+		approved.forEach((item) => verifiedList?.appendChild(renderItem(item)));
 
 		const hasVerified = approved.length > 0;
-		const hasUnfiltered = unfiltered.length > 0;
 
 		if (verifiedWrap) verifiedWrap.hidden = !hasVerified;
-		if (unfilteredWrap) unfilteredWrap.hidden = !hasUnfiltered;
-		if (emptyEl) emptyEl.hidden = hasVerified || hasUnfiltered;
+		if (emptyEl) emptyEl.hidden = hasVerified;
 	}
 
 	async function loadSubmissions() {

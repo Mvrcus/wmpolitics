@@ -1,0 +1,96 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import FormattedDate from '../components/FormattedDate.astro';
+import { SITE_TITLE } from '../consts';
+import { getCurrentLegislators, getArticlesForLegislator } from '../lib/content';
+import { getCoverageStats, COVERAGE_TIER_LABELS } from '../lib/coverage';
+
+const legislators = await getCurrentLegislators();
+const rows = await Promise.all(
+	legislators.map(async (entry) => {
+		const articles = await getArticlesForLegislator(entry.data.slug);
+		return { entry, stats: getCoverageStats(entry, articles) };
+	}),
+);
+
+const title = `Coverage dashboard | ${SITE_TITLE}`;
+const description =
+	'How evenly we cover every officeholder — documented points, sources, articles, and scores for each profile, gaps included.';
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<BaseHead title={title} description={description} />
+	</head>
+	<body>
+		<Header />
+		<main>
+			<header class="page-header">
+				<h1>Coverage dashboard</h1>
+				<p class="hero-lead">
+					Our coverage is uneven — here's exactly how. Every current officeholder gets the same
+					profile skeleton; this table shows where the reporting is thin, so you can hold us to the
+					same standard we hold them.
+				</p>
+			</header>
+
+			<section class="section">
+				<div class="coverage-table-wrap">
+					<table class="coverage-table">
+						<thead>
+							<tr>
+								<th scope="col">Officeholder</th>
+								<th scope="col">Tier</th>
+								<th scope="col">Highlights</th>
+								<th scope="col">Concerns</th>
+								<th scope="col">Sources</th>
+								<th scope="col">Articles</th>
+								<th scope="col">Scored</th>
+								<th scope="col">Last reviewed</th>
+							</tr>
+						</thead>
+						<tbody>
+							{
+								rows.map(({ entry, stats }) => (
+									<tr>
+										<th scope="row">
+											<a href={`/legislators/${entry.data.slug}/`}>{entry.data.name}</a>
+										</th>
+										<td>
+											<span class:list={['coverage-tier', `coverage-tier--${stats.tier}`]}>
+												{COVERAGE_TIER_LABELS[stats.tier]}
+											</span>
+										</td>
+										<td>{stats.highlights}</td>
+										<td>{stats.concerns}</td>
+										<td>{stats.sources}</td>
+										<td>{stats.articles}</td>
+										<td>{stats.hasScores ? 'Yes' : 'Not yet'}</td>
+										<td>
+											{stats.lastReviewed ? (
+												<FormattedDate date={stats.lastReviewed} />
+											) : (
+												'Not yet reviewed'
+											)}
+										</td>
+									</tr>
+								))
+							}
+						</tbody>
+					</table>
+				</div>
+				<p class="coverage-method prose">
+					<strong>How to read this:</strong> "Documented" means at least two sourced points on each
+					side (supporter and critic) plus a source list. Profiles are scored only after crossing
+					that bar. If one officeholder has far more concerns documented than everyone else, that's
+					either a real difference in their record or a gap in ours — this page exists so you can
+					ask which.
+				</p>
+			</section>
+		</main>
+		<Footer />
+	</body>
+</html>

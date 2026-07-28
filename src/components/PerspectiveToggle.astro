@@ -39,7 +39,11 @@ const concernCount = concerns.length;
 					</svg>
 				</span>
 				<span class="perspective-tab-label">Supporter highlights</span>
-				<span class="perspective-tab-badge">{highlightCount} highlight{highlightCount === 1 ? '' : 's'}</span>
+				<span class="perspective-tab-badge">
+					{highlightCount === 0
+						? 'not yet documented'
+						: `${highlightCount} highlight${highlightCount === 1 ? '' : 's'}`}
+				</span>
 			</button>
 			<button
 				type="button"
@@ -57,7 +61,11 @@ const concernCount = concerns.length;
 					</svg>
 				</span>
 				<span class="perspective-tab-label">Critic concerns</span>
-				<span class="perspective-tab-badge">{concernCount} concern{concernCount === 1 ? '' : 's'}</span>
+				<span class="perspective-tab-badge">
+					{concernCount === 0
+						? 'not yet documented'
+						: `${concernCount} concern${concernCount === 1 ? '' : 's'}`}
+				</span>
 			</button>
 		</div>
 		<p class="perspective-helper">
@@ -72,24 +80,31 @@ const concernCount = concerns.length;
 			aria-labelledby="tab-supporters"
 			class="panel panel-supporters"
 		>
-			<ul class="point-list">
-				{
-					goodPoints.map((point) => (
-						<li>
-							<span class="point-badge point-badge--editorial">Verified by WM Politics</span>
-							<h3>{point.title}</h3>
-							<p>{point.body}</p>
-							{point.source && (
-								<p class="point-source">
-									<a href={point.source} target="_blank" rel="noopener noreferrer">
-										Source
-									</a>
-								</p>
-							)}
-						</li>
-					))
-				}
-			</ul>
+			{
+				goodPoints.length > 0 ? (
+					<ul class="point-list">
+						{goodPoints.map((point) => (
+							<li>
+								<span class="point-badge point-badge--editorial">Verified by WM Politics</span>
+								<h3>{point.title}</h3>
+								<p>{point.body}</p>
+								{point.source && (
+									<p class="point-source">
+										<a href={point.source} target="_blank" rel="noopener noreferrer">
+											Source
+										</a>
+									</p>
+								)}
+							</li>
+						))}
+					</ul>
+				) : (
+					<p class="perspective-empty">
+						No supporter highlights documented yet for {name}. Know of one with a source? Use the
+						submission form below — sourced additions are reviewed and published.
+					</p>
+				)
+			}
 		</div>
 		<div
 			id="panel-critics"
@@ -98,24 +113,31 @@ const concernCount = concerns.length;
 			class="panel panel-critics"
 			hidden
 		>
-			<ul class="point-list">
-				{
-					concerns.map((point) => (
-						<li>
-							<span class="point-badge point-badge--editorial">Verified by WM Politics</span>
-							<h3>{point.title}</h3>
-							<p>{point.body}</p>
-							{point.source && (
-								<p class="point-source">
-									<a href={point.source} target="_blank" rel="noopener noreferrer">
-										Source
-									</a>
-								</p>
-							)}
-						</li>
-					))
-				}
-			</ul>
+			{
+				concerns.length > 0 ? (
+					<ul class="point-list">
+						{concerns.map((point) => (
+							<li>
+								<span class="point-badge point-badge--editorial">Verified by WM Politics</span>
+								<h3>{point.title}</h3>
+								<p>{point.body}</p>
+								{point.source && (
+									<p class="point-source">
+										<a href={point.source} target="_blank" rel="noopener noreferrer">
+											Source
+										</a>
+									</p>
+								)}
+							</li>
+						))}
+					</ul>
+				) : (
+					<p class="perspective-empty">
+						No critic concerns documented yet for {name}. Know of one with a source? Use the
+						submission form below — sourced additions are reviewed and published.
+					</p>
+				)
+			}
 		</div>
 	</div>
 </section>

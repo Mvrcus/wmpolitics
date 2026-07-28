@@ -1,0 +1,84 @@
+---
+import voteHistory from '../data/vote-history.json';
+
+const ottawa = voteHistory.counties.ottawa;
+const m2020 = ottawa.p2020.repPct - ottawa.p2020.demPct;
+const m2024 = ottawa.p2024.repPct - ottawa.p2024.demPct;
+const shift = m2024 - m2020;
+const turnoutDelta = ottawa.p2024.total - ottawa.p2020.total;
+const turnoutPct = ((turnoutDelta / ottawa.p2020.total) * 100).toFixed(1);
+const stateMargin = Math.abs(
+	voteHistory.statewide.p2024.repPct - voteHistory.statewide.p2024.demPct,
+).toFixed(1);
+
+const insights = [
+	`Ottawa County voted Republican by ${m2024.toFixed(1)} points in 2024 (${ottawa.p2024.repPct}% to ${ottawa.p2024.demPct}%) — while Michigan overall was decided by just ${stateMargin}.`,
+	shift < 0
+		? `The Republican margin here narrowed by ${Math.abs(shift).toFixed(1)} points between 2020 and 2024 — this area moved against the statewide trend.`
+		: `The Republican margin here grew by ${shift.toFixed(1)} points between 2020 and 2024.`,
+	`Turnout grew by ${turnoutDelta.toLocaleString()} votes (${turnoutPct}%) from 2020 to 2024. In an area this one-sided, the August primary usually decides the seat before November does.`,
+];
+---
+
+<section class="section vote-picture" aria-labelledby="vote-picture-heading">
+	<div class="section-header">
+		<h2 id="vote-picture-heading">How West Michigan actually votes</h2>
+		<a href="/holland/">Who represents you</a>
+	</div>
+	<div class="vote-picture-grid">
+		<div class="cc-chart-wrap vote-picture-chart">
+			<canvas data-vote-picture-chart height="190" aria-label="Ottawa County presidential results, 2020 and 2024"></canvas>
+		</div>
+		<ul class="cc-insights">
+			{insights.map((text) => <li>{text}</li>)}
+		</ul>
+	</div>
+	<p class="cc-source">
+		Official certified results — history, not predictions.
+		{voteHistory.sources.map((s, i) => (
+			<>
+				<a href={s.url} target="_blank" rel="noopener noreferrer">{s.label}</a>{i < voteHistory.sources.length - 1 ? ' · ' : ''}
+			</>
+		))}
+	</p>
+</section>
+
+<script>
+	import voteHistory from '../data/vote-history.json';
+
+	async function renderVotePicture() {
+		const canvas = document.querySelector<HTMLCanvasElement>('[data-vote-picture-chart]');
+		if (!canvas) return;
+		const county = voteHistory.counties.ottawa;
+		const { Chart, BarController, BarElement, CategoryScale, LinearScale, Legend, Tooltip } =
+			await import('chart.js');
+		Chart.register(BarController, BarElement, CategoryScale, LinearScale, Legend, Tooltip);
+
+		new Chart(canvas, {
+			type: 'bar',
+			data: {
+				labels: ['2020 presidential', '2024 presidential'],
+				datasets: [
+					{
+						label: 'Republican share',
+						data: [county.p2020.repPct, county.p2024.repPct],
+						backgroundColor: '#9b1c1c',
+					},
+					{
+						label: 'Democratic share',
+						data: [county.p2020.demPct, county.p2024.demPct],
+						backgroundColor: '#1a4480',
+					},
+				],
+			},
+			options: {
+				responsive: true,
+				maintainAspectRatio: false,
+				scales: { y: { min: 0, max: 100, ticks: { callback: (v) => `${v}%` } } },
+				plugins: { legend: { position: 'bottom' } },
+			},
+		});
+	}
+
+	renderVotePicture();
+</script>

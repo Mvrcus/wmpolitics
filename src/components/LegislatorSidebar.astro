@@ -11,7 +11,7 @@ import NewsletterSignup from './NewsletterSignup.astro';
 
 interface Props {
 	entry: CollectionEntry<'legislators'>;
-	editorialScores: EditorialScores;
+	editorialScores: EditorialScores | null;
 	showNewsletter?: boolean;
 }
 
@@ -25,22 +25,37 @@ const otherLegislators = allLegislators.filter((l) => l.data.slug !== d.slug).sl
 ---
 
 <aside class="legislator-sidebar" aria-label="Profile sidebar">
-	<details class="legislator-at-a-glance">
+	<details class="legislator-at-a-glance" open>
 		<summary class="legislator-at-a-glance-summary">At a glance</summary>
 		<div class="legislator-at-a-glance-body">
 			<section class="sidebar-block sidebar-scorecard" aria-labelledby="sidebar-editorial-heading">
 				<h2 id="sidebar-editorial-heading" class="sidebar-heading">Editorial score</h2>
-				<div class="sidebar-overall-score">
-					<ScoreMeter score={editorialScores.overall} label="Overall" size="compact" showValue={true} />
-				</div>
-				<DimensionScores scores={editorialScores} compact />
+				{
+					editorialScores ? (
+						<>
+							<div class="sidebar-overall-score">
+								<ScoreMeter
+									score={editorialScores.overall}
+									label="Overall"
+									size="compact"
+									showValue={true}
+								/>
+							</div>
+							<DimensionScores scores={editorialScores} compact />
+						</>
+					) : (
+						<p class="sidebar-score-empty">
+							Not yet scored — profiles are scored only after enough sourced reporting is documented.
+						</p>
+					)
+				}
 			</section>
 
 			<section class="sidebar-block sidebar-vote">
 				<PublicVote
 					slug={d.slug}
 					legislatorName={d.name}
-					editorialOverall={editorialScores.overall}
+					editorialOverall={editorialScores?.overall}
 					compact
 				/>
 			</section>

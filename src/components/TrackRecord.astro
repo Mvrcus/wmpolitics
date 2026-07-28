@@ -1,0 +1,210 @@
+---
+interface KeyVote {
+	voteId: string;
+	title: string;
+	note: string;
+}
+
+interface Props {
+	slug: string;
+	legislatorName: string;
+	/** True when this legislator is in the track-record roster (has an API feed). */
+	hasFeed: boolean;
+	keyVotes?: KeyVote[];
+}
+
+const { slug, legislatorName, hasFeed, keyVotes = [] } = Astro.props;
+---
+
+<section
+	id="track-record"
+	class="section track-record"
+	data-track-record
+	data-slug={slug}
+	data-has-feed={hasFeed ? 'true' : 'false'}
+	aria-labelledby="track-record-heading"
+>
+	<div class="section-header">
+		<h2 id="track-record-heading">Track record</h2>
+	</div>
+	{
+		hasFeed ? (
+			<p class="track-record-empty" data-track-record-empty>
+				Official roll-call votes and sponsored bills for {legislatorName} sync weekly from
+				Congress.gov and OpenStates. Nothing has synced yet — until then, see the sources below.
+			</p>
+		) : (
+			<p class="track-record-empty">
+				No roll-call feed is available for this office — county boards and city councils don't
+				publish machine-readable vote records. Documented positions appear in the sourced sections
+				above and below.
+			</p>
+		)
+	}
+	<div class="track-record-body" data-track-record-body hidden>
+		<p class="track-record-stats" data-track-record-stats></p>
+		<div data-track-record-keyvotes hidden>
+			<h3 class="track-record-subhead">Key votes</h3>
+			<ul class="track-record-list" data-keyvotes-list></ul>
+		</div>
+		<div data-track-record-votes hidden>
+			<h3 class="track-record-subhead">Recent roll-call votes</h3>
+			<ul class="track-record-list" data-votes-list></ul>
+		</div>
+		<div data-track-record-bills hidden>
+			<h3 class="track-record-subhead">Sponsored bills</h3>
+			<ul class="track-record-list" data-bills-list></ul>
+			<p class="track-record-cosponsored" data-cosponsored hidden></p>
+		</div>
+		<p class="track-record-updated" data-track-record-updated></p>
+	</div>
+</section>
+
+<script define:vars={{ slug, keyVotes }}>
+	const root = document.querySelector(`[data-track-record][data-slug="${slug}"]`);
+	if (root && root.dataset.hasFeed === 'true') {
+		const emptyEl = root.querySelector('[data-track-record-empty]');
+		const bodyEl = root.querySelector('[data-track-record-body]');
+		const statsEl = root.querySelector('[data-track-record-stats]');
+		const keyVotesWrap = root.querySelector('[data-track-record-keyvotes]');
+		const keyVotesList = root.querySelector('[data-keyvotes-list]');
+		const votesWrap = root.querySelector('[data-track-record-votes]');
+		const votesList = root.querySelector('[data-votes-list]');
+		const billsWrap = root.querySelector('[data-track-record-bills]');
+		const billsList = root.querySelector('[data-bills-list]');
+		const cosponsoredEl = root.querySelector('[data-cosponsored]');
+		const updatedEl = root.querySelector('[data-track-record-updated]');
+
+		const POSITION_LABELS = {
+			yea: 'Voted yes',
+			nay: 'Voted no',
+			present: 'Present',
+			'not-voting': 'Did not vote',
+		};
+
+		function positionBadge(position) {
+			const span = document.createElement('span');
+			span.className = `track-record-position track-record-position--${position}`;
+			span.textContent = POSITION_LABELS[position] ?? position;
+			return span;
+		}
+
+		function voteItem(vote, editorialNote) {
+			const li = document.createElement('li');
+			li.className = 'track-record-item';
+
+			const head = document.createElement('div');
+			head.className = 'track-record-item-head';
+			head.appendChild(positionBadge(vote.position));
+
+			const link = document.createElement('a');
+			link.href = vote.url;
+			link.target = '_blank';
+			link.rel = 'noopener noreferrer';
+			link.textContent = vote.billNumber ? `${vote.billNumber} — ${vote.question}` : vote.question;
+			head.appendChild(link);
+
+			const date = document.createElement('span');
+			date.className = 'track-record-date';
+			date.textContent = vote.date;
+			head.appendChild(date);
+
+			li.appendChild(head);
+
+			if (vote.result) {
+				const result = document.createElement('p');
+				result.className = 'track-record-result';
+				result.textContent = `Result: ${vote.result}`;
+				li.appendChild(result);
+			}
+
+			if (editorialNote) {
+				const note = document.createElement('p');
+				note.className = 'track-record-note';
+				note.textContent = editorialNote;
+				li.appendChild(note);
+			}
+
+			return li;
+		}
+
+		async function load() {
+			let payload;
+			try {
+				const res = await fetch(`/api/track-record/${slug}`);
+				if (!res.ok) return;
+				payload = await res.json();
+			} catch {
+				return;
+			}
+
+			const votes = payload?.votes ?? [];
+			const sponsored = payload?.bills?.sponsored ?? [];
+			if (votes.length === 0 && sponsored.length === 0) return;
+
+			if (emptyEl) emptyEl.hidden = true;
+			if (bodyEl) bodyEl.hidden = false;
+
+			const stats = payload.stats ?? {};
+			if (statsEl && stats.totalVotes > 0) {
+				let text = `${stats.totalVotes} roll-call vote${stats.totalVotes === 1 ? '' : 's'} tracked`;
+				if (stats.trackedSince) text += ` since ${stats.trackedSince}`;
+				if (stats.missedPct != null) text += ` · ${stats.missedPct}% missed`;
+				statsEl.textContent = text;
+			}
+
+			const voteById = new Map(votes.map((v) => [v.voteId, v]));
+			const matchedKeyVotes = keyVotes
+				.map((kv) => ({ kv, vote: voteById.get(kv.voteId) }))
+				.filter((entry) => entry.vote);
+			if (matchedKeyVotes.length > 0 && keyVotesWrap && keyVotesList) {
+				matchedKeyVotes.forEach(({ kv, vote }) => {
+					keyVotesList.appendChild(voteItem(vote, `${kv.title}: ${kv.note}`));
+				});
+				keyVotesWrap.hidden = false;
+			}
+
+			if (votes.length > 0 && votesWrap && votesList) {
+				votes.forEach((vote) => votesList.appendChild(voteItem(vote)));
+				votesWrap.hidden = false;
+			}
+
+			if (sponsored.length > 0 && billsWrap && billsList) {
+				sponsored.forEach((bill) => {
+					const li = document.createElement('li');
+					li.className = 'track-record-item';
+
+					const link = document.createElement('a');
+					link.href = bill.url;
+					link.target = '_blank';
+					link.rel = 'noopener noreferrer';
+					link.textContent = `${bill.number} — ${bill.title}`;
+					li.appendChild(link);
+
+					if (bill.latestAction) {
+						const action = document.createElement('p');
+						action.className = 'track-record-result';
+						action.textContent = bill.latestActionDate
+							? `${bill.latestAction} (${bill.latestActionDate})`
+							: bill.latestAction;
+						li.appendChild(action);
+					}
+
+					billsList.appendChild(li);
+				});
+				billsWrap.hidden = false;
+
+				if (cosponsoredEl && payload.bills.cosponsoredCount > 0) {
+					cosponsoredEl.textContent = `Plus ${payload.bills.cosponsoredCount} cosponsored bills this Congress.`;
+					cosponsoredEl.hidden = false;
+				}
+			}
+
+			if (updatedEl && payload.updatedAt) {
+				updatedEl.textContent = `Data from Congress.gov / OpenStates, last synced ${payload.updatedAt.slice(0, 10)}. Every entry links to its primary source.`;
+			}
+		}
+
+		load();
+	}
+</script>

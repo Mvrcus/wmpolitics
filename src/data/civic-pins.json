@@ -1,0 +1,8 @@
+[
+	{ "name": "Holland City Hall", "detail": "City clerk · local ballots & voter registration", "lat": 42.7897, "lng": -86.1077 },
+	{ "name": "Zeeland City Hall", "detail": "City clerk · local ballots & voter registration", "lat": 42.8126, "lng": -86.0105 },
+	{ "name": "Ottawa County Offices (West Olive)", "detail": "County clerk · elections office", "lat": 42.9075, "lng": -86.0227 },
+	{ "name": "Grand Haven City Hall", "detail": "City clerk · northern Ottawa County", "lat": 43.0631, "lng": -86.2284 },
+	{ "name": "Holland Township Offices", "detail": "Township clerk · 49424 area voting", "lat": 42.8218, "lng": -86.0894 },
+	{ "name": "Park Township Offices", "detail": "Township clerk · lakeshore precincts", "lat": 42.7909, "lng": -86.1608 }
+]

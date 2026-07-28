@@ -1,0 +1,396 @@
+---
+import LegislatorCard from './LegislatorCard.astro';
+import { getHollandLegislators } from '../lib/content';
+import { groupLegislatorsByOffice } from '../lib/legislators';
+import { TRACK_RECORD_ROSTER } from '../lib/track-record/roster';
+import zipMap from '../data/zip-districts.json';
+import zipCentroids from '../data/zip-centroids.json';
+import civicPins from '../data/civic-pins.json';
+import voteHistory from '../data/vote-history.json';
+
+const legislators = await getHollandLegislators();
+const grouped = groupLegislatorsByOffice(legislators);
+const liveFeedSlugs = TRACK_RECORD_ROSTER.map((entry) => entry.slug);
+
+/* Statutory election calendar by office — rule-based, not editorial:
+   US House + MI House every 2 years; MI Senate seats elected 2022 expire 2026;
+   MI county commissions moved to 4-year terms with the 2024 election (next 2028);
+   Holland city races run in odd Novembers (next 2027). */
+const NEXT_ELECTION: Record<string, string> = {
+	'us-house': 'Nov 3, 2026',
+	'state-house': 'Nov 3, 2026',
+	'state-senate': 'Nov 3, 2026',
+	local: 'County board: Nov 2028 · Holland city: Nov 2027',
+};
+---
+
+<section class="command-center" id="command-center" data-command-center aria-label="Find your representation">
+	<div class="cc-map" data-cc-map aria-hidden="true"></div>
+	<div class="cc-mist" data-cc-mist aria-hidden="true"></div>
+
+	<div class="cc-overlay">
+		<div class="cc-panel cc-panel--search" data-cc-search>
+			<span class="cc-watermark cc-watermark--dem" aria-hidden="true"></span>
+			<span class="cc-watermark cc-watermark--rep" aria-hidden="true"></span>
+			<p class="cc-banner" data-cc-banner hidden>
+				<strong>First time here?</strong> Give us a ZIP and we'll show you who represents that
+				area, how it has actually voted, and what's on its next ballot — sourced, no account, no
+				tracking. <button type="button" class="cc-banner-dismiss" data-cc-banner-dismiss>Got it</button>
+			</p>
+			<p class="cc-masthead">West Michigan Politics</p>
+			<p class="cc-kicker">Nonpartisan civic record · Holland &amp; Ottawa County</p>
+			<h1 class="cc-title">Who runs your corner of Michigan?</h1>
+			<form class="cc-form" data-cc-form>
+				<label class="sr-only" for="cc-zip">ZIP code</label>
+				<input
+					type="text"
+					id="cc-zip"
+					name="zip"
+					inputmode="numeric"
+					pattern="[0-9]{5}"
+					maxlength="5"
+					placeholder="ZIP code"
+					autocomplete="postal-code"
+				/>
+				<button type="submit" class="btn cc-submit">Scan my area</button>
+			</form>
+			<p class="cc-hint" data-cc-hint>
+				Covering Holland, Zeeland &amp; Ottawa County. We never store your ZIP.
+			</p>
+		</div>
+
+		<div class="cc-panel cc-panel--results" data-cc-results hidden>
+			<div class="cc-results-head">
+				<h2 data-cc-place>Your area</h2>
+				<button type="button" class="btn btn-outline btn-sm" data-cc-reset>New scan</button>
+			</div>
+
+			<section class="cc-section" data-cc-analytics aria-label="How your area votes">
+				<h3 class="cc-section-title">How this area actually votes</h3>
+				<div class="cc-chart-wrap">
+					<canvas data-cc-chart height="170" aria-label="Past presidential results for this county"></canvas>
+				</div>
+				<ul class="cc-insights" data-cc-insights></ul>
+				<p class="cc-source">
+					Official certified results, not predictions.
+					{voteHistory.sources.map((s, i) => (
+						<>
+							<a href={s.url} target="_blank" rel="noopener noreferrer">{s.label}</a>{i < voteHistory.sources.length - 1 ? ' · ' : ''}
+						</>
+					))}
+				</p>
+			</section>
+
+			<section class="cc-section" aria-label="Upcoming voting opportunities">
+				<h3 class="cc-section-title">Next chances to vote here</h3>
+				<ul class="cc-ballot" data-cc-ballot></ul>
+				<p class="cc-source">
+					Register or check your ballot at{' '}
+					<a href="https://www.michigan.gov/vote" target="_blank" rel="noopener noreferrer">Michigan Voter Information</a>.
+				</p>
+			</section>
+
+			<section class="cc-section" aria-label="Your current leadership">
+				<h3 class="cc-section-title">Current leadership for this ZIP</h3>
+				<p class="cc-legend">
+					<span class="cc-chip cc-chip--live">Live data</span> synced from Congress.gov / OpenStates ·
+					<span class="cc-chip cc-chip--editorial">Editorial</span> reviewed profiles (no public API
+					exists below the state level)
+				</p>
+				<div class="cc-groups">
+					{
+						grouped.map((group) => (
+							<div class="cc-group" data-cc-office-group>
+								<h4 class="cc-group-title">
+									{group.label}
+									<span class="cc-group-election">{NEXT_ELECTION[group.office] ?? ''}</span>
+								</h4>
+								<ul class="card-grid cc-grid">
+									{group.legislators.map((leg) => (
+										<li data-leg-slug={leg.data.slug} data-office={group.office}>
+											<span
+												class:list={[
+													'cc-chip',
+													liveFeedSlugs.includes(leg.data.slug)
+														? 'cc-chip--live'
+														: 'cc-chip--editorial',
+												]}
+											>
+												{liveFeedSlugs.includes(leg.data.slug) ? 'Live data' : 'Editorial'}
+											</span>
+											<LegislatorCard legislator={leg} />
+										</li>
+									))}
+								</ul>
+							</div>
+						))
+					}
+				</div>
+			</section>
+		</div>
+	</div>
+</section>
+
+<script>
+	import { Map as MaplibreMap, Marker } from 'maplibre-gl';
+	import 'maplibre-gl/dist/maplibre-gl.css';
+	import zipMap from '../data/zip-districts.json';
+	import zipCentroids from '../data/zip-centroids.json';
+	import civicPins from '../data/civic-pins.json';
+	import voteHistory from '../data/vote-history.json';
+
+	const root = document.querySelector<HTMLElement>('[data-command-center]');
+
+	if (root) {
+		const mapEl = root.querySelector<HTMLElement>('[data-cc-map]');
+		const mistEl = root.querySelector<HTMLElement>('[data-cc-mist]');
+		const searchPanel = root.querySelector<HTMLElement>('[data-cc-search]');
+		const resultsPanel = root.querySelector<HTMLElement>('[data-cc-results]');
+		const form = root.querySelector<HTMLFormElement>('[data-cc-form]');
+		const zipInput = root.querySelector<HTMLInputElement>('#cc-zip');
+		const hintEl = root.querySelector<HTMLElement>('[data-cc-hint]');
+		const banner = root.querySelector<HTMLElement>('[data-cc-banner]');
+		const placeEl = root.querySelector<HTMLElement>('[data-cc-place]');
+		const insightsEl = root.querySelector<HTMLElement>('[data-cc-insights]');
+		const ballotEl = root.querySelector<HTMLElement>('[data-cc-ballot]');
+		const chartCanvas = root.querySelector<HTMLCanvasElement>('[data-cc-chart]');
+		const legItems = [...root.querySelectorAll<HTMLElement>('[data-leg-slug]')];
+		const groups = [...root.querySelectorAll<HTMLElement>('[data-cc-office-group]')];
+		const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+		type CentroidEntry = {
+			lat: number;
+			lng: number;
+			zoom: number;
+			place: string;
+			county: keyof typeof voteHistory.counties;
+			countyNote: string | null;
+		};
+		const centroids = zipCentroids as Record<string, CentroidEntry>;
+		const zips = zipMap as Record<string, { slugs: string[]; split: boolean; note: string | null }>;
+
+		// First-visit banner
+		try {
+			if (banner && !localStorage.getItem('wmp-cc-seen')) banner.hidden = false;
+		} catch {
+			/* storage unavailable */
+		}
+		banner?.querySelector('[data-cc-banner-dismiss]')?.addEventListener('click', () => {
+			banner.hidden = true;
+			try {
+				localStorage.setItem('wmp-cc-seen', '1');
+			} catch {
+				/* ignore */
+			}
+		});
+
+		// Map init — muted, "situation room" look via free OpenFreeMap vector tiles.
+		const map = new MaplibreMap({
+			container: mapEl!,
+			style: 'https://tiles.openfreemap.org/styles/positron',
+			center: [-86.06, 42.86],
+			zoom: 9.4,
+			pitch: 0,
+			attributionControl: { compact: true },
+			interactive: false,
+		});
+
+		map.on('load', () => {
+			for (const pin of civicPins as Array<{ name: string; detail: string; lat: number; lng: number }>) {
+				const el = document.createElement('div');
+				el.className = 'cc-pin';
+				el.title = `${pin.name} — ${pin.detail}`;
+				new Marker({ element: el }).setLngLat([pin.lng, pin.lat]).addTo(map);
+			}
+
+			// County lean circles from certified past results (2024).
+			for (const county of Object.values(voteHistory.counties)) {
+				const margin = county.p2024.repPct - county.p2024.demPct;
+				const el = document.createElement('div');
+				el.className = `cc-county-dot ${margin >= 0 ? 'cc-county-dot--rep' : 'cc-county-dot--dem'}`;
+				el.innerHTML = `<span>${county.name}</span><em>${margin >= 0 ? 'R' : 'D'} +${Math.abs(margin).toFixed(1)} in 2024</em>`;
+				new Marker({ element: el }).setLngLat([county.lng, county.lat]).addTo(map);
+			}
+		});
+
+		// Prefill ZIP from Cloudflare edge geolocation — never auto-search.
+		fetch('/api/geo')
+			.then((res) => (res.ok ? res.json() : null))
+			.then((geo: { postalCode?: string | null } | null) => {
+				if (geo?.postalCode && zipInput && !zipInput.value) {
+					zipInput.value = geo.postalCode;
+					if (hintEl) {
+						hintEl.textContent = `Looks like you're near ${geo.postalCode} — hit Scan, or type another ZIP. We never store it.`;
+					}
+				}
+			})
+			.catch(() => {
+				/* geolocation is a nicety, not a dependency */
+			});
+
+		let chart: import('chart.js').Chart | null = null;
+
+		async function renderChart(countyKey: keyof typeof voteHistory.counties) {
+			if (!chartCanvas) return;
+			const county = voteHistory.counties[countyKey];
+			const { Chart, BarController, BarElement, CategoryScale, LinearScale, Legend, Tooltip } =
+				await import('chart.js');
+			Chart.register(BarController, BarElement, CategoryScale, LinearScale, Legend, Tooltip);
+
+			chart?.destroy();
+			chart = new Chart(chartCanvas, {
+				type: 'bar',
+				data: {
+					labels: ['2020 presidential', '2024 presidential'],
+					datasets: [
+						{
+							label: 'Republican share',
+							data: [county.p2020.repPct, county.p2024.repPct],
+							backgroundColor: '#9b1c1c',
+						},
+						{
+							label: 'Democratic share',
+							data: [county.p2020.demPct, county.p2024.demPct],
+							backgroundColor: '#1a4480',
+						},
+					],
+				},
+				options: {
+					responsive: true,
+					maintainAspectRatio: false,
+					scales: {
+						y: { min: 0, max: 100, ticks: { callback: (v) => `${v}%` } },
+					},
+					plugins: { legend: { position: 'bottom' } },
+				},
+			});
+		}
+
+		function buildInsights(countyKey: keyof typeof voteHistory.counties, zip: string) {
+			const county = voteHistory.counties[countyKey];
+			const m2020 = county.p2020.repPct - county.p2020.demPct;
+			const m2024 = county.p2024.repPct - county.p2024.demPct;
+			const shift = m2024 - m2020;
+			const turnoutDelta = county.p2024.total - county.p2020.total;
+			const turnoutPct = ((turnoutDelta / county.p2020.total) * 100).toFixed(1);
+			const stateMargin2024 = voteHistory.statewide.p2024.repPct - voteHistory.statewide.p2024.demPct;
+
+			const items = [
+				`${county.name} voted Republican by ${m2024.toFixed(1)} points in 2024 (${county.p2024.repPct}% to ${county.p2024.demPct}%) — Michigan overall was decided by just ${Math.abs(stateMargin2024).toFixed(1)}.`,
+				shift < 0
+					? `The Republican margin here narrowed by ${Math.abs(shift).toFixed(1)} points between 2020 and 2024 — this area moved against the statewide trend.`
+					: `The Republican margin here grew by ${shift.toFixed(1)} points between 2020 and 2024.`,
+				`Turnout ${turnoutDelta >= 0 ? 'grew' : 'fell'} by ${Math.abs(turnoutDelta).toLocaleString()} votes (${turnoutPct}%) from 2020 to 2024 — in an area this one-sided, primaries often decide the seat before November does.`,
+			];
+
+			const centroid = centroids[zip];
+			if (centroid?.countyNote) items.push(`${centroid.countyNote} — county-level figures may blend two counties for your address.`);
+			return items;
+		}
+
+		function buildBallot(zip: string) {
+			if (!ballotEl) return;
+			ballotEl.replaceChildren();
+			const entries = [
+				{ when: 'Aug 4, 2026', what: 'Michigan primary — U.S. House (MI-04), State House 86, State Senate 30 nominations are decided here' },
+				{ when: 'Nov 3, 2026', what: 'General election — U.S. House, State House, State Senate seats covering this ZIP' },
+				{ when: 'Nov 2027', what: 'Holland city elections (mayor & council)' },
+				{ when: 'Nov 2028', what: 'Ottawa County Board (commissioners now serve 4-year terms)' },
+			];
+			for (const entry of entries) {
+				const li = document.createElement('li');
+				const when = document.createElement('strong');
+				when.textContent = entry.when;
+				li.append(when, document.createTextNode(` — ${entry.what}`));
+				ballotEl.appendChild(li);
+			}
+		}
+
+		function filterLeadership(zip: string) {
+			const wanted = new Set(zips[zip]?.slugs ?? []);
+			const useAll = wanted.size === 0;
+			legItems.forEach((li) => {
+				li.hidden = !useAll && !wanted.has(li.dataset.legSlug ?? '');
+			});
+			groups.forEach((group) => {
+				const visible = [...group.querySelectorAll<HTMLElement>('[data-leg-slug]')].some((li) => !li.hidden);
+				group.hidden = !visible;
+			});
+		}
+
+		function showResults(zip: string) {
+			const centroid = centroids[zip];
+			const countyKey = centroid?.county ?? 'ottawa';
+
+			if (placeEl) {
+				placeEl.textContent = centroid ? `${centroid.place} · ${zip}` : `ZIP ${zip} — nearest coverage: Ottawa County`;
+			}
+			if (insightsEl) {
+				insightsEl.replaceChildren();
+				for (const text of buildInsights(countyKey, zip)) {
+					const li = document.createElement('li');
+					li.textContent = text;
+					insightsEl.appendChild(li);
+				}
+			}
+			buildBallot(zip);
+			filterLeadership(zip);
+			renderChart(countyKey);
+
+			searchPanel!.hidden = true;
+			resultsPanel!.hidden = false;
+			resultsPanel!.classList.add('cc-panel--reveal');
+		}
+
+		function runScan(zip: string) {
+			const centroid = centroids[zip];
+			root!.classList.add('cc-scanning');
+			mistEl?.classList.add('cc-mist--active');
+
+			const flyMs = reducedMotion ? 0 : 3200;
+			if (centroid) {
+				map.flyTo({
+					center: [centroid.lng, centroid.lat],
+					zoom: centroid.zoom,
+					duration: flyMs,
+					essential: true,
+				});
+			}
+
+			window.setTimeout(() => {
+				showResults(zip);
+				window.setTimeout(() => {
+					mistEl?.classList.remove('cc-mist--active');
+					root!.classList.remove('cc-scanning');
+				}, reducedMotion ? 0 : 900);
+			}, flyMs + 300);
+		}
+
+		form?.addEventListener('submit', (event) => {
+			event.preventDefault();
+			const zip = (zipInput?.value ?? '').trim();
+			if (!/^\d{5}$/.test(zip)) return;
+			try {
+				localStorage.setItem('wmp-zip', zip);
+			} catch {
+				/* ignore */
+			}
+			runScan(zip);
+		});
+
+		root.querySelector('[data-cc-reset]')?.addEventListener('click', () => {
+			resultsPanel!.hidden = true;
+			resultsPanel!.classList.remove('cc-panel--reveal');
+			searchPanel!.hidden = false;
+			map.flyTo({ center: [-86.06, 42.86], zoom: 9.4, duration: reducedMotion ? 0 : 1800 });
+		});
+
+		// Returning visitor: prefill their last ZIP (still no auto-search).
+		try {
+			const saved = localStorage.getItem('wmp-zip');
+			if (saved && /^\d{5}$/.test(saved) && zipInput && !zipInput.value) zipInput.value = saved;
+		} catch {
+			/* ignore */
+		}
+	}
+</script>

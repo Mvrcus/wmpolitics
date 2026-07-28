@@ -26,7 +26,7 @@ const legislators = defineCollection({
 	schema: z.object({
 		name: z.string(),
 		slug: z.string(),
-		office: z.enum(["us-house", "us-senate", "state-house", "state-senate", "local"]),
+		office: z.enum(["us-house", "us-senate", "governor", "state-house", "state-senate", "local"]),
 		district: z.string(),
 		/** Groups current and past holders of the same elected seat. */
 		seatSlug: z.string(),
@@ -37,6 +37,10 @@ const legislators = defineCollection({
 		termEnd: z.number().optional(),
 		party: z.string().optional(),
 		photo: z.string().optional(),
+		/** True when `photo` is an official portrait (affects alt text). */
+		photoIsOfficial: z.boolean().optional(),
+		/** Date the profile content was last editorially reviewed. */
+		lastReviewed: z.coerce.date().optional(),
 		servesHolland: z.boolean(),
 		proximityRank: z.number(),
 		summary: z.string(),
@@ -44,6 +48,16 @@ const legislators = defineCollection({
 		concerns: z.array(pointSchema),
 		sources: z.array(sourceSchema).optional(),
 		editorialScores: editorialScoresSchema.optional(),
+		/** Editorial framing for specific roll calls; matched by voteId against synced data. */
+		keyVotes: z
+			.array(
+				z.object({
+					voteId: z.string(),
+					title: z.string(),
+					note: z.string(),
+				}),
+			)
+			.optional(),
 	}),
 });
 

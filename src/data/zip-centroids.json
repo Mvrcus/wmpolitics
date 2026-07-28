@@ -1,0 +1,10 @@
+{
+	"49423": { "lat": 42.772, "lng": -86.105, "zoom": 12.3, "place": "Holland (south side)", "county": "ottawa", "countyNote": "Parts of 49423 sit in Allegan County" },
+	"49422": { "lat": 42.79, "lng": -86.108, "zoom": 12.3, "place": "Holland", "county": "ottawa", "countyNote": null },
+	"49424": { "lat": 42.816, "lng": -86.127, "zoom": 12.2, "place": "Holland (north side)", "county": "ottawa", "countyNote": null },
+	"49434": { "lat": 42.777, "lng": -86.2, "zoom": 13, "place": "Macatawa", "county": "ottawa", "countyNote": null },
+	"49464": { "lat": 42.815, "lng": -86.011, "zoom": 12.5, "place": "Zeeland", "county": "ottawa", "countyNote": null },
+	"49460": { "lat": 42.928, "lng": -86.12, "zoom": 12, "place": "West Olive", "county": "ottawa", "countyNote": null },
+	"49417": { "lat": 43.052, "lng": -86.218, "zoom": 12.2, "place": "Grand Haven", "county": "ottawa", "countyNote": null },
+	"49456": { "lat": 43.077, "lng": -86.194, "zoom": 12.5, "place": "Spring Lake", "county": "ottawa", "countyNote": null }
+}

@@ -26,19 +26,19 @@ const votingEnabled =
 	<header class="public-vote-header">
 		{
 			compact ? (
-				<h2 class="sidebar-heading">Tar &amp; Feather</h2>
+				<h2 class="sidebar-heading">Constituent Pulse</h2>
 			) : (
-				<h2>Tar &amp; Feather Score</h2>
+				<h2>Constituent Pulse</h2>
 			)
 		}
 		<p class="public-vote-lead">
 			{
 				compact ? (
-					<>One vote per profile — how is {legislatorName} doing?</>
+					<>One vote per profile — how well is {legislatorName} serving you?</>
 				) : (
 					<>
-						<em>Feathers for strong service — tar &amp; feather for a town ready to run them out.</em>{' '}
-						One vote per profile — how is {legislatorName} serving West Michigan?
+						<em>A service check, not a popularity contest.</em>{' '}
+						One vote per profile — how well is {legislatorName} serving West Michigan constituents?
 					</>
 				)
 			}
@@ -54,7 +54,7 @@ const votingEnabled =
 			</div>
 		</div>
 		<div class="tomato-tar-chart-meta">
-			<p class="tomato-tar-chart-label" data-tomato-tar-label>Feathered</p>
+			<p class="tomato-tar-chart-label" data-tomato-tar-label>Serving well</p>
 			<p class="tomato-tar-chart-tagline" data-tomato-tar-tagline hidden></p>
 			<p class="tomato-tar-chart-count" data-vote-count></p>
 		</div>
@@ -72,14 +72,16 @@ const votingEnabled =
 		<form class="public-vote-form" data-vote-form novalidate>
 			<fieldset class="public-vote-fieldset">
 				<legend class="tomato-tar-vote-question">
-					How is {legislatorName} doing for West Michigan?
+					How well is {legislatorName} serving constituents?
 				</legend>
-				<p class="tomato-tar-vote-hint">Tar on the left (shame), feather on the right (constituents are happy).</p>
+				<p class="tomato-tar-vote-hint">
+					Rate the service you get — responsiveness, access, follow-through — not the party label.
+				</p>
 				<div class="tomato-tar-range">
 					<div class="tomato-tar-range-labels">
-						<span>Tar</span>
+						<span>Not serving us</span>
 						<span class="tomato-tar-range-value" data-range-value aria-live="polite">3</span>
-						<span>Feather</span>
+						<span>Serving us well</span>
 					</div>
 					<input
 						type="range"
@@ -93,7 +95,7 @@ const votingEnabled =
 						aria-valuemin={1}
 						aria-valuemax={5}
 						aria-valuenow={3}
-						aria-label={`Tar and feather score for ${legislatorName} in West Michigan`}
+						aria-label={`Constituent Pulse rating for ${legislatorName}, from not serving us to serving us well`}
 					/>
 				</div>
 			</fieldset>
@@ -137,9 +139,9 @@ const votingEnabled =
 	let scoreChart = null;
 
 	function sentimentLabel(pct) {
-		if (pct >= 60) return 'Feathered';
+		if (pct >= 60) return 'Serving well';
 		if (pct >= 40) return 'Mixed';
-		return 'Tarred';
+		return 'Falling short';
 	}
 
 	function sentimentClass(pct) {
@@ -211,7 +213,7 @@ const votingEnabled =
 		if (centerEl) centerEl.dataset.sentiment = cls;
 		if (taglineEl) {
 			if (pct >= 60) {
-				taglineEl.textContent = 'Feathers, not tar';
+				taglineEl.textContent = 'Constituents approve';
 				taglineEl.hidden = false;
 			} else {
 				taglineEl.hidden = true;
@@ -313,7 +315,7 @@ const votingEnabled =
 		const overall = Number(fd.get('overall'));
 
 		if (!overall || overall < 1 || overall > 5) {
-			setStatus('Pick a rating on the tar-to-feather scale before submitting.', 'error');
+			setStatus('Pick a rating before submitting.', 'error');
 			return;
 		}
 

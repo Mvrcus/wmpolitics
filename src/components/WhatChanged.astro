@@ -1,0 +1,94 @@
+---
+import FormattedDate from './FormattedDate.astro';
+import { getRecentChanges, getLastChangeDate, CHANGE_TYPE_LABELS } from '../lib/changes';
+
+const changes = await getRecentChanges();
+const lastChange = changes.length === 0 ? await getLastChangeDate() : null;
+---
+
+<section class="what-changed" aria-labelledby="what-changed-heading">
+	<div class="section-header">
+		<h2 id="what-changed-heading">What changed this week</h2>
+		<a href="/rss.xml">RSS</a>
+	</div>
+
+	{
+		changes.length > 0 ? (
+			<ul class="what-changed-list">
+				{changes.map((item) => (
+					<li class="what-changed-item">
+						<span class="what-changed-type">{CHANGE_TYPE_LABELS[item.type]}</span>
+						<a href={item.href}>{item.title}</a>
+						<span class="what-changed-date">
+							<FormattedDate date={item.date} />
+						</span>
+					</li>
+				))}
+			</ul>
+		) : (
+			<p class="what-changed-empty">
+				Quiet stretch — {lastChange ? (
+					<>
+						the last change was <FormattedDate date={lastChange} />
+					</>
+				) : (
+					'no dated changes yet'
+				)}. That itself is worth knowing: nothing new has been documented, and we say so rather
+				than manufacture news.
+			</p>
+		)
+	}
+
+	<ul class="what-changed-list what-changed-community" data-community-activity hidden></ul>
+
+	<p class="what-changed-cta">
+		<a href="#newsletter">Get this weekly</a> — we send when something changes, not on a schedule.
+	</p>
+</section>
+
+<script>
+	async function loadActivity() {
+		const list = document.querySelector<HTMLElement>('[data-community-activity]');
+		if (!list) return;
+
+		try {
+			const res = await fetch('/api/recent-activity');
+			if (!res.ok) return;
+			const data = (await res.json()) as {
+				items?: Array<{
+					type: string;
+					legislator_slug: string;
+					title?: string;
+					submission_type?: string;
+					count?: number;
+				}>;
+			};
+			const items = data.items ?? [];
+			if (items.length === 0) return;
+
+			for (const item of items) {
+				const li = document.createElement('li');
+				li.className = 'what-changed-item';
+
+				const type = document.createElement('span');
+				type.className = 'what-changed-type';
+				type.textContent = 'Community';
+
+				const link = document.createElement('a');
+				link.href = `/legislators/${item.legislator_slug}/`;
+				link.textContent =
+					item.type === 'submission'
+						? `New reviewed ${item.submission_type ?? 'submission'}: ${item.title ?? ''}`
+						: `${item.count} new community score${item.count === 1 ? '' : 's'} for ${item.legislator_slug.replace(/-/g, ' ')}`;
+
+				li.append(type, link);
+				list.appendChild(li);
+			}
+			list.hidden = false;
+		} catch {
+			/* static content stands alone */
+		}
+	}
+
+	loadActivity();
+</script>

@@ -22,7 +22,7 @@ export const GET: APIRoute = async ({ params, locals }) => {
 
 	const env = locals.runtime?.env;
 	if (!isDbBinding(env?.DB)) {
-		return json({ approved: [], unfiltered: [] });
+		return json({ approved: [] });
 	}
 
 	try {
@@ -30,19 +30,15 @@ export const GET: APIRoute = async ({ params, locals }) => {
 		const { results } = await env.DB.prepare(
 			`SELECT id, legislator_slug, submission_type, title, body, source, status, agree_count, created_at
       FROM submissions
-      WHERE legislator_slug = ? AND status IN ('approved', 'pending')
+      WHERE legislator_slug = ? AND status = 'approved'
       ORDER BY agree_count DESC, datetime(created_at) DESC`,
 		)
 			.bind(slug)
 			.all<SubmissionRecord>();
 
-		const rows = results ?? [];
-		const approved = rows.filter((r) => r.status === 'approved');
-		const unfiltered = rows.filter((r) => r.status === 'pending');
-
-		return json({ approved, unfiltered });
+		return json({ approved: results ?? [] });
 	} catch (err) {
 		console.warn('submissions list unavailable', err);
-		return json({ approved: [], unfiltered: [] });
+		return json({ approved: [] });
 	}
 };

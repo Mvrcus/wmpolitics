@@ -1,10 +1,11 @@
 import type { CollectionEntry } from 'astro:content';
 
-const OFFICE_ORDER = ['us-house', 'us-senate', 'state-house', 'state-senate', 'local'] as const;
+const OFFICE_ORDER = ['us-house', 'us-senate', 'governor', 'state-house', 'state-senate', 'local'] as const;
 
 export const OFFICE_LABELS: Record<string, string> = {
 	'us-house': 'U.S. House',
 	'us-senate': 'U.S. Senate',
+	governor: 'Governor of Michigan',
 	'state-house': 'State House',
 	'state-senate': 'State Senate',
 	local: 'Local Government',

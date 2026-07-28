@@ -1,0 +1,150 @@
+---
+import LegislatorCard from './LegislatorCard.astro';
+import { getHollandLegislators } from '../lib/content';
+import { groupLegislatorsByOffice } from '../lib/legislators';
+import zipMap from '../data/zip-districts.json';
+
+interface Props {
+	heading?: string;
+	lead?: string;
+}
+
+const {
+	heading = 'Who represents you?',
+	lead = 'Enter your ZIP code to see your representation stack — from Congress to city hall.',
+} = Astro.props;
+
+const legislators = await getHollandLegislators();
+const grouped = groupLegislatorsByOffice(legislators);
+---
+
+<section class="who-represents" data-who-represents aria-labelledby="who-represents-heading">
+	<div class="who-represents-intro">
+		<h2 id="who-represents-heading">{heading}</h2>
+		<p class="who-represents-lead">{lead}</p>
+		<form class="who-represents-form" data-zip-form>
+			<label class="sr-only" for="who-represents-zip">ZIP code</label>
+			<input
+				type="text"
+				id="who-represents-zip"
+				name="zip"
+				inputmode="numeric"
+				pattern="[0-9]{5}"
+				maxlength="5"
+				placeholder="ZIP code (e.g. 49423)"
+				autocomplete="postal-code"
+			/>
+			<button type="submit" class="btn">Show my reps</button>
+			<button type="button" class="btn btn-outline" data-zip-clear hidden>Show all</button>
+		</form>
+		<p class="who-represents-note" data-zip-note role="status"></p>
+	</div>
+
+	<div class="who-represents-groups">
+		{
+			grouped.map((group) => (
+				<div class="who-represents-group" data-office-group>
+					<h3 class="who-represents-office">{group.label}</h3>
+					<ul class="card-grid who-represents-grid">
+						{group.legislators.map((leg) => (
+							<li data-leg-slug={leg.data.slug}>
+								<LegislatorCard legislator={leg} />
+							</li>
+						))}
+					</ul>
+				</div>
+			))
+		}
+	</div>
+
+	<p class="who-represents-verify">
+		District lines change after redistricting. Verify your address on{' '}
+		<a href="https://www.michigan.gov/vote" target="_blank" rel="noopener noreferrer">
+			Michigan Voter Information
+		</a>
+		before contacting an office.
+	</p>
+</section>
+
+<script define:vars={{ zipMap }}>
+	const root = document.querySelector('[data-who-represents]');
+	if (root) {
+		const form = root.querySelector('[data-zip-form]');
+		const input = form?.querySelector('input[name="zip"]');
+		const clearBtn = root.querySelector('[data-zip-clear]');
+		const noteEl = root.querySelector('[data-zip-note]');
+		const items = [...root.querySelectorAll('[data-leg-slug]')];
+		const groups = [...root.querySelectorAll('[data-office-group]')];
+		const STORAGE_KEY = 'wmp-zip';
+
+		function setNote(message) {
+			if (noteEl) noteEl.textContent = message ?? '';
+		}
+
+		function showAll() {
+			items.forEach((li) => (li.hidden = false));
+			groups.forEach((g) => (g.hidden = false));
+			if (clearBtn) clearBtn.hidden = true;
+			setNote('');
+		}
+
+		function applyZip(zip, { save = true } = {}) {
+			const entry = zipMap[zip];
+			if (!entry) {
+				showAll();
+				setNote(
+					`We don't have district data for ${zip} yet — we cover Holland & Ottawa County. Showing everyone; verify your districts at Michigan Voter Information below.`,
+				);
+				return;
+			}
+
+			const wanted = new Set(entry.slugs);
+			items.forEach((li) => {
+				li.hidden = !wanted.has(li.dataset.legSlug);
+			});
+			groups.forEach((g) => {
+				const visible = [...g.querySelectorAll('[data-leg-slug]')].some((li) => !li.hidden);
+				g.hidden = !visible;
+			});
+			if (clearBtn) clearBtn.hidden = false;
+
+			let note = `Your ${zip} representation stack.`;
+			if (entry.split && entry.note) note += ` ${entry.note}`;
+			setNote(note);
+
+			if (save) {
+				try {
+					localStorage.setItem(STORAGE_KEY, zip);
+				} catch {
+					/* storage unavailable */
+				}
+			}
+		}
+
+		form?.addEventListener('submit', (event) => {
+			event.preventDefault();
+			const zip = (input?.value ?? '').trim();
+			if (/^[0-9]{5}$/.test(zip)) applyZip(zip);
+		});
+
+		clearBtn?.addEventListener('click', () => {
+			showAll();
+			if (input) input.value = '';
+			try {
+				localStorage.removeItem(STORAGE_KEY);
+			} catch {
+				/* storage unavailable */
+			}
+		});
+
+		try {
+			const saved = localStorage.getItem(STORAGE_KEY);
+			if (saved && /^[0-9]{5}$/.test(saved)) {
+				if (input) input.value = saved;
+				applyZip(saved, { save: false });
+			}
+		} catch {
+			/* storage unavailable */
+		}
+	}
+</script>

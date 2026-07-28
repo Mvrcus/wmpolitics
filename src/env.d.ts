@@ -12,4 +12,8 @@ interface Env {
 	VOTE_HASH_SALT?: string;
 	DEV_SKIP_TURNSTILE?: string;
 	ADMIN_SECRET?: string;
+	CONGRESS_GOV_API_KEY?: string;
+	OPENSTATES_API_KEY?: string;
+	SYNC_TRIGGER_TOKEN?: string;
+	SYNC_DRY_RUN?: string;
 }

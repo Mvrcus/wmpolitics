@@ -18,3 +18,10 @@ All images are stored locally under `/images/`. Sources and licenses:
 | `og-default.jpg` | Default Open Graph / Twitter card | Same as `lake-michigan-beach.jpg` | See above |
 
 Official portraits for state and local officials were not used where a clear public-domain headshot was unavailable; placeholder imagery is labeled in alt text on profile pages.
+
+## Party symbol watermarks
+
+- `party-donkey.svg` — "Donkey silhouette 02" by LadyofHats, Wikimedia Commons, **public domain**. Used as a low-opacity watermark (recolored via CSS mask).
+- `party-elephant.svg` — "Elephant with tusks silhouette" by Leslie973 / BrightKumquat, Wikimedia Commons, **CC BY-SA 4.0** (https://creativecommons.org/licenses/by-sa/4.0/). Used as a low-opacity watermark (recolored via CSS mask); this modified use remains under CC BY-SA 4.0.
+
+These are generic animal silhouettes in the tradition of Thomas Nast's public-domain engravings — deliberately NOT the trademarked official party logos.
