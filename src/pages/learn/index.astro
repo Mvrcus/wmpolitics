@@ -62,6 +62,48 @@ const LAW_STEPS = [
 	{ step: 'Signature', text: 'The governor (or president) signs it into law — or vetoes it, which the legislature can only override with a two-thirds vote.' },
 	{ step: 'Real life', text: 'Agencies write the fine print and enforce it. This is when it starts showing up in your life.' },
 ];
+
+const BIG_FOUR = [
+	{
+		title: 'Governor',
+		tagline: 'The state’s CEO',
+		text: 'Runs the executive branch: signs or vetoes every bill, proposes the budget, commands the National Guard, and appoints the department heads who run daily operations.',
+	},
+	{
+		title: 'Lieutenant Governor',
+		tagline: 'The state’s Vice President',
+		text: 'Steps in if the Governor is out of state or incapacitated, and presides over the State Senate — including breaking tie votes.',
+	},
+	{
+		title: 'Attorney General',
+		tagline: 'The state’s top lawyer',
+		text: 'Represents Michigan in court, enforces consumer protection laws, and advises state agencies on what’s legal. When you hear "the state is suing," this is who’s doing it.',
+	},
+	{
+		title: 'Secretary of State',
+		tagline: 'The state’s top administrator',
+		text: 'Oversees statewide elections, issues driver’s licenses, registers vehicles, and keeps official state records. In Michigan, "going to the Secretary of State" is where you renew your plates.',
+	},
+];
+
+const CABINET = [
+	{
+		title: 'State Police Director',
+		text: 'Oversees state troopers and statewide law enforcement.',
+	},
+	{
+		title: 'State Treasurer',
+		text: 'Manages the state budget, tax collection, and the state’s bank accounts.',
+	},
+	{
+		title: 'Transportation (MDOT) Director',
+		text: 'Handles state highway repairs, road planning, and infrastructure projects.',
+	},
+	{
+		title: 'Natural Resources (DNR) Director',
+		text: 'Manages state parks, wildlife, fishing, hunting, and environmental protection.',
+	},
+];
 ---
 
 <!doctype html>
@@ -164,6 +206,44 @@ const LAW_STEPS = [
 						))
 					}
 				</ol>
+			</section>
+
+			<section class="section">
+				<div class="section-header">
+					<h2>Legislators write the rules. Who runs the machine?</h2>
+				</div>
+				<p class="hero-lead learn-section-lead">
+					The executive branch. In Michigan you elect the "big four" directly — and the Governor
+					appoints the rest.
+				</p>
+				<div class="job-grid">
+					{
+						BIG_FOUR.map((role) => (
+							<article class="job-card">
+								<p class="exec-tagline">{role.tagline}</p>
+								<h3>{role.title}</h3>
+								<p>{role.text}</p>
+							</article>
+						))
+					}
+				</div>
+				<div class="cabinet">
+					<h3 class="cabinet-heading">…and the appointed department heads (the cabinet)</h3>
+					<p class="cabinet-lead">
+						Just like the President appoints federal agency heads, the Governor picks directors to
+						run state departments. The legislature writes the laws for these areas — but these are
+						the people actually running the operations on the ground.
+					</p>
+					<ul class="cabinet-list">
+						{
+							CABINET.map((role) => (
+								<li>
+									<strong>{role.title}.</strong> {role.text}
+								</li>
+							))
+						}
+					</ul>
+				</div>
 			</section>
 
 			<section class="section">
@@ -376,6 +456,60 @@ const LAW_STEPS = [
 		line-height: 1.5;
 		color: var(--color-muted);
 		margin: 0;
+	}
+
+	.exec-tagline {
+		font-family: var(--font-sans);
+		font-size: 0.7rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.08em;
+		color: var(--color-accent);
+		margin: 0;
+	}
+
+	.cabinet {
+		margin-top: 1.5rem;
+		border: 2px solid var(--color-black);
+		background: var(--color-surface);
+		padding: 1.5rem;
+	}
+
+	.cabinet-heading {
+		font-family: var(--font-serif);
+		font-size: 1.15rem;
+		margin: 0 0 0.5rem;
+	}
+
+	.cabinet-lead {
+		font-family: var(--font-sans);
+		font-size: 0.9rem;
+		line-height: 1.55;
+		color: var(--color-muted);
+		margin: 0 0 1rem;
+		max-width: 46rem;
+	}
+
+	.cabinet-list {
+		margin: 0;
+		padding: 0;
+		list-style: none;
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+		gap: 0.75rem 1.5rem;
+	}
+
+	.cabinet-list li {
+		font-family: var(--font-sans);
+		font-size: 0.9rem;
+		line-height: 1.5;
+		color: var(--color-muted);
+		padding-left: 1rem;
+		border-left: 3px solid var(--color-accent);
+	}
+
+	.cabinet-list strong {
+		color: var(--color-black);
 	}
 
 	.game-cta {

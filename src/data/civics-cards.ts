@@ -55,6 +55,30 @@ export const DECKS: Deck[] = [
 				hook: 'A governor’s veto pen is why "which party holds the governorship" matters as much as who controls the legislature.',
 			},
 			{
+				front: 'The "big four"',
+				back: 'The four statewide executives Michigan voters elect directly: Governor, Lieutenant Governor, Attorney General, and Secretary of State. Everyone else running state government is appointed, not elected.',
+				hook: 'These four are the only state-level executives you can hire and fire with your ballot.',
+			},
+			{
+				front: 'Lieutenant Governor',
+				back: 'The state’s Vice President. Steps in if the Governor is out of state or incapacitated, and presides over the State Senate — breaking tie votes when the chamber deadlocks.',
+			},
+			{
+				front: 'Attorney General',
+				back: 'The state’s top lawyer. Represents the state in court, enforces consumer protection laws, and advises state agencies on legal questions.',
+				hook: 'When "the state" sues a polluter or a scam company, this is the office doing it.',
+			},
+			{
+				front: 'Secretary of State',
+				back: 'The state’s top administrator. Oversees statewide elections, issues driver’s licenses, registers vehicles, and keeps official state records.',
+				hook: 'In Michigan, the branch office where you renew your plates is literally called "the Secretary of State."',
+			},
+			{
+				front: 'Cabinet (state)',
+				back: 'The department directors the Governor appoints to run daily operations — State Police, Treasury, Transportation (MDOT), Natural Resources (DNR), and more. The legislature writes the laws; these people run the machinery.',
+				hook: 'Your state park fees, road projects, and tax refunds all flow through appointed hands, not elected ones.',
+			},
+			{
 				front: 'Appropriation',
 				back: 'The money vote. An appropriation is a law that decides how much public money gets spent, and on what. Budgets are where promises become real — or don’t.',
 				hook: 'A legislator can vote for a program and then vote against funding it. Watch the appropriations.',
