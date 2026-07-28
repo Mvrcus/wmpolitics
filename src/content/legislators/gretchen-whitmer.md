@@ -9,7 +9,8 @@ status: current
 termStart: 2019
 termEnd: 2027
 party: Democrat
-photo: /images/civic-placeholder.jpg
+photo: /images/gretchen-whitmer.jpg
+photoIsOfficial: true
 servesHolland: true
 proximityRank: 8
 summary: >-
