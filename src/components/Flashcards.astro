@@ -1,0 +1,480 @@
+---
+import { DECKS } from '../data/civics-cards';
+---
+
+<div class="flashcards" data-flashcards>
+	<div class="deck-tabs" role="tablist" aria-label="Choose a deck">
+		{
+			DECKS.map((deck, i) => (
+				<button
+					type="button"
+					class:list={['deck-tab', i === 0 && 'active']}
+					role="tab"
+					aria-selected={i === 0 ? 'true' : 'false'}
+					aria-controls="fc-stage"
+					data-deck-tab={deck.id}
+				>
+					<span class="deck-tab-label">{deck.label}</span>
+					<span class="deck-tab-count">{deck.cards.length} cards</span>
+				</button>
+			))
+		}
+	</div>
+
+	<p class="deck-blurb" data-blurb>{DECKS[0].blurb}</p>
+
+	<div class="fc-stage" id="fc-stage" role="tabpanel">
+		<p class="fc-progress" aria-live="polite" data-progress></p>
+
+		<div class="fc-play" data-play>
+			<button type="button" class="fc-card" data-card aria-pressed="false">
+				<span class="fc-face fc-face--front">
+					<span class="fc-face-label">Prompt</span>
+					<span class="fc-front-text" data-front></span>
+					<span class="fc-flip-hint" aria-hidden="true">Tap to flip →</span>
+				</span>
+				<span class="fc-face fc-face--back">
+					<span class="fc-face-label">Answer</span>
+					<span class="fc-back-text" data-back></span>
+					<span class="fc-hook" data-hook hidden></span>
+				</span>
+			</button>
+
+			<div class="fc-judge" data-judge hidden>
+				<p class="fc-judge-prompt">Did you have it?</p>
+				<div class="fc-judge-buttons">
+					<button type="button" class="btn fc-btn-know" data-know>Knew it</button>
+					<button type="button" class="btn btn-outline fc-btn-review" data-review>
+						Still learning
+					</button>
+				</div>
+				<p class="fc-judge-note">"Still learning" sends the card to the back of the deck.</p>
+			</div>
+
+			<div class="fc-controls">
+				<button type="button" class="fc-shuffle" data-shuffle>↻ Restart &amp; shuffle</button>
+			</div>
+		</div>
+
+		<div class="fc-summary" data-summary hidden>
+			<p class="fc-summary-headline" data-summary-headline></p>
+			<p class="fc-summary-detail" data-summary-detail></p>
+			<div class="fc-summary-buttons">
+				<button type="button" class="btn" data-again>Play again</button>
+				<button type="button" class="btn btn-outline" data-missed hidden>
+					Replay the ones I missed
+				</button>
+			</div>
+		</div>
+	</div>
+
+	<noscript>
+		<p class="fc-noscript">
+			The flashcard game needs JavaScript. No worries — every term also appears in plain text on
+			the <a href="/learn/">Start Here guide</a>.
+		</p>
+	</noscript>
+
+	<script type="application/json" data-fc-data set:html={JSON.stringify(DECKS)} />
+</div>
+
+<script>
+	interface Flashcard {
+		front: string;
+		back: string;
+		hook?: string;
+	}
+	interface Deck {
+		id: string;
+		label: string;
+		blurb: string;
+		cards: Flashcard[];
+	}
+
+	const root = document.querySelector<HTMLElement>('[data-flashcards]');
+
+	if (root) {
+		const decks: Deck[] = JSON.parse(
+			root.querySelector('[data-fc-data]')?.textContent ?? '[]',
+		);
+
+		const blurbEl = root.querySelector<HTMLElement>('[data-blurb]')!;
+		const progressEl = root.querySelector<HTMLElement>('[data-progress]')!;
+		const playEl = root.querySelector<HTMLElement>('[data-play]')!;
+		const cardEl = root.querySelector<HTMLButtonElement>('[data-card]')!;
+		const frontEl = root.querySelector<HTMLElement>('[data-front]')!;
+		const backEl = root.querySelector<HTMLElement>('[data-back]')!;
+		const hookEl = root.querySelector<HTMLElement>('[data-hook]')!;
+		const judgeEl = root.querySelector<HTMLElement>('[data-judge]')!;
+		const summaryEl = root.querySelector<HTMLElement>('[data-summary]')!;
+		const summaryHeadline = root.querySelector<HTMLElement>('[data-summary-headline]')!;
+		const summaryDetail = root.querySelector<HTMLElement>('[data-summary-detail]')!;
+		const missedBtn = root.querySelector<HTMLButtonElement>('[data-missed]')!;
+
+		let deck: Deck = decks[0];
+		let queue: number[] = [];
+		let attempted = new Set<number>();
+		let missedFirstTry = new Set<number>();
+		let done = 0;
+		let total = 0;
+
+		function shuffle<T>(arr: T[]): T[] {
+			const a = [...arr];
+			for (let i = a.length - 1; i > 0; i--) {
+				const j = Math.floor(Math.random() * (i + 1));
+				[a[i], a[j]] = [a[j], a[i]];
+			}
+			return a;
+		}
+
+		function setFlipped(flipped: boolean, animate = true) {
+			cardEl.classList.toggle('no-anim', !animate);
+			cardEl.classList.toggle('flipped', flipped);
+			cardEl.setAttribute('aria-pressed', String(flipped));
+			judgeEl.hidden = !flipped;
+			if (!animate) {
+				// Force reflow so the transition class removal applies before re-enabling.
+				void cardEl.offsetWidth;
+				cardEl.classList.remove('no-anim');
+			}
+		}
+
+		function renderCard() {
+			const card = deck.cards[queue[0]];
+			frontEl.textContent = card.front;
+			backEl.textContent = card.back;
+			hookEl.textContent = card.hook ?? '';
+			hookEl.hidden = !card.hook;
+			progressEl.textContent = `${done} of ${total} down · ${queue.length} to go`;
+			setFlipped(false, false);
+		}
+
+		function startDeck(cardIndices?: number[]) {
+			queue = shuffle(cardIndices ?? deck.cards.map((_, i) => i));
+			attempted = new Set();
+			missedFirstTry = new Set();
+			done = 0;
+			total = queue.length;
+			summaryEl.hidden = true;
+			playEl.hidden = false;
+			renderCard();
+		}
+
+		function finishDeck() {
+			playEl.hidden = true;
+			summaryEl.hidden = false;
+			const firstTry = total - missedFirstTry.size;
+			progressEl.textContent = 'Deck complete!';
+			summaryHeadline.textContent =
+				firstTry === total
+					? `Perfect — all ${total} on the first try.`
+					: `You knew ${firstTry} of ${total} on the first try.`;
+			summaryDetail.textContent =
+				firstTry === total
+					? 'Try another deck, or shuffle this one and see if it sticks.'
+					: 'The ones you missed came back around until you had them — that’s the whole trick.';
+			missedBtn.hidden = missedFirstTry.size === 0;
+		}
+
+		function advance(knewIt: boolean) {
+			const idx = queue.shift()!;
+			if (!attempted.has(idx)) {
+				attempted.add(idx);
+				if (!knewIt) missedFirstTry.add(idx);
+			}
+			if (knewIt) {
+				done += 1;
+			} else {
+				queue.push(idx);
+			}
+			if (queue.length === 0) {
+				finishDeck();
+			} else {
+				renderCard();
+			}
+		}
+
+		cardEl.addEventListener('click', () => {
+			setFlipped(!cardEl.classList.contains('flipped'));
+		});
+
+		root.querySelector('[data-know]')?.addEventListener('click', () => advance(true));
+		root.querySelector('[data-review]')?.addEventListener('click', () => advance(false));
+		root.querySelector('[data-shuffle]')?.addEventListener('click', () => startDeck());
+		root.querySelector('[data-again]')?.addEventListener('click', () => startDeck());
+		missedBtn.addEventListener('click', () => startDeck([...missedFirstTry]));
+
+		root.querySelectorAll<HTMLButtonElement>('[data-deck-tab]').forEach((tab) => {
+			tab.addEventListener('click', () => {
+				const next = decks.find((d) => d.id === tab.dataset.deckTab);
+				if (!next) return;
+				deck = next;
+				blurbEl.textContent = deck.blurb;
+				root.querySelectorAll('[data-deck-tab]').forEach((t) => {
+					const active = t === tab;
+					t.classList.toggle('active', active);
+					t.setAttribute('aria-selected', String(active));
+				});
+				startDeck();
+			});
+		});
+
+		startDeck();
+	}
+</script>
+
+<style>
+	.flashcards {
+		max-width: 44rem;
+		margin: 0 auto;
+	}
+
+	.deck-tabs {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+		margin-bottom: 1rem;
+	}
+
+	.deck-tab {
+		flex: 1 1 10rem;
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 0.15rem;
+		padding: 0.65rem 0.9rem;
+		background: var(--color-white);
+		border: 2px solid var(--color-black);
+		cursor: pointer;
+		font-family: var(--font-sans);
+		transition: background 0.15s;
+	}
+
+	.deck-tab:hover {
+		background: var(--color-surface);
+	}
+
+	.deck-tab.active {
+		background: var(--color-black);
+		color: var(--color-white);
+	}
+
+	.deck-tab-label {
+		font-weight: 700;
+		font-size: 0.9rem;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+	}
+
+	.deck-tab-count {
+		font-size: 0.75rem;
+		opacity: 0.7;
+	}
+
+	.deck-blurb {
+		font-family: var(--font-sans);
+		color: var(--color-muted);
+		font-size: 0.9rem;
+		margin: 0 0 1.5rem;
+	}
+
+	.fc-progress {
+		font-family: var(--font-sans);
+		font-size: 0.8125rem;
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 0.06em;
+		color: var(--color-muted);
+		margin: 0 0 0.75rem;
+		min-height: 1.2em;
+	}
+
+	.fc-card {
+		display: block;
+		width: 100%;
+		min-height: 21rem;
+		position: relative;
+		background: none;
+		border: none;
+		padding: 0;
+		cursor: pointer;
+		text-align: left;
+		perspective: 1200px;
+		font: inherit;
+		color: inherit;
+	}
+
+	.fc-face {
+		position: absolute;
+		inset: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+		padding: 1.5rem;
+		background: var(--color-white);
+		border: 2px solid var(--color-black);
+		box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.12);
+		backface-visibility: hidden;
+		transition: transform 0.5s;
+		overflow-y: auto;
+	}
+
+	.fc-card.no-anim .fc-face {
+		transition: none;
+	}
+
+	.fc-face--front {
+		transform: rotateY(0deg);
+		justify-content: center;
+	}
+
+	.fc-face--back {
+		transform: rotateY(-180deg);
+		background: var(--color-surface);
+	}
+
+	.fc-card.flipped .fc-face--front {
+		transform: rotateY(180deg);
+	}
+
+	.fc-card.flipped .fc-face--back {
+		transform: rotateY(0deg);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.fc-face {
+			transition: none;
+		}
+	}
+
+	.fc-face-label {
+		font-family: var(--font-sans);
+		font-size: 0.7rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.1em;
+		color: var(--color-accent);
+	}
+
+	.fc-front-text {
+		font-family: var(--font-serif);
+		font-size: clamp(1.4rem, 4vw, 2rem);
+		font-weight: 700;
+		line-height: 1.2;
+	}
+
+	.fc-flip-hint {
+		margin-top: auto;
+		font-family: var(--font-sans);
+		font-size: 0.8125rem;
+		color: var(--color-muted);
+	}
+
+	.fc-back-text {
+		font-family: var(--font-serif);
+		font-size: 1.05rem;
+		line-height: 1.55;
+	}
+
+	.fc-hook {
+		margin-top: auto;
+		padding-top: 0.75rem;
+		border-top: 1px solid var(--color-border);
+		font-family: var(--font-sans);
+		font-size: 0.85rem;
+		line-height: 1.5;
+		color: var(--color-accent);
+		font-weight: 600;
+	}
+
+	.fc-judge {
+		margin-top: 1.25rem;
+		text-align: center;
+	}
+
+	.fc-judge-prompt {
+		font-family: var(--font-sans);
+		font-weight: 700;
+		font-size: 0.9rem;
+		text-transform: uppercase;
+		letter-spacing: 0.06em;
+		margin: 0 0 0.6rem;
+	}
+
+	.fc-judge-buttons {
+		display: flex;
+		justify-content: center;
+		gap: 0.75rem;
+		flex-wrap: wrap;
+	}
+
+	.fc-judge-note {
+		font-family: var(--font-sans);
+		font-size: 0.75rem;
+		color: var(--color-muted);
+		margin: 0.6rem 0 0;
+	}
+
+	.fc-controls {
+		margin-top: 1.5rem;
+		text-align: center;
+	}
+
+	.fc-shuffle {
+		background: none;
+		border: none;
+		padding: 0.25rem;
+		font-family: var(--font-sans);
+		font-size: 0.8125rem;
+		font-weight: 600;
+		color: var(--color-muted);
+		cursor: pointer;
+		text-decoration: underline;
+	}
+
+	.fc-shuffle:hover {
+		color: var(--color-accent);
+	}
+
+	.fc-summary {
+		border: 2px solid var(--color-black);
+		background: var(--color-surface);
+		box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.12);
+		padding: 2rem 1.5rem;
+		text-align: center;
+	}
+
+	.fc-summary-headline {
+		font-family: var(--font-serif);
+		font-size: 1.5rem;
+		font-weight: 700;
+		margin: 0 0 0.5rem;
+	}
+
+	.fc-summary-detail {
+		font-family: var(--font-sans);
+		color: var(--color-muted);
+		font-size: 0.95rem;
+		margin: 0 0 1.25rem;
+	}
+
+	.fc-summary-buttons {
+		display: flex;
+		justify-content: center;
+		gap: 0.75rem;
+		flex-wrap: wrap;
+	}
+
+	.fc-noscript {
+		font-family: var(--font-sans);
+		border: 2px solid var(--color-black);
+		padding: 1rem;
+		background: var(--color-surface);
+	}
+
+	@media (max-width: 540px) {
+		.fc-card {
+			min-height: 24rem;
+		}
+	}
+</style>
