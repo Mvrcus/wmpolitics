@@ -17,6 +17,20 @@ All images are stored locally under `/images/`. Sources and licenses:
 | `article-capitol.jpg` | Article: communication policies | [Pexels](https://www.pexels.com/photo/208733/) | Pexels License (free use) |
 | `og-default.jpg` | Default Open Graph / Twitter card | Same as `lake-michigan-beach.jpg` | See above |
 
+## Official portraits (state & local officials)
+
+| File | Used on | Source | License / notes |
+|------|---------|--------|-----------------|
+| `gretchen-whitmer.jpg` | Gretchen Whitmer profile & cards | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:2025_Gretchen_Whitmer_(cropped).jpg) — photo by Jay Godwin, LBJ Presidential Library, Oct 2025 | **Public domain** (work of a U.S. federal employee). Courtesy credit: Jay Godwin / LBJ Presidential Library |
+| `mark-huizenga.jpg` | Mark Huizenga profile & cards | [Michigan Senate GOP caucus](https://www.senatormarkhuizenga.com/photos/) official headshot (2021) | Caucus photos page states photos "are intended for media and public use and may be freely reproduced." Not a formal open license. Credit: Michigan Senate Republican Caucus |
+| `thomas-albert.jpg` | Thomas Albert profile & cards | [Michigan Senate GOP caucus](https://www.senatorthomasalbert.com/photos/) official headshot (Jan 2023) | Same caucus permission grant as above. Credit: Michigan Senate Republican Caucus |
+| `nancy-deboer.jpg` | Nancy DeBoer profile & cards | [Michigan House Republicans](https://gophouse.org/member/RepNancyDeBoer/about) official portrait (2023) | Official caucus portrait; no explicit license (Michigan state works are not public domain). Editorial use; credit: Michigan House Republicans |
+| `nathan-bocks.jpg` | Nathan Bocks profile & cards | [City of Holland — Mayor page](https://www.cityofholland.com/387/Mayor) official photo (cropped to portrait) | © City of Holland; no explicit license. Editorial use; credit: City of Holland, Michigan |
+| `doug-zylstra.jpg` | Doug Zylstra profile & cards | [Ottawa County Board — District 3](https://boards.miottawa.org/commissioner/district-3/) official 2025-term headshot | © Ottawa County — [site policy](https://miottawa.org/policies/) prohibits *commercial* use without permission. Editorial/civic use; credit: Ottawa County |
+| `jordan-jorritsma.jpg` | Jordan Jorritsma profile & cards | [Ottawa County Board — District 2](https://boards.miottawa.org/commissioner/district-2/) official 2025-term headshot | Same Ottawa County terms as above |
+| `jacob-bonnema.jpg` | Jacob Bonnema profile & cards | [Ottawa County Board — District 4](https://boards.miottawa.org/commissioner/district-4/) official 2025-term headshot | Same Ottawa County terms as above |
+
+Only the Whitmer photo carries a true free license (public domain). The rest are official government headshots used for civic/editorial purposes with source credit — standard practice for official portraits, but if the site ever runs ads or otherwise becomes commercial, request written permission (Ottawa County explicitly requires it for commercial use) or replace those images. `civic-placeholder.jpg` is retained as a fallback for any future officials without a usable portrait.
 Official portraits for state and local officials were not used where a clear public-domain headshot was unavailable; placeholder imagery is labeled in alt text on profile pages.
 
 ## Party symbol watermarks

@@ -7,7 +7,8 @@ seatSlug: ottawa-county-district-2
 seatLabel: Ottawa County District 2
 status: current
 party: Republican
-photo: /images/civic-placeholder.jpg
+photo: /images/jordan-jorritsma.jpg
+photoIsOfficial: true
 servesHolland: true
 proximityRank: 5
 summary: >-

@@ -7,7 +7,8 @@ seatSlug: ottawa-county-district-3
 seatLabel: Ottawa County District 3
 status: current
 party: Democrat
-photo: /images/civic-placeholder.jpg
+photo: /images/doug-zylstra.jpg
+photoIsOfficial: true
 servesHolland: true
 proximityRank: 4
 summary: >-
