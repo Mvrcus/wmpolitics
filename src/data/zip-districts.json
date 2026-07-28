@@ -1,49 +1,136 @@
 {
 	"49423": {
-		"slugs": ["bill-huizenga", "nancy-deboer", "mark-huizenga", "doug-zylstra", "nathan-bocks"],
+		"slugs": [
+			"bill-huizenga",
+			"gary-peters",
+			"elissa-slotkin",
+			"nancy-deboer",
+			"roger-victory",
+			"doug-zylstra",
+			"jim-barry",
+			"eric-deboer",
+			"sarah-matwiejczyk",
+			"justin-roebuck",
+			"cheryl-clark",
+			"nathan-bocks",
+			"keith-van-beek"
+		],
 		"split": true,
-		"note": "Parts of 49423 fall outside the City of Holland (Allegan County side), where county board seats differ."
+		"note": "Parts of 49423 fall outside the City of Holland (Allegan County side), where county offices differ; Park Township streets are county board District 1, not District 3."
 	},
 	"49422": {
-		"slugs": ["bill-huizenga", "nancy-deboer", "mark-huizenga", "doug-zylstra", "nathan-bocks"],
+		"slugs": [
+			"bill-huizenga",
+			"gary-peters",
+			"elissa-slotkin",
+			"nancy-deboer",
+			"roger-victory",
+			"doug-zylstra",
+			"eric-deboer",
+			"sarah-matwiejczyk",
+			"justin-roebuck",
+			"cheryl-clark",
+			"nathan-bocks",
+			"keith-van-beek"
+		],
 		"split": true,
 		"note": "PO-box ZIP for Holland — county board seat depends on your street address."
 	},
 	"49424": {
 		"slugs": [
 			"bill-huizenga",
+			"gary-peters",
+			"elissa-slotkin",
 			"nancy-deboer",
-			"mark-huizenga",
+			"bradley-slagh",
+			"roger-victory",
+			"jim-barry",
 			"jordan-jorritsma",
 			"jacob-bonnema",
-			"nathan-bocks"
+			"eric-deboer",
+			"sarah-matwiejczyk",
+			"justin-roebuck",
+			"cheryl-clark",
+			"nathan-bocks",
+			"keith-van-beek"
 		],
 		"split": true,
-		"note": "49424 spans Holland Charter and Park townships plus part of the city — your county commissioner depends on your street."
+		"note": "49424 spans Holland Charter and Park townships plus part of the city — your state house district and county commissioner depend on your street."
 	},
 	"49434": {
-		"slugs": ["bill-huizenga", "nancy-deboer", "mark-huizenga", "jordan-jorritsma"],
-		"split": false,
-		"note": null
+		"slugs": [
+			"bill-huizenga",
+			"gary-peters",
+			"elissa-slotkin",
+			"nancy-deboer",
+			"roger-victory",
+			"jim-barry",
+			"jordan-jorritsma",
+			"eric-deboer",
+			"sarah-matwiejczyk",
+			"justin-roebuck",
+			"cheryl-clark"
+		],
+		"split": true,
+		"note": "Park Township is split between county board districts 1 and 2 — your commissioner depends on your street."
 	},
 	"49464": {
-		"slugs": ["bill-huizenga", "mark-huizenga", "jacob-bonnema", "nancy-deboer"],
+		"slugs": [
+			"bill-huizenga",
+			"gary-peters",
+			"elissa-slotkin",
+			"nancy-deboer",
+			"bradley-slagh",
+			"roger-victory",
+			"jacob-bonnema",
+			"eric-deboer",
+			"sarah-matwiejczyk",
+			"justin-roebuck",
+			"cheryl-clark"
+		],
 		"split": true,
 		"note": "Zeeland-area state house lines shifted in redistricting — verify your district before contacting an office."
 	},
 	"49460": {
-		"slugs": ["bill-huizenga", "mark-huizenga"],
+		"slugs": [
+			"bill-huizenga",
+			"gary-peters",
+			"elissa-slotkin",
+			"roger-victory",
+			"eric-deboer",
+			"sarah-matwiejczyk",
+			"justin-roebuck",
+			"cheryl-clark"
+		],
 		"split": true,
-		"note": "West Olive's county commissioner district isn't profiled on this site yet."
+		"note": "West Olive's state house and county commissioner districts aren't profiled on this site yet."
 	},
 	"49417": {
-		"slugs": ["bill-huizenga"],
+		"slugs": [
+			"bill-huizenga",
+			"gary-peters",
+			"elissa-slotkin",
+			"roger-victory",
+			"eric-deboer",
+			"sarah-matwiejczyk",
+			"justin-roebuck",
+			"cheryl-clark"
+		],
 		"split": true,
-		"note": "Grand Haven is at the edge of our coverage area — federal profile applies; state and county profiles are coming."
+		"note": "Grand Haven is at the edge of our coverage area — its state house and county board seats aren't profiled yet."
 	},
 	"49456": {
-		"slugs": ["bill-huizenga"],
+		"slugs": [
+			"bill-huizenga",
+			"gary-peters",
+			"elissa-slotkin",
+			"roger-victory",
+			"eric-deboer",
+			"sarah-matwiejczyk",
+			"justin-roebuck",
+			"cheryl-clark"
+		],
 		"split": true,
-		"note": "Spring Lake is at the edge of our coverage area — federal profile applies; state and county profiles are coming."
+		"note": "Spring Lake is at the edge of our coverage area — its state house and county board seats aren't profiled yet."
 	}
 }

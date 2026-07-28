@@ -10,7 +10,7 @@ party: Democrat
 photo: /images/doug-zylstra.jpg
 photoIsOfficial: true
 servesHolland: true
-proximityRank: 4
+proximityRank: 9
 summary: >-
   Ottawa County commissioner for the City of Holland since 2019. Re-elected November
   2024; began a four-year term January 2025. Often the board's lone Democratic voice.
