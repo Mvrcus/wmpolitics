@@ -7,7 +7,8 @@ seatSlug: mi-state-senate-30
 seatLabel: State Senate District 30
 status: current
 party: Republican
-photo: /images/civic-placeholder.jpg
+photo: /images/mark-huizenga.jpg
+photoIsOfficial: true
 servesHolland: true
 proximityRank: 3
 summary: >-

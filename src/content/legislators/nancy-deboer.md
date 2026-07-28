@@ -7,7 +7,8 @@ seatSlug: mi-state-house-86
 seatLabel: State House District 86
 status: current
 party: Republican
-photo: /images/civic-placeholder.jpg
+photo: /images/nancy-deboer.jpg
+photoIsOfficial: true
 servesHolland: true
 proximityRank: 2
 summary: >-

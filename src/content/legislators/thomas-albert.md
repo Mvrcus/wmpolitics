@@ -9,7 +9,8 @@ status: past
 termStart: 2017
 termEnd: 2022
 party: Republican
-photo: /images/civic-placeholder.jpg
+photo: /images/thomas-albert.jpg
+photoIsOfficial: true
 servesHolland: true
 proximityRank: 99
 summary: >-

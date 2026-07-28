@@ -7,7 +7,8 @@ seatSlug: ottawa-county-district-4
 seatLabel: Ottawa County District 4
 status: current
 party: Republican
-photo: /images/civic-placeholder.jpg
+photo: /images/jacob-bonnema.jpg
+photoIsOfficial: true
 servesHolland: true
 proximityRank: 6
 summary: >-
