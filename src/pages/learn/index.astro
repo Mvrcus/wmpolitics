@@ -167,6 +167,20 @@ const LAW_STEPS = [
 			</section>
 
 			<section class="section">
+				<div class="cheat-sheet-cta">
+					<div>
+						<p class="learn-kicker">The cheat sheet</p>
+						<h2>So when do you actually get a say?</h2>
+						<p>
+							Every seat that represents Holland — who holds it, how long terms last, when it's
+							next on your ballot, and the term-limit rules — in four quick tables.
+						</p>
+					</div>
+					<a href="/learn/elections/" class="btn">See who runs when →</a>
+				</div>
+			</section>
+
+			<section class="section">
 				<div class="game-cta">
 					<p class="learn-kicker">Quiz yourself</p>
 					<h2>Think it stuck? Play the flashcards.</h2>
@@ -375,6 +389,33 @@ const LAW_STEPS = [
 		font-size: 0.9rem;
 		line-height: 1.5;
 		color: var(--color-muted);
+		margin: 0;
+	}
+
+	.cheat-sheet-cta {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 1.5rem;
+		flex-wrap: wrap;
+		border: 2px solid var(--color-black);
+		background: var(--color-surface);
+		padding: 1.75rem clamp(1.25rem, 4vw, 2.5rem);
+		box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.1);
+	}
+
+	.cheat-sheet-cta h2 {
+		font-family: var(--font-serif);
+		font-size: clamp(1.3rem, 3vw, 1.7rem);
+		margin: 0 0 0.5rem;
+	}
+
+	.cheat-sheet-cta p:last-child {
+		font-family: var(--font-sans);
+		font-size: 0.95rem;
+		line-height: 1.6;
+		color: var(--color-muted);
+		max-width: 38rem;
 		margin: 0;
 	}
 

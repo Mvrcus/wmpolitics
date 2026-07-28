@@ -1,0 +1,315 @@
+---
+import BaseHead from '../../components/BaseHead.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import { SITE_TITLE } from '../../consts';
+import { LEVELS } from '../../data/election-seats';
+
+const title = `Who Runs When | ${SITE_TITLE}`;
+const description =
+	'Every seat that represents Holland — who holds it, how long the term is, when it is next on your ballot, and the term-limit rules, from City Hall to Washington.';
+
+// Roll the seat data up into "next chances to vote" — one card per upcoming
+// November, listing what's on that ballot.
+const upcoming = new Map<string, string[]>();
+for (const level of LEVELS) {
+	for (const seat of level.seats) {
+		const year = seat.nextElection.match(/\d{4}/)?.[0];
+		if (!year) continue;
+		const key = `Nov ${year}`;
+		const list = upcoming.get(key) ?? [];
+		list.push(seat.seat.split('—')[0].trim());
+		upcoming.set(key, list);
+	}
+}
+const BALLOTS = [...upcoming.entries()]
+	.sort(([a], [b]) => a.localeCompare(b))
+	.map(([when, seats]) => ({ when, seats: [...new Set(seats)] }));
+
+const PARTY_LABEL: Record<string, string> = { R: 'Republican', D: 'Democrat' };
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<BaseHead title={title} description={description} />
+	</head>
+	<body>
+		<Header />
+		<main>
+			<header class="page-header">
+				<p class="elections-kicker">The cheat sheet</p>
+				<h1>Who runs when?</h1>
+				<p class="hero-lead">
+					Every seat that represents Holland, from City Hall to Washington: who holds it now, how
+					long a term lasts, when it's next on your ballot — and whether the officeholder can stay
+					forever.
+				</p>
+			</header>
+
+			<section class="section">
+				<div class="section-header">
+					<h2>Mark your calendar</h2>
+				</div>
+				<p class="hero-lead elections-section-lead">
+					Your next chances to vote, and what's on each ballot.
+				</p>
+				<div class="ballot-grid">
+					{
+						BALLOTS.map((ballot) => (
+							<article class="ballot-card">
+								<h3>{ballot.when}</h3>
+								<ul>
+									{ballot.seats.map((seat) => (
+										<li>{seat}</li>
+									))}
+								</ul>
+							</article>
+						))
+					}
+				</div>
+			</section>
+
+			{
+				LEVELS.map((level, i) => (
+					<section class="section" id={level.id}>
+						<div class="section-header">
+							<h2>
+								<span class="level-num" aria-hidden="true">{i + 1}</span>
+								{level.label}
+								<span class="level-place">{level.place}</span>
+							</h2>
+						</div>
+						<div class="seat-table-wrap">
+							<table class="seat-table">
+								<thead>
+									<tr>
+										<th scope="col">Seat</th>
+										<th scope="col">Current official</th>
+										<th scope="col">Term</th>
+										<th scope="col">Next election</th>
+										<th scope="col">Term limits</th>
+									</tr>
+								</thead>
+								<tbody>
+									{level.seats.map((seat) => (
+										<tr>
+											<th scope="row">
+												{seat.seat}
+												{seat.note && <span class="seat-note">{seat.note}</span>}
+											</th>
+											<td>
+												{seat.slug ? (
+													<a href={`/legislators/${seat.slug}/`}>{seat.official}</a>
+												) : (
+													seat.official
+												)}
+												{seat.party && (
+													<span
+														class:list={['party-mark', `party-mark--${seat.party.toLowerCase()}`]}
+														title={PARTY_LABEL[seat.party]}
+													>
+														({seat.party})
+													</span>
+												)}
+											</td>
+											<td>{seat.term}</td>
+											<td class="seat-next">{seat.nextElection}</td>
+											<td>{seat.termLimits}</td>
+										</tr>
+									))}
+								</tbody>
+							</table>
+						</div>
+						<p class="cycle-note">
+							<strong>Worth remembering:</strong> {level.cycleNote}
+						</p>
+					</section>
+				))
+			}
+
+			<section class="section">
+				<div class="prose">
+					<h2>What to do with this</h2>
+					<ul>
+						<li>
+							<strong>Meet the people in the tables.</strong> Most of them have
+							<a href="/legislators/"> a profile here</a> showing what supporters highlight and
+							what critics raise.
+						</li>
+						<li>
+							<strong>See how the levels stack up.</strong> The
+							<a href="/#power-ladder"> power ladder</a> shows what each level actually decides
+							for your street.
+						</li>
+						<li>
+							<strong>Verify before you vote.</strong> District lines change after redistricting —
+							confirm your districts and polling place at{' '}
+							<a href="https://www.michigan.gov/vote" target="_blank" rel="noopener noreferrer">
+								Michigan Voter Information
+							</a>.
+						</li>
+					</ul>
+				</div>
+			</section>
+		</main>
+		<Footer />
+	</body>
+</html>
+
+<style>
+	.elections-kicker {
+		font-family: var(--font-sans);
+		font-size: 0.75rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.1em;
+		color: var(--color-accent);
+		margin: 0 0 0.5rem;
+	}
+
+	.elections-section-lead {
+		margin-bottom: 2rem;
+	}
+
+	.ballot-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+		gap: 1rem;
+	}
+
+	.ballot-card {
+		border: 2px solid var(--color-black);
+		background: var(--color-white);
+		padding: 1.25rem;
+		box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.1);
+	}
+
+	.ballot-card h3 {
+		font-family: var(--font-serif);
+		font-size: 1.35rem;
+		margin: 0 0 0.75rem;
+		color: var(--color-accent);
+	}
+
+	.ballot-card ul {
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.ballot-card li {
+		font-family: var(--font-sans);
+		font-size: 0.9rem;
+		line-height: 1.5;
+		padding: 0.25rem 0;
+		border-top: 1px solid var(--color-border);
+	}
+
+	.level-num {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 2rem;
+		height: 2rem;
+		margin-right: 0.5rem;
+		border: 2px solid var(--color-black);
+		font-family: var(--font-serif);
+		font-size: 1.1rem;
+		vertical-align: middle;
+	}
+
+	.level-place {
+		display: inline-block;
+		margin-left: 0.6rem;
+		font-family: var(--font-sans);
+		font-size: 0.8125rem;
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 0.06em;
+		color: var(--color-muted);
+	}
+
+	.seat-table-wrap {
+		overflow-x: auto;
+		border: 2px solid var(--color-black);
+		background: var(--color-white);
+	}
+
+	.seat-table {
+		width: 100%;
+		border-collapse: collapse;
+		font-family: var(--font-sans);
+		font-size: 0.9rem;
+	}
+
+	.seat-table th,
+	.seat-table td {
+		text-align: left;
+		vertical-align: top;
+		padding: 0.75rem 0.9rem;
+		border-bottom: 1px solid var(--color-border);
+	}
+
+	.seat-table thead th {
+		font-size: 0.72rem;
+		text-transform: uppercase;
+		letter-spacing: 0.08em;
+		background: var(--color-surface);
+		border-bottom: 2px solid var(--color-black);
+		white-space: nowrap;
+	}
+
+	.seat-table tbody tr:last-child th,
+	.seat-table tbody tr:last-child td {
+		border-bottom: none;
+	}
+
+	.seat-table tbody th {
+		font-weight: 600;
+		min-width: 13rem;
+	}
+
+	.seat-note {
+		display: block;
+		font-weight: 400;
+		font-size: 0.8rem;
+		color: var(--color-muted);
+		margin-top: 0.2rem;
+	}
+
+	.seat-next {
+		font-weight: 700;
+		white-space: nowrap;
+	}
+
+	.party-mark {
+		margin-left: 0.35rem;
+		font-weight: 700;
+		font-size: 0.8rem;
+	}
+
+	.party-mark--r {
+		color: var(--party-republican);
+	}
+
+	.party-mark--d {
+		color: var(--party-democrat);
+	}
+
+	.cycle-note {
+		font-family: var(--font-sans);
+		font-size: 0.9rem;
+		line-height: 1.55;
+		color: var(--color-muted);
+		background: var(--color-surface);
+		border-left: 4px solid var(--color-accent);
+		padding: 0.85rem 1rem;
+		margin: 1rem 0 0;
+		max-width: 52rem;
+	}
+
+	.cycle-note strong {
+		color: var(--color-black);
+	}
+</style>
