@@ -7,7 +7,8 @@ seatSlug: holland-mayor
 seatLabel: Mayor of Holland
 status: current
 party: Nonpartisan
-photo: /images/civic-placeholder.jpg
+photo: /images/nathan-bocks.jpg
+photoIsOfficial: true
 servesHolland: true
 proximityRank: 7
 summary: >-
