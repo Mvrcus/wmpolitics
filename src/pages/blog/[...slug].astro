@@ -1,5 +1,0 @@
----
-const slug = Astro.params.slug;
-const path = Array.isArray(slug) ? slug.join("/") : slug;
-return Astro.redirect(`/updates/${path}/`, 301);
----
