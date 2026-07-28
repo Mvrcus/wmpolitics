@@ -17,12 +17,15 @@ export type RosterEntry = {
 /**
  * Hand-maintained map of profile slugs to external legislative-data IDs.
  * Slugs must match `slug` frontmatter in src/content/legislators/. Legislators
- * absent here (county commissioners, mayor, past officeholders) have no
- * machine-readable feed and degrade gracefully.
+ * absent here (county officers and commissioners, mayor, city manager, U.S.
+ * senators, past officeholders) have no machine-readable feed and degrade
+ * gracefully.
  */
 export const TRACK_RECORD_ROSTER: RosterEntry[] = [
 	{ slug: 'bill-huizenga', source: 'congress', chamber: 'us-house', bioguideId: 'H001058' },
 	{ slug: 'nancy-deboer', source: 'openstates', chamber: 'mi-house', openstatesName: 'Nancy DeBoer' },
+	{ slug: 'bradley-slagh', source: 'openstates', chamber: 'mi-house', openstatesName: 'Bradley Slagh' },
+	{ slug: 'roger-victory', source: 'openstates', chamber: 'mi-senate', openstatesName: 'Roger Victory' },
 	{ slug: 'mark-huizenga', source: 'openstates', chamber: 'mi-senate', openstatesName: 'Mark Huizenga' },
 ];
 

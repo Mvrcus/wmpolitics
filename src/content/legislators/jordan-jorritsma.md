@@ -10,7 +10,7 @@ party: Republican
 photo: /images/jordan-jorritsma.jpg
 photoIsOfficial: true
 servesHolland: true
-proximityRank: 5
+proximityRank: 10
 summary: >-
   Ottawa County commissioner for District 2 since January 2025. Elected November
   2024 by a narrow margin. Represents Holland Charter Township precincts and part

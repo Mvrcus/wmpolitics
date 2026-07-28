@@ -9,9 +9,9 @@ type Entry = CollectionEntry<'legislators'>;
 
 const all = sortLegislators(
 	filterLegislatorsByStatus(await getCollection('legislators'), 'current'),
-);
+).filter((l) => l.data.servesHolland);
 
-const isMayor = (l: Entry) => l.data.office === 'local' && l.data.seatSlug.includes('mayor');
+const isCity = (l: Entry) => l.data.office === 'local' && l.data.seatSlug.startsWith('holland-');
 
 const RUNGS: Array<{
 	step: number;
@@ -29,16 +29,16 @@ const RUNGS: Array<{
 		closeness: 5,
 		reach: 'A phone call away — answers to a few thousand voters.',
 		decides: ['Streets & snow plows', 'Water & sewer', 'Police & fire', 'Zoning & housing'],
-		holders: all.filter(isMayor),
+		holders: all.filter(isCity),
 	},
 	{
 		step: 2,
 		title: 'Your county',
-		place: 'Ottawa County Board',
+		place: 'Ottawa County — board & elected officers',
 		closeness: 4,
 		reach: 'Public meetings you can attend — and speak at.',
 		decides: ['Sheriff & jail', 'Health department', 'County parks', 'Running your elections'],
-		holders: all.filter((l) => l.data.office === 'local' && !isMayor(l)),
+		holders: all.filter((l) => l.data.office === 'local' && !isCity(l)),
 	},
 	{
 		step: 3,
@@ -61,9 +61,9 @@ const RUNGS: Array<{
 	{
 		step: 5,
 		title: 'Washington',
-		place: 'U.S. House — MI-04',
+		place: 'U.S. House & Senate',
 		closeness: 1,
-		reach: 'One voice among 435 — furthest from your kitchen table.',
+		reach: 'Your representative and two senators — furthest from your kitchen table.',
 		decides: ['Federal budget', 'Great Lakes funding', 'Social Security & Medicare law'],
 		holders: all.filter((l) => l.data.office === 'us-house' || l.data.office === 'us-senate'),
 	},
