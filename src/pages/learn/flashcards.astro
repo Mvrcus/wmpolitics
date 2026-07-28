@@ -1,0 +1,76 @@
+---
+import BaseHead from '../../components/BaseHead.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import Flashcards from '../../components/Flashcards.astro';
+import { SITE_TITLE } from '../../consts';
+
+const title = `Civics Flashcards | ${SITE_TITLE}`;
+const description =
+	'A quick flashcard game: political terms in plain English, laws that changed everyday life, and legislators remembered for representing people well.';
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<BaseHead title={title} description={description} />
+	</head>
+	<body>
+		<Header />
+		<main>
+			<header class="page-header">
+				<p class="fc-page-kicker">A five-minute game</p>
+				<h1>Civics flashcards</h1>
+				<p class="hero-lead">
+					Flip a card, then be honest: did you have it? Cards you miss come back around until they
+					stick. New to all this? Read the <a href="/learn/">Start Here guide</a> first.
+				</p>
+			</header>
+
+			<section class="section fc-section">
+				<Flashcards />
+			</section>
+
+			<section class="section">
+				<div class="fc-next">
+					<p>
+						Done studying? Go see the real thing —
+						<a href="/legislators/">the people who represent West Michigan right now</a>, with
+						track records you can check yourself.
+					</p>
+				</div>
+			</section>
+		</main>
+		<Footer />
+	</body>
+</html>
+
+<style>
+	.fc-page-kicker {
+		font-family: var(--font-sans);
+		font-size: 0.75rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.1em;
+		color: var(--color-accent);
+		margin: 0 0 0.5rem;
+	}
+
+	.fc-section {
+		padding-top: 1rem;
+	}
+
+	.fc-next {
+		max-width: 44rem;
+		margin: 0 auto;
+		border-top: 1px solid var(--color-border);
+		padding-top: 1.5rem;
+	}
+
+	.fc-next p {
+		font-family: var(--font-sans);
+		font-size: 0.95rem;
+		color: var(--color-muted);
+		margin: 0;
+	}
+</style>
