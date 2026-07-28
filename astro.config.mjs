@@ -17,8 +17,7 @@ export default defineConfig({
 			namedExports: [],
 		},
 	}),
-	redirects: {
-		"/blog": "/updates",
-		"/blog/[...slug]": "/updates/[...slug]",
-	},
+	// /blog -> /updates redirects live in public/_redirects; Astro's `redirects`
+	// option compiles them to `/updates/*/index.html`, which Cloudflare rejects
+	// as an infinite loop (it strips /index.html with its own redirect).
 });
