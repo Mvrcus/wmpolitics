@@ -6,6 +6,8 @@ district: "Ottawa County Board — District 1 (Park Township & North Holland)"
 seatSlug: ottawa-county-district-1
 seatLabel: Ottawa County District 1
 status: current
+photo: /images/jim-barry.jpg
+photoIsOfficial: true
 servesHolland: true
 proximityRank: 12
 summary: >-

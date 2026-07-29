@@ -6,6 +6,8 @@ district: "Ottawa County Sheriff (countywide)"
 seatSlug: ottawa-county-sheriff
 seatLabel: Ottawa County Sheriff
 status: current
+photo: /images/eric-deboer.jpg
+photoIsOfficial: true
 servesHolland: true
 proximityRank: 13
 summary: >-

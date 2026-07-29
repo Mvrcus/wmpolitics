@@ -8,6 +8,8 @@ seatLabel: U.S. Senate — Class II seat
 status: current
 termStart: 2015
 party: Democrat
+photo: /images/gary-peters.jpg
+photoIsOfficial: true
 servesHolland: true
 proximityRank: 2
 summary: >-

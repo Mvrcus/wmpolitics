@@ -8,6 +8,8 @@ seatLabel: Ottawa County Clerk / Register of Deeds
 status: current
 termStart: 2014
 party: Republican
+photo: /images/justin-roebuck.jpg
+photoIsOfficial: true
 servesHolland: true
 proximityRank: 15
 summary: >-

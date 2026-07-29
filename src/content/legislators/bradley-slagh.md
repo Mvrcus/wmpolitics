@@ -8,6 +8,8 @@ seatLabel: Michigan House District 85
 status: current
 termStart: 2019
 party: Republican
+photo: /images/bradley-slagh.jpg
+photoIsOfficial: true
 servesHolland: true
 proximityRank: 6
 summary: >-

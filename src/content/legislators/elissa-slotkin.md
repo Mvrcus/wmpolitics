@@ -8,6 +8,8 @@ seatLabel: U.S. Senate — Class I seat
 status: current
 termStart: 2025
 party: Democrat
+photo: /images/elissa-slotkin.jpg
+photoIsOfficial: true
 servesHolland: true
 proximityRank: 3
 summary: >-
