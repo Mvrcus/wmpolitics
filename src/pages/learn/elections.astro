@@ -26,7 +26,7 @@ const BALLOTS = [...upcoming.entries()]
 	.sort(([a], [b]) => a.localeCompare(b))
 	.map(([when, seats]) => ({ when, seats: [...new Set(seats)] }));
 
-const PARTY_LABEL: Record<string, string> = { R: 'Republican', D: 'Democrat' };
+const PARTY_LABEL: Record<string, string> = { R: 'Republican', D: 'Democrat', I: 'Independent' };
 ---
 
 <!doctype html>
@@ -93,30 +93,59 @@ const PARTY_LABEL: Record<string, string> = { R: 'Republican', D: 'Democrat' };
 								</thead>
 								<tbody>
 									{level.seats.map((seat) => (
-										<tr>
-											<th scope="row">
-												{seat.seat}
-												{seat.note && <span class="seat-note">{seat.note}</span>}
-											</th>
-											<td>
-												{seat.slug ? (
-													<a href={`/legislators/${seat.slug}/`}>{seat.official}</a>
-												) : (
-													seat.official
-												)}
-												{seat.party && (
-													<span
-														class:list={['party-mark', `party-mark--${seat.party.toLowerCase()}`]}
-														title={PARTY_LABEL[seat.party]}
-													>
-														({seat.party})
-													</span>
-												)}
-											</td>
-											<td>{seat.term}</td>
-											<td class="seat-next">{seat.nextElection}</td>
-											<td>{seat.termLimits}</td>
-										</tr>
+										<>
+											<tr>
+												<th scope="row">
+													{seat.seat}
+													{seat.note && <span class="seat-note">{seat.note}</span>}
+												</th>
+												<td>
+													{seat.slug ? (
+														<a href={`/legislators/${seat.slug}/`}>{seat.official}</a>
+													) : (
+														seat.official
+													)}
+													{seat.party && (
+														<span
+															class:list={['party-mark', `party-mark--${seat.party.toLowerCase()}`]}
+															title={PARTY_LABEL[seat.party]}
+														>
+															({seat.party})
+														</span>
+													)}
+												</td>
+												<td>{seat.term}</td>
+												<td class="seat-next">{seat.nextElection}</td>
+												<td>{seat.termLimits}</td>
+											</tr>
+											{seat.candidates && (
+												<tr class="race-row">
+													<td colspan="5">
+														<span class="race-row-label">
+															Running in {seat.nextElection}
+															{seat.raceNote && <em> — {seat.raceNote}</em>}:
+														</span>
+														<ul class="race-row-candidates">
+															{seat.candidates.map((cand) => (
+																<li title={cand.note}>
+																	{cand.name}
+																	{cand.party && (
+																		<span
+																			class:list={['party-mark', `party-mark--${cand.party.toLowerCase()}`]}
+																			title={PARTY_LABEL[cand.party]}
+																		>
+																			({cand.party})
+																		</span>
+																	)}
+																	{cand.incumbent && <span class="race-row-inc">incumbent</span>}
+																	{cand.note && <span class="race-row-note">{cand.note}</span>}
+																</li>
+															))}
+														</ul>
+													</td>
+												</tr>
+											)}
+										</>
 									))}
 								</tbody>
 							</table>
@@ -295,6 +324,64 @@ const PARTY_LABEL: Record<string, string> = { R: 'Republican', D: 'Democrat' };
 
 	.party-mark--d {
 		color: var(--party-democrat);
+	}
+
+	.party-mark--i {
+		color: var(--party-nonpartisan);
+	}
+
+	.race-row td {
+		background: var(--color-surface);
+		font-size: 0.85rem;
+		border-top: none;
+	}
+
+	.race-row-label {
+		display: block;
+		font-family: var(--font-sans);
+		font-size: 0.7rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.06em;
+		color: var(--color-muted);
+		margin-bottom: 0.3rem;
+	}
+
+	.race-row-label em {
+		font-style: normal;
+		text-transform: none;
+		letter-spacing: normal;
+		color: var(--color-accent);
+	}
+
+	.race-row-candidates {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 0.2rem;
+	}
+
+	.race-row-candidates li {
+		font-family: var(--font-sans);
+	}
+
+	.race-row-inc {
+		margin-left: 0.4rem;
+		font-size: 0.68rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		padding: 0.1rem 0.35rem;
+		border: 1px solid var(--color-border);
+		background: var(--color-white);
+	}
+
+	.race-row-note {
+		display: block;
+		font-size: 0.78rem;
+		color: var(--color-muted);
 	}
 
 	.cycle-note {

@@ -6,6 +6,7 @@ district: "Michigan House District 86 (Holland area)"
 seatSlug: mi-state-house-86
 seatLabel: State House District 86
 status: current
+termStart: 2023
 party: Republican
 photo: /images/nancy-deboer.jpg
 photoIsOfficial: true
