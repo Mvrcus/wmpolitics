@@ -1332,6 +1332,112 @@ main > .page-header:first-child {
 	color: var(--color-muted);
 }
 
+.holder-term {
+	display: block;
+	font-family: var(--font-sans);
+	font-size: 0.72rem;
+	color: var(--color-muted);
+	margin-top: 0.15rem;
+}
+
+.holder-race {
+	padding: 0 0 0.75rem;
+	margin-left: 4rem;
+}
+
+.holder-race-label {
+	display: block;
+	font-family: var(--font-sans);
+	font-size: 0.68rem;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.06em;
+	color: var(--color-muted);
+	margin-bottom: 0.35rem;
+}
+
+.holder-race-label em {
+	font-style: normal;
+	text-transform: none;
+	letter-spacing: normal;
+	font-weight: 600;
+	color: var(--color-accent);
+}
+
+.race-candidates {
+	list-style: none;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.35rem;
+	margin: 0;
+	padding: 0;
+}
+
+.race-cand {
+	font-family: var(--font-sans);
+	font-size: 0.72rem;
+	font-weight: 600;
+	padding: 0.2rem 0.5rem;
+	background: #f2f1ec;
+	border: 1px solid var(--color-border);
+	cursor: default;
+}
+
+.race-cand--r {
+	background: var(--party-republican-bg);
+	border-color: var(--party-republican);
+}
+
+.race-cand--d {
+	background: var(--party-democrat-bg);
+	border-color: var(--party-democrat);
+}
+
+.race-cand--i {
+	background: var(--party-nonpartisan-bg);
+	border-color: var(--party-nonpartisan);
+}
+
+.race-cand--incumbent {
+	border-width: 2px;
+}
+
+.race-cand-party {
+	margin-left: 0.3rem;
+	font-size: 0.62rem;
+	font-weight: 700;
+}
+
+.race-cand--r .race-cand-party {
+	color: var(--party-republican);
+}
+
+.race-cand--d .race-cand-party {
+	color: var(--party-democrat);
+}
+
+.race-cand--i .race-cand-party {
+	color: var(--party-nonpartisan);
+}
+
+.rung-more {
+	font-family: var(--font-sans);
+	font-size: 0.78rem;
+	font-weight: 600;
+	margin: 0.75rem 0 0;
+	padding-top: 0.65rem;
+	border-top: 1px solid var(--color-border);
+}
+
+.rung-more a {
+	text-decoration: none;
+	color: var(--color-accent);
+}
+
+.rung-more a:hover {
+	text-decoration: underline;
+}
+
 .ladder-foot {
 	position: relative;
 	font-family: var(--font-sans);
@@ -1361,6 +1467,9 @@ main > .page-header:first-child {
 	}
 	.holder-signal {
 		font-size: 0.65rem;
+	}
+	.holder-race {
+		margin-left: 0;
 	}
 }
 

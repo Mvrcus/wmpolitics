@@ -6,6 +6,7 @@ district: "Ottawa County Board — District 4 (Zeeland & Holland Charter)"
 seatSlug: ottawa-county-district-4
 seatLabel: Ottawa County District 4
 status: current
+termStart: 2023
 party: Republican
 photo: /images/jacob-bonnema.jpg
 photoIsOfficial: true
