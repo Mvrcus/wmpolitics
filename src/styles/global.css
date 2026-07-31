@@ -1183,19 +1183,48 @@ main > .page-header:first-child {
 	margin-left: 0.35rem;
 }
 
+/* the expand control must look like a control: circled chevron, filled when open */
 .rung-caret {
 	flex: 0 0 auto;
-	font-size: 0.8rem;
-	color: var(--color-muted);
-	transition: transform 0.15s;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 1.9rem;
+	height: 1.9rem;
+	border: 2px solid var(--color-black);
+	border-radius: 50%;
+	color: var(--color-black);
+	transition: transform 0.15s, background 0.15s, color 0.15s;
+}
+
+.rung-summary:hover {
+	background: var(--color-surface);
+}
+
+.rung-summary:hover .rung-caret {
+	background: var(--color-black);
+	color: var(--color-white);
+}
+
+.rung-summary:focus-visible {
+	outline: 2px solid var(--color-accent);
+	outline-offset: -2px;
 }
 
 .rung-card[open] .rung-caret {
 	transform: rotate(180deg);
+	background: var(--color-black);
+	color: var(--color-white);
 }
 
 .rung-card[open] .rung-summary {
 	border-bottom: 1px solid var(--color-border);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.rung-caret {
+		transition: none;
+	}
 }
 
 .rung-body {
