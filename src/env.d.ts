@@ -13,6 +13,7 @@ interface Env {
 	DEV_SKIP_TURNSTILE?: string;
 	ADMIN_SECRET?: string;
 	CONGRESS_GOV_API_KEY?: string;
+	GOOGLE_CIVIC_API_KEY?: string;
 	OPENSTATES_API_KEY?: string;
 	SYNC_TRIGGER_TOKEN?: string;
 	SYNC_DRY_RUN?: string;
