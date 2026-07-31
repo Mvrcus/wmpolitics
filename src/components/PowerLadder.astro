@@ -34,7 +34,7 @@ const RUNGS: Array<{
 	{
 		step: 2,
 		title: 'Your county',
-		place: 'Ottawa County — board & elected officers',
+		place: 'Ottawa County',
 		closeness: 4,
 		reach: 'Public meetings you can attend — and speak at.',
 		decides: ['Sheriff & jail', 'Health department', 'County parks', 'Running your elections'],
@@ -69,9 +69,9 @@ const RUNGS: Array<{
 	},
 ];
 
-function serviceSignal(entry: Entry): { cls: string; label: string } {
+function serviceSignal(entry: Entry): { cls: string; label: string } | null {
 	const scores = resolveEditorialScores(entry);
-	if (!scores) return { cls: 'unscored', label: 'Not yet scored' };
+	if (!scores) return null;
 	if (scores.overall >= 60) return { cls: 'good', label: `Serving well · ${scores.overall}/100` };
 	if (scores.overall >= 40) return { cls: 'mixed', label: `Mixed · ${scores.overall}/100` };
 	return { cls: 'poor', label: `Falling short · ${scores.overall}/100` };
@@ -85,89 +85,109 @@ function serviceSignal(entry: Entry): { cls: string; label: string } {
 	<header class="ladder-head">
 		<h2 id="power-ladder-heading" class="ladder-title">Where does your power actually live?</h2>
 		<p class="ladder-lead">
-			Start at your own street — that's where one voice matters most — and climb rung by rung to
-			Lansing and Washington. At every step: who holds the seat, what they decide for you, and
-			whether the record says they're serving this area.
-		</p>
-		<p class="ladder-legend" aria-hidden="true">
-			<span class="signal-dot signal-dot--good"></span> Serving well
-			<span class="signal-dot signal-dot--mixed"></span> Mixed
-			<span class="signal-dot signal-dot--poor"></span> Falling short
-			<span class="signal-dot signal-dot--unscored"></span> Not yet scored
+			Start at your own street — where one voice matters most — and climb toward Washington.
+			Open a rung to see who holds it and what they decide for you.
 		</p>
 	</header>
 
 	<ol class="ladder">
 		{
-			RUNGS.filter((rung) => rung.holders.length > 0).map((rung) => (
-				<li class="rung">
-					<div class="rung-rail" aria-hidden="true">
-						<span class="rung-step">{rung.step}</span>
-					</div>
-					<div class="rung-body">
-						<div class="rung-head">
-							<div>
-								<h2 class="rung-title">{rung.title}</h2>
-								<p class="rung-place">{rung.place}</p>
-							</div>
-							<div class="rung-closeness" title={`Closeness to your daily life: ${rung.closeness} of 5`}>
-								<span class="rung-closeness-label">Close to home</span>
-								<span class="closeness-meter" role="img" aria-label={`Closeness to your daily life: ${rung.closeness} out of 5`}>
-									{[1, 2, 3, 4, 5].map((i) => (
-										<i class:list={['closeness-seg', i <= rung.closeness && 'closeness-seg--on']} />
-									))}
+			RUNGS.filter((rung) => rung.holders.length > 0).map((rung) => {
+				const faces = rung.holders.filter((h) => h.data.photo).slice(0, 3);
+				const extra = rung.holders.length - faces.length;
+				const unscored = rung.holders.filter((h) => !serviceSignal(h)).length;
+				return (
+					<li class="rung">
+						<details class="rung-card" open={rung.step === 1}>
+							<summary class="rung-summary">
+								<span class="rung-step" aria-hidden="true">{rung.step}</span>
+								<span class="rung-sum-text">
+									<h3 class="rung-title">{rung.title}</h3>
+									<span class="rung-sum-meta">
+										{rung.place} · {rung.holders.length}{' '}
+										{rung.holders.length === 1 ? 'official' : 'officials'}
+									</span>
 								</span>
-							</div>
-						</div>
-						<p class="rung-reach">{rung.reach}</p>
-						<ul class="rung-decides">
-							{rung.decides.map((item) => (
-								<li>{item}</li>
-							))}
-						</ul>
-						<ul class="rung-holders">
-							{rung.holders.map((holder) => {
-								const signal = serviceSignal(holder);
-								const identity = partyInfo(holder.data.party);
-								return (
-									<li>
-										<a class="holder-row" href={`/legislators/${holder.data.slug}/`}>
-											{holder.data.photo && (
-												<span class="holder-photo">
-													<img
-														src={holder.data.photo}
-														alt=""
-														width={56}
-														height={70}
-														loading="lazy"
-														decoding="async"
-													/>
-													{identity && (
-														<span
-															class:list={['party-stamp', 'party-stamp--mini', `party-stamp--${identity.key}`]}
-															aria-hidden="true"
-														>
-															{identity.abbrev}
+								<span class="rung-faces" aria-hidden="true">
+									{faces.map((h) => (
+										<span class="rung-face">
+											<img src={h.data.photo} alt="" width={26} height={26} loading="lazy" decoding="async" />
+										</span>
+									))}
+									{extra > 0 && <span class="rung-face-more">+{extra}</span>}
+								</span>
+								<span class="rung-caret" aria-hidden="true">▾</span>
+							</summary>
+							<div class="rung-body">
+								<div class="rung-meta-row">
+									<p class="rung-reach">{rung.reach}</p>
+									<div class="rung-closeness" title={`Closeness to your daily life: ${rung.closeness} of 5`}>
+										<span class="rung-closeness-label">Close to home</span>
+										<span class="closeness-meter" role="img" aria-label={`Closeness to your daily life: ${rung.closeness} out of 5`}>
+											{[1, 2, 3, 4, 5].map((i) => (
+												<i class:list={['closeness-seg', i <= rung.closeness && 'closeness-seg--on']} />
+											))}
+										</span>
+									</div>
+								</div>
+								<ul class="rung-decides">
+									{rung.decides.map((item) => (
+										<li>{item}</li>
+									))}
+								</ul>
+								<ul class="rung-holders">
+									{rung.holders.map((holder) => {
+										const signal = serviceSignal(holder);
+										const identity = partyInfo(holder.data.party);
+										return (
+											<li>
+												<a class="holder-row" href={`/legislators/${holder.data.slug}/`}>
+													{holder.data.photo && (
+														<span class="holder-photo">
+															<img
+																src={holder.data.photo}
+																alt=""
+																width={56}
+																height={70}
+																loading="lazy"
+																decoding="async"
+															/>
+															{identity && (
+																<span
+																	class:list={['party-stamp', 'party-stamp--mini', `party-stamp--${identity.key}`]}
+																	aria-hidden="true"
+																>
+																	{identity.abbrev}
+																</span>
+															)}
 														</span>
 													)}
-												</span>
-											)}
-											<span class="holder-text">
-												<strong>{holder.data.name}</strong>
-												<span class="holder-district">{holder.data.district}</span>
-											</span>
-											<span class:list={['holder-signal', `holder-signal--${signal.cls}`]}>
-												<span class:list={['signal-dot', `signal-dot--${signal.cls}`]} aria-hidden="true" />
-												{signal.label}
-											</span>
-										</a>
-									</li>
-								);
-							})}
-						</ul>
-					</div>
-				</li>
-			))
+													<span class="holder-text">
+														<strong>{holder.data.name}</strong>
+														<span class="holder-district">{holder.data.district}</span>
+														{signal && (
+															<span class:list={['signal-chip', `signal-chip--${signal.cls}`]}>
+																<span class:list={['signal-dot', `signal-dot--${signal.cls}`]} aria-hidden="true" />
+																{signal.label}
+															</span>
+														)}
+													</span>
+												</a>
+											</li>
+										);
+									})}
+								</ul>
+								{unscored > 0 && (
+									<p class="rung-unscored">
+										{unscored} of {rung.holders.length} not yet scored —{' '}
+										<a href="/coverage/">how scoring works</a>
+									</p>
+								)}
+							</div>
+						</details>
+					</li>
+				);
+			})
 		}
 	</ol>
 
