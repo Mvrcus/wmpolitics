@@ -1,0 +1,210 @@
+---
+import { getCollection } from 'astro:content';
+import BaseHead from '../../components/BaseHead.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import { SITE_TITLE } from '../../consts';
+import { LEVELS } from '../../data/election-seats';
+import type { Seat, Candidate } from '../../data/election-seats';
+
+const title = `The 2026 Ballot | ${SITE_TITLE}`;
+const description =
+	'Every seat Holland and Ottawa County vote on in 2026, who is running for each, and the two dates that decide it — the Aug 4 primary and the Nov 3 general.';
+
+// Every 2026 race with a declared field, in ladder order (federal → state).
+const races: Array<{ levelLabel: string; seat: Seat }> = LEVELS.flatMap((level) =>
+	level.seats
+		.filter((seat) => seat.nextElection.includes('2026') && (seat.candidates?.length ?? 0) > 0)
+		.map((seat) => ({ levelLabel: level.label, seat })),
+);
+
+const candidateCount = races.reduce((n, r) => n + (r.seat.candidates?.length ?? 0), 0);
+const openSeats = races.filter((r) => r.seat.raceNote?.toLowerCase().includes('open seat')).length;
+
+// Incumbents on this page have site profiles — reuse their real portraits.
+const legislators = await getCollection('legislators');
+const photoBySlug = new Map(legislators.map((l) => [l.data.slug, l.data.photo]));
+
+const PARTY_LABEL: Record<string, string> = { R: 'Republican', D: 'Democrat', I: 'Independent' };
+
+function raceStatus(seat: Seat): { cls: string; label: string } {
+	const note = seat.raceNote?.toLowerCase() ?? '';
+	if (note.includes('open seat')) return { cls: 'open', label: 'Open seat' };
+	if (note.includes('matchup is set')) return { cls: 'set', label: 'November matchup set' };
+	if ((seat.candidates?.length ?? 0) === 1) return { cls: 'solo', label: 'Unopposed so far' };
+	return { cls: 'primary', label: 'Contested primary' };
+}
+
+// Group a race's field by primary: R field, D field, then anyone else.
+function primaryFields(seat: Seat): Array<{ key: string; label: string; candidates: Candidate[] }> {
+	const cands = seat.candidates ?? [];
+	const fields: Array<{ key: string; label: string; candidates: Candidate[] }> = [];
+	const r = cands.filter((c) => c.party === 'R');
+	const d = cands.filter((c) => c.party === 'D');
+	const other = cands.filter((c) => c.party !== 'R' && c.party !== 'D');
+	if (r.length) fields.push({ key: 'r', label: 'Republican primary', candidates: r });
+	if (d.length) fields.push({ key: 'd', label: 'Democratic primary', candidates: d });
+	if (other.length) fields.push({ key: 'other', label: 'Other candidates', candidates: other });
+	return fields;
+}
+
+function initials(name: string): string {
+	return name
+		.split(/\s+/)
+		.filter((w) => /^[A-Z]/.test(w))
+		.slice(0, 2)
+		.map((w) => w[0])
+		.join('');
+}
+
+function incumbentPhoto(seat: Seat, cand: Candidate): string | undefined {
+	if (!cand.incumbent || !seat.slug) return undefined;
+	return photoBySlug.get(seat.slug);
+}
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<BaseHead title={title} description={description} />
+	</head>
+	<body>
+		<Header />
+		<main>
+			<section class="e26-hero" aria-label="2026 election overview">
+				<span class="cc-watermark cc-watermark--dem" aria-hidden="true"></span>
+				<span class="cc-watermark cc-watermark--rep" aria-hidden="true"></span>
+				<div class="e26-hero-inner">
+					<p class="e26-kicker">Holland &amp; Ottawa County · Michigan</p>
+					<h1 class="e26-title">Your 2026 ballot</h1>
+					<p class="e26-lead">
+						Every seat this area votes on in 2026 and who's running for it — verified against
+						official filings, kept current as the field changes.
+					</p>
+					<div class="e26-dates">
+						<div class="e26-date">
+							<span class="e26-date-label">Primary</span>
+							<span class="e26-date-num">Aug 4</span>
+							<span class="e26-date-note" data-countdown="2026-08-04">
+								picks each party's nominee
+							</span>
+						</div>
+						<div class="e26-date">
+							<span class="e26-date-label">General</span>
+							<span class="e26-date-num">Nov 3</span>
+							<span class="e26-date-note" data-countdown="2026-11-03">picks the winner</span>
+						</div>
+					</div>
+					<ul class="e26-stats" aria-label="2026 race totals">
+						<li><strong>{races.length}</strong> races</li>
+						<li><strong>{candidateCount}</strong> declared candidates</li>
+						<li><strong>{openSeats}</strong> open seats — no incumbent</li>
+					</ul>
+				</div>
+			</section>
+
+			<section class="section">
+				<p class="hero-lead e26-page-lead">
+					In an area this one-sided, the August primary usually decides the seat before November
+					does — if you only vote once in 2026, the primary is the one that counts most.
+					Incumbents link to their full record; everyone gets the same treatment.
+				</p>
+
+				<div class="e26-races">
+					{
+						races.map(({ levelLabel, seat }) => {
+							const status = raceStatus(seat);
+							return (
+								<article class="e26-race" id={seat.seatSlug} aria-label={seat.seat}>
+									<header class="e26-race-head">
+										<div class="e26-race-titles">
+											<p class="e26-race-level">{levelLabel}</p>
+											<h2 class="e26-race-seat">{seat.seat}</h2>
+										</div>
+										<span class:list={['e26-status', `e26-status--${status.cls}`]}>{status.label}</span>
+									</header>
+									{seat.raceNote && <p class="e26-race-note">{seat.raceNote}</p>}
+									{primaryFields(seat).map((field) => (
+										<div class="e26-field">
+											<h3 class:list={['e26-field-label', `e26-field-label--${field.key}`]}>
+												{field.label}
+											</h3>
+											<ul class="e26-cands">
+												{field.candidates.map((cand) => {
+													const photo = incumbentPhoto(seat, cand);
+													const body = (
+														<>
+															<span class:list={['e26-cand-face', cand.party && `e26-cand-face--${cand.party.toLowerCase()}`]}>
+																{photo ? (
+																	<img src={photo} alt="" width={56} height={70} loading="lazy" decoding="async" />
+																) : (
+																	<span class="e26-cand-initials" aria-hidden="true">{initials(cand.name)}</span>
+																)}
+															</span>
+															<span class="e26-cand-text">
+																<strong>{cand.name}</strong>
+																<span class="e26-cand-meta">
+																	{cand.party ? PARTY_LABEL[cand.party] : 'Non-partisan'}
+																	{cand.incumbent && <span class="e26-incumbent">Incumbent</span>}
+																</span>
+																{cand.note && <span class="e26-cand-note">{cand.note}</span>}
+															</span>
+														</>
+													);
+													return (
+														<li>
+															{cand.incumbent && seat.slug ? (
+																<a class="e26-cand e26-cand--link" href={`/legislators/${seat.slug}/`}>
+																	{body}
+																</a>
+															) : (
+																<span class="e26-cand">{body}</span>
+															)}
+														</li>
+													);
+												})}
+											</ul>
+										</div>
+									))}
+									<p class="e26-race-foot">
+										{seat.term.replace(' years', '-year')} term · term limits:{' '}
+										{seat.termLimits.toLowerCase()} ·{' '}
+										<a href={`/learn/elections/#${seat.seatSlug}`}>seat details</a>
+									</p>
+								</article>
+							);
+						})
+					}
+				</div>
+			</section>
+
+			<section class="section">
+				<div class="section-header">
+					<h2>Before you vote</h2>
+				</div>
+				<div class="start-links">
+					<a href="/holland/" class="btn btn-primary">Who represents you now</a>
+					<a href="/learn/elections/" class="text-link">Terms &amp; term limits cheat sheet</a>
+					<a href="https://mvic.sos.state.mi.us/" class="text-link" target="_blank" rel="noopener noreferrer">
+						Register / check your ballot (Michigan SOS)
+					</a>
+				</div>
+				<p class="cc-source" style="margin-top: 1.5rem;">
+					Candidate fields verified July 2026 against official filings; updated as candidates enter
+					or drop out. No endorsements — <a href="/about/">how we cover races</a>.
+				</p>
+			</section>
+		</main>
+		<Footer />
+
+		<script>
+			// Add a live "N days away" to each date tile; text falls back gracefully without JS.
+			for (const el of document.querySelectorAll<HTMLElement>('[data-countdown]')) {
+				const target = new Date(`${el.dataset.countdown}T00:00:00`);
+				const days = Math.ceil((target.getTime() - Date.now()) / 86_400_000);
+				if (days > 0) el.textContent = `${days} days away — ${el.textContent}`;
+				else if (days === 0) el.textContent = 'today';
+			}
+		</script>
+	</body>
+</html>

@@ -1615,6 +1615,356 @@ main > .page-header:first-child {
 	}
 }
 
+/* 2026 ballot page (/elections/2026/) */
+.e26-hero {
+	position: relative;
+	overflow: hidden;
+	width: 100vw;
+	margin-left: calc(50% - 50vw);
+	margin-top: calc(-1 * var(--section-gap));
+	padding: clamp(2.5rem, 5vw, 4rem) var(--content-padding) clamp(2rem, 5vw, 3rem);
+	text-align: center;
+	background:
+		radial-gradient(ellipse at 50% 30%, rgba(255, 255, 255, 0.85), transparent 70%),
+		var(--engraved-field),
+		#f5f4ee;
+}
+
+.e26-hero-inner {
+	position: relative;
+	max-width: 46rem;
+	margin: 0 auto;
+}
+
+.e26-kicker {
+	font-family: var(--font-sans);
+	font-size: 0.75rem;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.12em;
+	color: var(--color-muted);
+	margin: 0 0 0.75rem;
+}
+
+.e26-title {
+	font-family: var(--font-serif);
+	font-size: clamp(2rem, 4.5vw, 3rem);
+	line-height: 1.08;
+	margin: 0 0 1rem;
+}
+
+.e26-lead {
+	font-size: 1.05rem;
+	line-height: 1.6;
+	color: var(--color-muted);
+	max-width: 34rem;
+	margin: 0 auto 1.75rem;
+}
+
+.e26-dates {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 0.75rem;
+	max-width: 30rem;
+	margin: 0 auto 1.5rem;
+}
+
+.e26-date {
+	background: var(--color-white);
+	border: 1px solid var(--color-black);
+	padding: 0.8rem 0.9rem 0.7rem;
+	text-align: left;
+}
+
+.e26-date-label {
+	display: block;
+	font-family: var(--font-sans);
+	font-size: 0.68rem;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.08em;
+	color: var(--color-muted);
+}
+
+.e26-date-num {
+	display: block;
+	font-family: var(--font-serif);
+	font-size: 1.9rem;
+	font-weight: 700;
+	line-height: 1.15;
+}
+
+.e26-date-note {
+	display: block;
+	font-family: var(--font-sans);
+	font-size: 0.72rem;
+	color: var(--color-muted);
+	margin-top: 0.2rem;
+	line-height: 1.35;
+}
+
+.e26-stats {
+	list-style: none;
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: 0.5rem;
+	margin: 0;
+	padding: 0;
+}
+
+.e26-stats li {
+	font-family: var(--font-sans);
+	font-size: 0.8rem;
+	color: var(--color-muted);
+	background: rgba(255, 255, 255, 0.82);
+	border: 1px solid var(--color-border);
+	border-radius: 999px;
+	padding: 0.3rem 0.85rem;
+}
+
+.e26-stats strong {
+	color: var(--color-black);
+}
+
+.e26-page-lead {
+	margin: 0 auto 2rem;
+	max-width: 52rem;
+}
+
+.e26-races {
+	display: grid;
+	gap: 1.25rem;
+	max-width: 52rem;
+	margin: 0 auto;
+}
+
+.e26-race {
+	background: var(--color-white);
+	border: 1px solid var(--color-black);
+	padding: 1.1rem 1.25rem 1rem;
+}
+
+.e26-race-head {
+	display: flex;
+	justify-content: space-between;
+	align-items: flex-start;
+	gap: 0.75rem;
+	flex-wrap: wrap;
+}
+
+.e26-race-level {
+	font-family: var(--font-sans);
+	font-size: 0.68rem;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.08em;
+	color: var(--color-muted);
+	margin: 0 0 0.1rem;
+}
+
+.e26-race-seat {
+	font-family: var(--font-serif);
+	font-size: 1.2rem;
+	line-height: 1.25;
+	margin: 0;
+}
+
+.e26-status {
+	font-family: var(--font-sans);
+	font-size: 0.72rem;
+	font-weight: 600;
+	border-radius: 999px;
+	padding: 0.18rem 0.65rem;
+	white-space: nowrap;
+}
+
+.e26-status--open {
+	background: var(--color-tomatoes-bg);
+	color: var(--color-accent-hover);
+}
+
+.e26-status--set {
+	background: var(--color-tarred-bg);
+	color: var(--color-tarred);
+}
+
+.e26-status--primary {
+	background: var(--color-mixed-bg);
+	color: var(--color-mixed);
+}
+
+.e26-status--solo {
+	background: var(--party-nonpartisan-bg);
+	color: var(--color-muted);
+}
+
+.e26-race-note {
+	font-family: var(--font-sans);
+	font-size: 0.85rem;
+	font-style: italic;
+	color: var(--color-muted);
+	margin: 0.35rem 0 0;
+}
+
+.e26-field {
+	margin-top: 1rem;
+}
+
+.e26-field-label {
+	font-family: var(--font-sans);
+	font-size: 0.7rem;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.07em;
+	margin: 0 0 0.5rem;
+}
+
+.e26-field-label--r {
+	color: var(--party-republican);
+}
+
+.e26-field-label--d {
+	color: var(--party-democrat);
+}
+
+.e26-field-label--other {
+	color: var(--color-muted);
+}
+
+.e26-cands {
+	list-style: none;
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: 0.5rem;
+	margin: 0;
+	padding: 0;
+}
+
+@media (min-width: 640px) {
+	.e26-cands {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+}
+
+.e26-cand {
+	display: flex;
+	align-items: flex-start;
+	gap: 0.7rem;
+	background: var(--color-paper);
+	border: 1px solid var(--color-border);
+	padding: 0.6rem 0.7rem;
+	height: 100%;
+}
+
+.e26-cand--link {
+	text-decoration: none;
+	color: inherit;
+	transition: border-color 0.15s;
+}
+
+.e26-cand--link:hover {
+	border-color: var(--color-black);
+}
+
+.e26-cand--link:hover strong {
+	color: var(--color-accent);
+}
+
+.e26-cand-face {
+	position: relative;
+	flex: 0 0 2.9rem;
+	width: 2.9rem;
+	height: 3.6rem;
+	overflow: hidden;
+	border: 1px solid var(--color-border);
+	background: var(--party-nonpartisan-bg);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.e26-cand-face img {
+	display: block;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.e26-cand-face--r {
+	background: var(--party-republican-bg);
+	border-color: var(--party-republican);
+}
+
+.e26-cand-face--d {
+	background: var(--party-democrat-bg);
+	border-color: var(--party-democrat);
+}
+
+.e26-cand-initials {
+	font-family: var(--font-sans);
+	font-size: 0.95rem;
+	font-weight: 700;
+	color: var(--color-muted);
+}
+
+.e26-cand-face--r .e26-cand-initials {
+	color: var(--party-republican);
+}
+
+.e26-cand-face--d .e26-cand-initials {
+	color: var(--party-democrat);
+}
+
+.e26-cand-text {
+	flex: 1;
+	min-width: 0;
+	font-family: var(--font-sans);
+}
+
+.e26-cand-text strong {
+	display: block;
+	font-size: 0.92rem;
+	line-height: 1.3;
+	transition: color 0.15s;
+}
+
+.e26-cand-meta {
+	display: block;
+	font-size: 0.72rem;
+	color: var(--color-muted);
+	margin-top: 0.1rem;
+}
+
+.e26-incumbent {
+	display: inline-block;
+	font-size: 0.62rem;
+	font-weight: 650;
+	background: var(--color-tarred-bg);
+	color: var(--color-tarred);
+	border-radius: 999px;
+	padding: 0.08rem 0.45rem;
+	margin-left: 0.4rem;
+	vertical-align: 1px;
+}
+
+.e26-cand-note {
+	display: block;
+	font-size: 0.75rem;
+	color: var(--color-muted);
+	line-height: 1.4;
+	margin-top: 0.2rem;
+}
+
+.e26-race-foot {
+	font-family: var(--font-sans);
+	font-size: 0.75rem;
+	color: var(--color-muted);
+	border-top: 1px solid var(--color-border);
+	padding-top: 0.6rem;
+	margin: 1rem 0 0;
+}
+
 /* ZIP command center */
 .command-center {
 	position: relative;
