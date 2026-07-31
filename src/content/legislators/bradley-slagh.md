@@ -40,6 +40,17 @@ sources:
     url: https://www.house.mi.gov/
   - label: Ballotpedia — Bradley Slagh
     url: https://ballotpedia.org/Bradley_Slagh
+publicOpinion:
+  score: 70
+  basis: election
+  confidence: high
+  asOf: "2026-07"
+  detail: >-
+    Re-elected November 2024 with 70.4% (39,199 of 55,689) over Democrat
+    Marcia Mansaray — his fourth straight contested win at 64% or better.
+  sources:
+    - label: Ballotpedia — Bradley Slagh
+      url: https://ballotpedia.org/Bradley_Slagh
 ---
 
 Bradley Slagh (R) represents Michigan House District 85, which covers Holland Charter Township and the Zeeland area. He has served in the House since 2019 and was previously Ottawa County Treasurer.

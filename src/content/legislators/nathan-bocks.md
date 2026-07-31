@@ -51,6 +51,19 @@ sources:
     url: https://www.mlive.com/news/grand-rapids/2025/11/incumbent-mayor-nathan-bocks-wins-reelection-in-holland.html
   - label: Ballotpedia — Mayor of Holland
     url: https://ballotpedia.org/Nathan_Bocks_(Mayor_of_Holland,_Michigan,_candidate_2025)
+publicOpinion:
+  score: 73
+  basis: election
+  confidence: high
+  asOf: "2026-07"
+  detail: >-
+    Re-elected November 2025 with 73% (4,620–1,705) over Brian Everitt — his
+    third straight contested win (67.5% in 2023, 53% in 2019).
+  sources:
+    - label: WHTC — November 2025 Holland results
+      url: https://whtc.com/2025/11/05/two-holland-council-members-holland-zeeland-ballot-proposals-pass/
+    - label: Holland Sentinel — Bocks wins fourth term
+      url: https://www.hollandsentinel.com/story/news/politics/elections/2025/11/04/nathan-bocks-earns-fourth-mayorship-term-in-holland/86935947007/
 ---
 
 Nathan Bocks is Holland's chief elected executive and council chair. City residents contact his office on zoning, public safety, utilities, and downtown policy—not on state or federal law.

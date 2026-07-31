@@ -44,6 +44,19 @@ sources:
     url: https://www.slotkin.senate.gov/
   - label: Congress.gov — Elissa Slotkin
     url: https://www.congress.gov/member/elissa-slotkin/S001208
+publicOpinion:
+  score: 49
+  basis: election
+  confidence: high
+  asOf: "2026-07"
+  detail: >-
+    Won the November 2024 open-seat Senate race with 48.6% (2,712,686 votes),
+    a 0.34-point margin over Mike Rogers. No verifiable statewide approval
+    poll has been published since; an April 2026 Glengariff survey showing 70%
+    favorability covered only Democratic primary voters and is not used.
+  sources:
+    - label: Wikipedia — 2024 U.S. Senate election in Michigan
+      url: https://en.wikipedia.org/wiki/2024_United_States_Senate_election_in_Michigan
 ---
 
 Elissa Slotkin (D) is Michigan's junior U.S. senator, elected in November 2024 and sworn in January 2025. She previously represented mid-Michigan's 8th and 7th districts in the U.S. House.

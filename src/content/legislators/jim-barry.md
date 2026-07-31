@@ -35,6 +35,20 @@ concerns:
 sources:
   - label: Ottawa County — District 1
     url: https://boards.miottawa.org/commissioner/district-1/
+publicOpinion:
+  score: 61
+  basis: election
+  confidence: medium
+  asOf: "2026-07"
+  detail: >-
+    Won his first term November 2024 with about 61% (10,397–6,741) over
+    Democrat Danielle Smith; vote counts come from press reports of county
+    results, and the share excludes write-in votes.
+  sources:
+    - label: Sarah Leach (Sentinel Leach) — district-by-district results
+      url: https://sentinelleach.substack.com/p/jorritsma-ekes-out-upset-win-over
+    - label: Fox 17 — August 2024 primary results
+      url: https://www.fox17online.com/news/national-politics/america-votes/election-results-ottawa-county-voters-push-commission-candidates-to-party-nomination
 ---
 
 Jim Barry represents District 1 — Park Township and the North Holland area — on the Ottawa County Board of Commissioners.
