@@ -277,13 +277,21 @@ main > .page-header:first-child {
 	font-family: var(--font-sans);
 	font-size: 0.875rem;
 	font-weight: 600;
-	text-transform: uppercase;
-	letter-spacing: 0.04em;
 	text-decoration: none;
+	white-space: nowrap;
 }
 
 .section-header a:hover {
 	color: var(--color-accent);
+}
+
+/* On phones the side-by-side header wraps into colliding stacks — stack it deliberately */
+@media (max-width: 640px) {
+	.section-header {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 0.2rem;
+	}
 }
 
 /* Page & featured hero images */
@@ -634,7 +642,7 @@ main > .page-header:first-child {
 	border-bottom-color: var(--color-black);
 }
 
-/* Buttons */
+/* Buttons — sentence case, one obvious primary per screen */
 .btn {
 	display: inline-block;
 	padding: 0.7rem 1.35rem;
@@ -643,9 +651,7 @@ main > .page-header:first-child {
 	text-decoration: none;
 	font-family: var(--font-sans);
 	font-weight: 600;
-	font-size: 0.875rem;
-	text-transform: uppercase;
-	letter-spacing: 0.05em;
+	font-size: 0.9rem;
 	border: 2px solid var(--color-black);
 	cursor: pointer;
 	transition: background 0.15s, color 0.15s;
@@ -654,6 +660,17 @@ main > .page-header:first-child {
 .btn:hover {
 	background: var(--color-white);
 	color: var(--color-black) !important;
+}
+
+.btn-primary {
+	background: var(--color-accent);
+	border-color: var(--color-accent);
+}
+
+.btn-primary:hover {
+	background: var(--color-accent-hover);
+	border-color: var(--color-accent-hover);
+	color: var(--color-white) !important;
 }
 
 .btn-outline {
@@ -666,10 +683,24 @@ main > .page-header:first-child {
 	color: var(--color-white) !important;
 }
 
+.text-link {
+	font-family: var(--font-sans);
+	font-size: 0.9rem;
+	font-weight: 600;
+	color: var(--color-black);
+	text-decoration: underline;
+	text-underline-offset: 3px;
+}
+
+.text-link:hover {
+	color: var(--color-accent);
+}
+
 .start-links {
 	display: flex;
 	flex-wrap: wrap;
-	gap: 0.75rem;
+	gap: 0.75rem 1.5rem;
+	align-items: center;
 }
 
 /* Office groups */
@@ -957,77 +988,40 @@ main > .page-header:first-child {
 	font-size: 1.08rem;
 	line-height: 1.6;
 	color: var(--color-muted);
-	margin: 0 0 1.75rem;
+	max-width: 34rem;
+	margin: 0 auto 1.5rem;
 }
 
+/* pill chips — the three promises without three boxes */
 .home-intro-points {
 	list-style: none;
 	display: flex;
 	flex-wrap: wrap;
 	justify-content: center;
-	gap: 0.75rem;
-	margin: 0 0 2rem;
+	gap: 0.5rem;
+	margin: 0 0 1.75rem;
 	padding: 0;
 }
 
 .home-intro-points li {
-	flex: 1 1 12rem;
-	max-width: 15rem;
 	font-family: var(--font-sans);
+	font-size: 0.82rem;
+	font-weight: 600;
+	color: var(--color-black);
 	background: rgba(255, 255, 255, 0.82);
 	border: 1px solid var(--color-border);
-	border-top: 2px solid var(--color-accent);
-	padding: 0.85rem 1rem;
-	text-align: left;
+	border-radius: 999px;
+	padding: 0.32rem 0.85rem;
 }
 
-.home-intro-points strong {
-	display: block;
-	font-size: 0.9rem;
-	margin-bottom: 0.2rem;
+.home-intro-cta {
+	margin-top: 0.25rem;
 }
 
-.home-intro-points span {
-	font-size: 0.8rem;
-	color: var(--color-muted);
-	line-height: 1.4;
-}
-
-.home-intro-cue {
-	display: inline-flex;
-	align-items: center;
-	gap: 0.5rem;
-	font-family: var(--font-sans);
-	font-size: 0.85rem;
-	font-weight: 700;
-	text-transform: uppercase;
-	letter-spacing: 0.08em;
-	text-decoration: none;
-	color: var(--color-black);
-}
-
-.home-intro-cue:hover {
-	color: var(--color-accent);
-}
-
-.home-intro-arrow {
-	display: inline-block;
-	animation: intro-bob 1.6s ease-in-out infinite;
-}
-
-@keyframes intro-bob {
-	0%,
-	100% {
-		transform: translateY(0);
-	}
-	50% {
-		transform: translateY(4px);
-	}
-}
-
-@media (prefers-reduced-motion: reduce) {
-	.home-intro-arrow {
-		animation: none;
+@media (max-width: 640px) {
+	/* centered text past two lines loses its anchor — left-align the lead on phones */
+	.home-intro-lead {
+		text-align: left;
 	}
 }
 
@@ -1065,17 +1059,6 @@ main > .page-header:first-child {
 	margin: 0 0 1.25rem;
 }
 
-.ladder-legend {
-	font-family: var(--font-sans);
-	font-size: 0.78rem;
-	color: var(--color-muted);
-	display: flex;
-	flex-wrap: wrap;
-	justify-content: center;
-	gap: 0.35rem 1rem;
-	margin: 0;
-}
-
 .signal-dot {
 	display: inline-block;
 	width: 0.65rem;
@@ -1106,32 +1089,26 @@ main > .page-header:first-child {
 	margin: 0 auto;
 	padding: 0;
 	max-width: 52rem;
+	display: grid;
+	gap: 0.75rem;
 }
 
-.rung {
-	position: relative;
+/* each rung is a collapsed summary card; open discloses the roster */
+.rung-card {
+	background: var(--color-white);
+	border: 1px solid var(--color-black);
+}
+
+.rung-summary {
 	display: flex;
-	gap: 1.25rem;
-	padding-bottom: 2rem;
+	align-items: center;
+	gap: 0.9rem;
+	padding: 0.85rem 1rem;
+	cursor: pointer;
+	list-style: none;
 }
 
-.rung-rail {
-	position: relative;
-	flex: 0 0 2.5rem;
-	display: flex;
-	justify-content: center;
-}
-
-.rung-rail::before {
-	content: '';
-	position: absolute;
-	top: 2.5rem;
-	bottom: -0.5rem;
-	width: 2px;
-	background: var(--color-black);
-}
-
-.rung:last-child .rung-rail::before {
+.rung-summary::-webkit-details-marker {
 	display: none;
 }
 
@@ -1139,47 +1116,100 @@ main > .page-header:first-child {
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	width: 2.5rem;
-	height: 2.5rem;
+	flex: 0 0 2.1rem;
+	width: 2.1rem;
+	height: 2.1rem;
 	border-radius: 50%;
 	background: var(--color-black);
 	color: #fff;
 	font-family: var(--font-sans);
-	font-size: 1.05rem;
+	font-size: 0.95rem;
 	font-weight: 700;
-	z-index: 1;
 }
 
-.rung-body {
+.rung-sum-text {
 	flex: 1;
-	background: var(--color-white);
-	border: 1px solid var(--color-black);
-	padding: 1.25rem 1.5rem 1rem;
 	min-width: 0;
-}
-
-.rung-head {
-	display: flex;
-	justify-content: space-between;
-	align-items: flex-start;
-	gap: 1rem;
-	flex-wrap: wrap;
 }
 
 .rung-title {
 	font-family: var(--font-serif);
-	font-size: 1.35rem;
+	font-size: 1.2rem;
+	line-height: 1.2;
 	margin: 0;
 }
 
-.rung-place {
+.rung-sum-meta {
+	display: block;
 	font-family: var(--font-sans);
 	font-size: 0.75rem;
-	font-weight: 700;
-	text-transform: uppercase;
-	letter-spacing: 0.08em;
 	color: var(--color-muted);
-	margin: 0.15rem 0 0;
+	margin-top: 0.1rem;
+}
+
+.rung-faces {
+	display: flex;
+	align-items: center;
+	flex: 0 0 auto;
+}
+
+.rung-face {
+	display: block;
+	width: 1.7rem;
+	height: 1.7rem;
+	border-radius: 50%;
+	overflow: hidden;
+	border: 2px solid var(--color-white);
+	background: #e4e2da;
+	margin-left: -0.5rem;
+}
+
+.rung-face:first-child {
+	margin-left: 0;
+}
+
+.rung-face img {
+	display: block;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.rung-face-more {
+	font-family: var(--font-sans);
+	font-size: 0.7rem;
+	font-weight: 600;
+	color: var(--color-muted);
+	margin-left: 0.35rem;
+}
+
+.rung-caret {
+	flex: 0 0 auto;
+	font-size: 0.8rem;
+	color: var(--color-muted);
+	transition: transform 0.15s;
+}
+
+.rung-card[open] .rung-caret {
+	transform: rotate(180deg);
+}
+
+.rung-card[open] .rung-summary {
+	border-bottom: 1px solid var(--color-border);
+}
+
+.rung-body {
+	padding: 1rem 1.25rem 1.1rem;
+	min-width: 0;
+}
+
+.rung-meta-row {
+	display: flex;
+	justify-content: space-between;
+	align-items: baseline;
+	gap: 1rem;
+	flex-wrap: wrap;
+	margin-bottom: 0.6rem;
 }
 
 .rung-closeness {
@@ -1219,7 +1249,7 @@ main > .page-header:first-child {
 	font-size: 0.85rem;
 	font-style: italic;
 	color: var(--color-muted);
-	margin: 0.5rem 0 0.75rem;
+	margin: 0;
 }
 
 .rung-decides {
@@ -1250,11 +1280,12 @@ main > .page-header:first-child {
 	border-top: 1px solid var(--color-border);
 }
 
+/* two-line rows: the text column owns the width; status is a chip below the name */
 .holder-row {
 	display: flex;
-	align-items: center;
+	align-items: flex-start;
 	gap: 0.9rem;
-	padding: 0.65rem 0;
+	padding: 0.7rem 0;
 	text-decoration: none;
 	color: inherit;
 }
@@ -1304,32 +1335,157 @@ main > .page-header:first-child {
 	color: var(--color-muted);
 }
 
-.holder-signal {
+/* tinted pills, shown only when there is a score to show */
+.signal-chip {
 	display: inline-flex;
 	align-items: center;
-	gap: 0.4rem;
+	gap: 0.35rem;
+	font-family: var(--font-sans);
+	font-size: 0.73rem;
+	font-weight: 600;
+	border-radius: 999px;
+	padding: 0.16rem 0.6rem;
+	margin-top: 0.3rem;
+}
+
+.signal-chip .signal-dot {
+	width: 0.5rem;
+	height: 0.5rem;
+}
+
+.signal-chip--good {
+	background: var(--color-supporter-bg);
+	color: var(--color-supporter-accent);
+}
+
+.signal-chip--mixed {
+	background: var(--color-mixed-bg);
+	color: var(--color-mixed);
+}
+
+.signal-chip--poor {
+	background: var(--color-tomatoes-bg);
+	color: var(--color-accent-hover);
+}
+
+.signal-chip--unscored {
+	background: #f2f1ec;
+	color: var(--color-muted);
+}
+
+.rung-unscored {
+	font-family: var(--font-sans);
+	font-size: 0.78rem;
+	color: var(--color-muted);
+	border-top: 1px solid var(--color-border);
+	padding-top: 0.6rem;
+	margin: 0.25rem 0 0;
+}
+
+.holder-term {
+	display: block;
 	font-family: var(--font-sans);
 	font-size: 0.72rem;
+	color: var(--color-muted);
+	margin-top: 0.15rem;
+}
+
+.holder-race {
+	padding: 0 0 0.75rem;
+	margin-left: 4rem;
+}
+
+.holder-race-label {
+	display: block;
+	font-family: var(--font-sans);
+	font-size: 0.68rem;
 	font-weight: 700;
 	text-transform: uppercase;
-	letter-spacing: 0.04em;
-	white-space: nowrap;
+	letter-spacing: 0.06em;
+	color: var(--color-muted);
+	margin-bottom: 0.35rem;
 }
 
-.holder-signal--good {
-	color: #1b6b2f;
-}
-
-.holder-signal--mixed {
-	color: #8a6d1a;
-}
-
-.holder-signal--poor {
+.holder-race-label em {
+	font-style: normal;
+	text-transform: none;
+	letter-spacing: normal;
+	font-weight: 600;
 	color: var(--color-accent);
 }
 
-.holder-signal--unscored {
-	color: var(--color-muted);
+.race-candidates {
+	list-style: none;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.35rem;
+	margin: 0;
+	padding: 0;
+}
+
+.race-cand {
+	font-family: var(--font-sans);
+	font-size: 0.72rem;
+	font-weight: 600;
+	padding: 0.2rem 0.5rem;
+	background: #f2f1ec;
+	border: 1px solid var(--color-border);
+	cursor: default;
+}
+
+.race-cand--r {
+	background: var(--party-republican-bg);
+	border-color: var(--party-republican);
+}
+
+.race-cand--d {
+	background: var(--party-democrat-bg);
+	border-color: var(--party-democrat);
+}
+
+.race-cand--i {
+	background: var(--party-nonpartisan-bg);
+	border-color: var(--party-nonpartisan);
+}
+
+.race-cand--incumbent {
+	border-width: 2px;
+}
+
+.race-cand-party {
+	margin-left: 0.3rem;
+	font-size: 0.62rem;
+	font-weight: 700;
+}
+
+.race-cand--r .race-cand-party {
+	color: var(--party-republican);
+}
+
+.race-cand--d .race-cand-party {
+	color: var(--party-democrat);
+}
+
+.race-cand--i .race-cand-party {
+	color: var(--party-nonpartisan);
+}
+
+.rung-more {
+	font-family: var(--font-sans);
+	font-size: 0.78rem;
+	font-weight: 600;
+	margin: 0.75rem 0 0;
+	padding-top: 0.65rem;
+	border-top: 1px solid var(--color-border);
+}
+
+.rung-more a {
+	text-decoration: none;
+	color: var(--color-accent);
+}
+
+.rung-more a:hover {
+	text-decoration: underline;
 }
 
 .holder-signals {
@@ -1362,6 +1518,51 @@ main > .page-header:first-child {
 	margin-bottom: 1rem;
 }
 
+/* the numbers are the story — set them as numbers, not prose */
+.vote-stats {
+	list-style: none;
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 0.6rem;
+	margin: 0 0 1rem;
+	padding: 0;
+}
+
+.vote-stat {
+	background: var(--color-surface);
+	padding: 0.7rem 0.85rem 0.6rem;
+}
+
+.vote-stat-num {
+	display: block;
+	font-family: var(--font-serif);
+	font-size: 1.45rem;
+	font-weight: 700;
+	line-height: 1.15;
+	font-variant-numeric: tabular-nums;
+}
+
+.vote-stat-num--rep {
+	color: var(--party-republican);
+}
+
+.vote-stat-cap {
+	display: block;
+	font-family: var(--font-sans);
+	font-size: 0.72rem;
+	color: var(--color-muted);
+	line-height: 1.35;
+	margin-top: 0.15rem;
+}
+
+.vote-kicker {
+	font-family: var(--font-sans);
+	font-size: 0.9rem;
+	line-height: 1.5;
+	color: var(--color-muted);
+	margin: 0;
+}
+
 @media (min-width: 900px) {
 	.vote-picture-grid {
 		grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
@@ -1372,8 +1573,8 @@ main > .page-header:first-child {
 	.rung-closeness {
 		text-align: left;
 	}
-	.holder-signal {
-		font-size: 0.65rem;
+	.holder-race {
+		margin-left: 0;
 	}
 }
 
@@ -1900,12 +2101,12 @@ main > .page-header:first-child {
 }
 
 .what-changed-type {
-	font-size: 0.7rem;
-	font-weight: 700;
-	text-transform: uppercase;
-	letter-spacing: 0.08em;
-	border: 1px solid var(--color-border);
-	padding: 0.1rem 0.45rem;
+	font-size: 0.72rem;
+	font-weight: 600;
+	background: var(--color-tarred-bg);
+	color: var(--color-tarred);
+	border-radius: 999px;
+	padding: 0.12rem 0.55rem;
 	white-space: nowrap;
 }
 

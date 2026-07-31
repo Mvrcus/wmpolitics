@@ -6,6 +6,7 @@ district: "Ottawa County Board — District 3 (City of Holland)"
 seatSlug: ottawa-county-district-3
 seatLabel: Ottawa County District 3
 status: current
+termStart: 2019
 party: Democrat
 photo: /images/doug-zylstra.jpg
 photoIsOfficial: true

@@ -6,6 +6,7 @@ district: "City of Holland — Mayor"
 seatSlug: holland-mayor
 seatLabel: Mayor of Holland
 status: current
+termStart: 2019
 party: Nonpartisan
 photo: /images/nathan-bocks.jpg
 photoIsOfficial: true
