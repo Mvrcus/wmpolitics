@@ -44,7 +44,7 @@ const PARTY_LABEL: Record<string, string> = { R: 'Republican', D: 'Democrat', I:
 				<p class="hero-lead">
 					Every seat that represents Holland, from City Hall to Washington: who holds it now, how
 					long a term lasts, when it's next on your ballot — and whether the officeholder can stay
-					forever.
+					forever. Voting this year? <a href="/elections/2026/">See who's running in 2026 →</a>
 				</p>
 			</header>
 
@@ -103,7 +103,7 @@ const PARTY_LABEL: Record<string, string> = { R: 'Republican', D: 'Democrat', I:
 								<tbody>
 									{level.seats.map((seat) => (
 										<>
-											<tr>
+											<tr id={seat.seatSlug}>
 												<th scope="row">
 													{seat.seat}
 													{seat.note && <span class="seat-note">{seat.note}</span>}
@@ -146,7 +146,7 @@ const PARTY_LABEL: Record<string, string> = { R: 'Republican', D: 'Democrat', I:
 																			({cand.party})
 																		</span>
 																	)}
-																	{cand.incumbent && <span class="race-row-inc">incumbent</span>}
+																	{cand.incumbent && <span class="race-row-inc">Incumbent</span>}
 																	{cand.note && <span class="race-row-note">{cand.note}</span>}
 																</li>
 															))}
@@ -322,9 +322,8 @@ const PARTY_LABEL: Record<string, string> = { R: 'Republican', D: 'Democrat', I:
 	}
 
 	.seat-table thead th {
-		font-size: 0.72rem;
-		text-transform: uppercase;
-		letter-spacing: 0.08em;
+		font-size: 0.75rem;
+		font-weight: 700;
 		background: var(--color-surface);
 		border-bottom: 2px solid var(--color-black);
 		white-space: nowrap;
@@ -411,12 +410,11 @@ const PARTY_LABEL: Record<string, string> = { R: 'Republican', D: 'Democrat', I:
 	.race-row-inc {
 		margin-left: 0.4rem;
 		font-size: 0.68rem;
-		font-weight: 700;
-		text-transform: uppercase;
-		letter-spacing: 0.05em;
-		padding: 0.1rem 0.35rem;
-		border: 1px solid var(--color-border);
-		background: var(--color-white);
+		font-weight: 650;
+		padding: 0.1rem 0.45rem;
+		border-radius: 999px;
+		background: var(--color-tarred-bg);
+		color: var(--color-tarred);
 	}
 
 	.race-row-note {

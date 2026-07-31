@@ -154,7 +154,9 @@ function serviceSignal(entry: Entry): { cls: string; label: string } | null {
 									))}
 									{extra > 0 && <span class="rung-face-more">+{extra}</span>}
 								</span>
-								<span class="rung-caret" aria-hidden="true">▾</span>
+								<span class="rung-caret" aria-hidden="true">
+									<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6" /></svg>
+								</span>
 							</summary>
 							<div class="rung-body">
 								<div class="rung-meta-row">
@@ -223,7 +225,7 @@ function serviceSignal(entry: Entry): { cls: string; label: string } | null {
 													</span>
 												</a>
 												{seat?.candidates && (
-													<div class="holder-race">
+													<a class="holder-race" href={`/elections/2026/#${holder.data.seatSlug}`}>
 														<span class="holder-race-label">
 															Running in {seat.nextElection}
 															{seat.raceNote && <em> — {seat.raceNote}</em>}
@@ -247,7 +249,8 @@ function serviceSignal(entry: Entry): { cls: string; label: string } | null {
 																</li>
 															))}
 														</ul>
-													</div>
+														<span class="holder-race-more">Full race details →</span>
+													</a>
 												)}
 											</li>
 										);
