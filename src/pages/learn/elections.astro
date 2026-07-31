@@ -1,6 +1,7 @@
 ---
 import BaseHead from '../../components/BaseHead.astro';
 import Header from '../../components/Header.astro';
+import CivicLookup from '../../components/CivicLookup.astro';
 import Footer from '../../components/Footer.astro';
 import { SITE_TITLE } from '../../consts';
 import { LEVELS } from '../../data/election-seats';
@@ -68,6 +69,14 @@ const PARTY_LABEL: Record<string, string> = { R: 'Republican', D: 'Democrat' };
 						))
 					}
 				</div>
+				<p class="live-elections" data-live-elections hidden></p>
+			</section>
+
+			<section class="section">
+				<CivicLookup
+					heading="Find your polling place and ballot"
+					lead="Enter your street address to confirm your districts. During election season this also shows your polling place, early-vote sites, drop boxes, and what's on your ballot."
+				/>
 			</section>
 
 			{
@@ -154,6 +163,30 @@ const PARTY_LABEL: Record<string, string> = { R: 'Republican', D: 'Democrat' };
 			</section>
 		</main>
 		<Footer />
+		<script>
+			// Live supplement to the static calendar: Google's election feed only
+			// lists elections it has active data for, so this stays empty most of
+			// the year and lights up as an election approaches.
+			(async () => {
+				const target = document.querySelector<HTMLElement>('[data-live-elections]');
+				if (!target) return;
+				try {
+					const res = await fetch('/api/civic/elections');
+					if (!res.ok) return;
+					const data = (await res.json()) as {
+						elections?: { name: string; electionDay: string }[];
+					};
+					const elections = data.elections ?? [];
+					if (!elections.length) return;
+					target.textContent = `Confirmed by Google's election feed: ${elections
+						.map((e) => `${e.name} on ${e.electionDay}`)
+						.join('; ')}.`;
+					target.hidden = false;
+				} catch {
+					/* feed unavailable; static calendar stands on its own */
+				}
+			})();
+		</script>
 	</body>
 </html>
 
@@ -170,6 +203,14 @@ const PARTY_LABEL: Record<string, string> = { R: 'Republican', D: 'Democrat' };
 
 	.elections-section-lead {
 		margin-bottom: 2rem;
+	}
+
+	.live-elections {
+		font-family: var(--font-sans);
+		font-size: 0.875rem;
+		font-weight: 600;
+		color: var(--color-accent);
+		margin: 1rem 0 0;
 	}
 
 	.ballot-grid {

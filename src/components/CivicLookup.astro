@@ -1,0 +1,561 @@
+---
+/**
+ * Address → "who represents me" lookup backed by the Google Civic Information
+ * API (via /api/civic/lookup), with election-time voting info (/api/civic/
+ * voterinfo) when Google supports an active election for the address.
+ *
+ * Self-contained and safe to mount on multiple pages: all DOM queries are
+ * scoped to the [data-civic-lookup] root.
+ */
+interface Props {
+	heading?: string;
+	lead?: string;
+}
+
+const {
+	heading = 'Who represents your address?',
+	lead = 'Enter your street address to see exactly which of these officials answer to you — street-level accurate, not a ZIP-code guess.',
+} = Astro.props;
+---
+
+<section class="civic-lookup" data-civic-lookup>
+	<h2>{heading}</h2>
+	<p class="civic-lead">{lead}</p>
+	<form class="civic-form" data-civic-form>
+		<label class="sr-only" for="civic-address">Street address</label>
+		<input
+			id="civic-address"
+			name="address"
+			type="text"
+			inputmode="text"
+			autocomplete="street-address"
+			placeholder="e.g. 270 S River Ave, Holland, MI 49423"
+			minlength="4"
+			maxlength="200"
+			required
+			data-civic-input
+		/>
+		<button type="submit" data-civic-submit>Look up</button>
+	</form>
+	<p class="civic-privacy">
+		Your address is sent to Google's Civic Information API to find your districts. We don't store
+		it.
+	</p>
+	<div class="civic-status" data-civic-status role="status" aria-live="polite" hidden></div>
+	<div class="civic-results" data-civic-results hidden>
+		<div data-civic-notes></div>
+		<ul class="civic-reps" data-civic-reps></ul>
+		<details class="civic-divisions" data-civic-divisions-wrap hidden>
+			<summary>Other districts at this address (no profiles here yet)</summary>
+			<ul data-civic-divisions></ul>
+		</details>
+		<div class="civic-voterinfo" data-civic-voterinfo hidden></div>
+	</div>
+</section>
+
+<script>
+	interface Rep {
+		slug: string;
+		name: string;
+		officeLabel: string;
+		district: string;
+		party: string | null;
+		servesHolland: boolean;
+		approximate: boolean;
+	}
+
+	interface LookupResponse {
+		error?: string;
+		address?: { line1?: string; city?: string; state?: string; zip?: string } | null;
+		reps?: Rep[];
+		otherDivisions?: { ocdId: string; name: string }[];
+		notes?: string[];
+	}
+
+	interface TrimmedLocation {
+		name: string | null;
+		address: string;
+		hours: string | null;
+		notes: string | null;
+		startDate: string | null;
+		endDate: string | null;
+	}
+
+	interface VoterInfoResponse {
+		error?: string;
+		available?: boolean;
+		election?: { name: string; electionDay: string } | null;
+		mailOnly?: boolean;
+		pollingLocations?: TrimmedLocation[];
+		earlyVoteSites?: TrimmedLocation[];
+		dropOffLocations?: TrimmedLocation[];
+		contests?: {
+			ballotTitle: string | null;
+			districtName: string | null;
+			candidates: { name: string | null; party: string | null; url: string | null }[];
+			referendumTitle: string | null;
+		}[];
+		localAdmin?: {
+			name: string | null;
+			electionInfoUrl: string | null;
+			registrationUrl: string | null;
+			absenteeVotingInfoUrl: string | null;
+			officials: { name: string | null; title: string | null; phone: string | null; email: string | null }[];
+		} | null;
+		stateAdmin?: VoterInfoResponse['localAdmin'];
+	}
+
+	const STORAGE_KEY = 'wmp-address';
+
+	const esc = (value: string) =>
+		value.replace(
+			/[&<>"']/g,
+			(char) =>
+				({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char] ?? char,
+		);
+
+	const partyMark = (party: string | null) => {
+		if (!party) return '';
+		const key = party.toLowerCase().startsWith('rep')
+			? 'r'
+			: party.toLowerCase().startsWith('dem')
+				? 'd'
+				: 'other';
+		return `<span class="civic-party civic-party--${key}">(${esc(party[0] ?? '')})</span>`;
+	};
+
+	const renderLocations = (title: string, locations: TrimmedLocation[]) => {
+		if (!locations.length) return '';
+		const items = locations
+			.slice(0, 5)
+			.map((location) => {
+				const dates =
+					location.startDate && location.endDate
+						? `${location.startDate} → ${location.endDate}`
+						: null;
+				return `<li>
+					<strong>${esc(location.name ?? 'Location')}</strong>
+					${location.address ? `<span>${esc(location.address)}</span>` : ''}
+					${location.hours ? `<span>${esc(location.hours)}</span>` : ''}
+					${dates ? `<span>${esc(dates)}</span>` : ''}
+				</li>`;
+			})
+			.join('');
+		return `<h4>${esc(title)}</h4><ul class="civic-locations">${items}</ul>`;
+	};
+
+	const renderAdmin = (admin: VoterInfoResponse['localAdmin']) => {
+		if (!admin) return '';
+		const links = [
+			admin.electionInfoUrl && `<a href="${esc(admin.electionInfoUrl)}" target="_blank" rel="noopener noreferrer">Election info</a>`,
+			admin.registrationUrl && `<a href="${esc(admin.registrationUrl)}" target="_blank" rel="noopener noreferrer">Register / check registration</a>`,
+			admin.absenteeVotingInfoUrl && `<a href="${esc(admin.absenteeVotingInfoUrl)}" target="_blank" rel="noopener noreferrer">Absentee voting</a>`,
+		].filter(Boolean);
+		const officials = (admin.officials ?? [])
+			.slice(0, 3)
+			.map((official) =>
+				[official.name, official.title, official.phone, official.email]
+					.filter(Boolean)
+					.map((part) => esc(String(part)))
+					.join(' · '),
+			)
+			.filter(Boolean);
+		if (!links.length && !officials.length) return '';
+		return `<h4>${esc(admin.name ?? 'Election officials')}</h4>
+			${links.length ? `<p class="civic-admin-links">${links.join(' ')}</p>` : ''}
+			${officials.length ? `<p class="civic-admin-officials">${officials.join('<br>')}</p>` : ''}`;
+	};
+
+	for (const root of document.querySelectorAll<HTMLElement>('[data-civic-lookup]')) {
+		const form = root.querySelector<HTMLFormElement>('[data-civic-form]')!;
+		const input = root.querySelector<HTMLInputElement>('[data-civic-input]')!;
+		const submit = root.querySelector<HTMLButtonElement>('[data-civic-submit]')!;
+		const status = root.querySelector<HTMLElement>('[data-civic-status]')!;
+		const results = root.querySelector<HTMLElement>('[data-civic-results]')!;
+		const notesEl = root.querySelector<HTMLElement>('[data-civic-notes]')!;
+		const repsEl = root.querySelector<HTMLElement>('[data-civic-reps]')!;
+		const divisionsWrap = root.querySelector<HTMLElement>('[data-civic-divisions-wrap]')!;
+		const divisionsEl = root.querySelector<HTMLElement>('[data-civic-divisions]')!;
+		const voterEl = root.querySelector<HTMLElement>('[data-civic-voterinfo]')!;
+
+		try {
+			const saved = localStorage.getItem(STORAGE_KEY);
+			if (saved) input.value = saved;
+		} catch {
+			/* storage unavailable */
+		}
+
+		const showStatus = (message: string, isError = false) => {
+			status.hidden = false;
+			status.textContent = message;
+			status.classList.toggle('civic-status--error', isError);
+		};
+
+		const loadVoterInfo = async (address: string) => {
+			voterEl.hidden = false;
+			voterEl.innerHTML = '<p class="civic-loading">Checking for upcoming election info…</p>';
+			try {
+				const res = await fetch(`/api/civic/voterinfo?address=${encodeURIComponent(address)}`);
+				const data = (await res.json()) as VoterInfoResponse;
+				if (!res.ok || data.error || data.available === false) {
+					voterEl.innerHTML = `<h3>Voting info</h3>
+						<p>No election with published polling data is coming up for this address right now.
+						Districts and registration can always be checked at
+						<a href="https://mvic.sos.state.mi.us/" target="_blank" rel="noopener noreferrer">Michigan Voter Information</a>.</p>`;
+					return;
+				}
+				const election = data.election
+					? `<p class="civic-election"><strong>${esc(data.election.name)}</strong> — ${esc(data.election.electionDay)}</p>`
+					: '';
+				const mailOnly = data.mailOnly
+					? '<p class="civic-note">Your precinct votes entirely by mail for this election.</p>'
+					: '';
+				const contests = (data.contests ?? [])
+					.slice(0, 20)
+					.map((contest) => {
+						const title = contest.ballotTitle ?? contest.referendumTitle ?? 'Contest';
+						const candidates = contest.candidates
+							.map(
+								(candidate) =>
+									`${candidate.url ? `<a href="${esc(candidate.url)}" target="_blank" rel="noopener noreferrer">${esc(candidate.name ?? '')}</a>` : esc(candidate.name ?? '')}${candidate.party ? ` (${esc(candidate.party)})` : ''}`,
+							)
+							.join(', ');
+						return `<li><strong>${esc(title)}</strong>${contest.districtName ? ` — ${esc(contest.districtName)}` : ''}${candidates ? `<span>${candidates}</span>` : ''}</li>`;
+					})
+					.join('');
+				voterEl.innerHTML = `<h3>Voting info for this address</h3>
+					${election}
+					${mailOnly}
+					${renderLocations('Your polling place', data.pollingLocations ?? [])}
+					${renderLocations('Early voting sites', data.earlyVoteSites ?? [])}
+					${renderLocations('Ballot drop boxes', data.dropOffLocations ?? [])}
+					${contests ? `<h4>On your ballot</h4><ul class="civic-contests">${contests}</ul>` : ''}
+					${renderAdmin(data.localAdmin ?? null)}
+					${renderAdmin(data.stateAdmin ?? null)}`;
+			} catch {
+				voterEl.hidden = true;
+			}
+		};
+
+		form.addEventListener('submit', async (event) => {
+			event.preventDefault();
+			const address = input.value.trim();
+			if (address.length < 4) return;
+
+			submit.disabled = true;
+			results.hidden = true;
+			showStatus('Looking up your districts…');
+
+			try {
+				const res = await fetch(`/api/civic/lookup?address=${encodeURIComponent(address)}`);
+				const data = (await res.json()) as LookupResponse;
+				if (!res.ok || data.error) {
+					showStatus(data.error ?? 'Lookup failed. Please try again.', true);
+					return;
+				}
+
+				try {
+					localStorage.setItem(STORAGE_KEY, address);
+				} catch {
+					/* storage unavailable */
+				}
+
+				const normalized = data.address
+					? [data.address.line1, data.address.city, data.address.state, data.address.zip]
+							.filter(Boolean)
+							.join(', ')
+					: address;
+				showStatus(`Showing representation for ${normalized}`);
+
+				notesEl.innerHTML = (data.notes ?? [])
+					.map((note) => `<p class="civic-note">${esc(note)}</p>`)
+					.join('');
+
+				const reps = data.reps ?? [];
+				repsEl.innerHTML = reps.length
+					? reps
+							.map(
+								(rep) => `<li class="civic-rep${rep.approximate ? ' civic-rep--approx' : ''}">
+									<a href="/legislators/${esc(rep.slug)}/">
+										<span class="civic-rep-office">${esc(rep.officeLabel)}</span>
+										<span class="civic-rep-name">${esc(rep.name)} ${partyMark(rep.party)}</span>
+										<span class="civic-rep-district">${esc(rep.district)}${rep.approximate ? ' · district not confirmed for your street' : ''}</span>
+									</a>
+								</li>`,
+							)
+							.join('')
+					: '<li class="civic-rep-empty">No profiled officials represent this address.</li>';
+
+				const divisions = data.otherDivisions ?? [];
+				divisionsWrap.hidden = divisions.length === 0;
+				divisionsEl.innerHTML = divisions
+					.map((division) => `<li>${esc(division.name)}</li>`)
+					.join('');
+
+				results.hidden = false;
+				void loadVoterInfo(address);
+			} catch {
+				showStatus('Lookup failed. Check your connection and try again.', true);
+			} finally {
+				submit.disabled = false;
+			}
+		});
+	}
+</script>
+
+<style>
+	.civic-lookup {
+		border: 2px solid var(--color-black);
+		background: var(--color-white);
+		box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.1);
+		padding: 1.5rem;
+		margin: 2rem 0;
+	}
+
+	.civic-lookup h2 {
+		font-family: var(--font-serif);
+		margin: 0 0 0.5rem;
+	}
+
+	.civic-lead {
+		font-family: var(--font-sans);
+		font-size: 0.9375rem;
+		color: var(--color-muted);
+		margin: 0 0 1rem;
+		max-width: 52rem;
+	}
+
+	.civic-form {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+	}
+
+	.civic-form input {
+		flex: 1 1 18rem;
+		font-family: var(--font-sans);
+		font-size: 1rem;
+		padding: 0.65rem 0.8rem;
+		border: 2px solid var(--color-black);
+		background: var(--color-white);
+	}
+
+	.civic-form button {
+		font-family: var(--font-sans);
+		font-size: 0.8125rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.06em;
+		padding: 0.65rem 1.25rem;
+		border: 2px solid var(--color-black);
+		background: var(--color-black);
+		color: var(--color-white);
+		cursor: pointer;
+	}
+
+	.civic-form button:hover {
+		background: var(--color-accent);
+		border-color: var(--color-accent);
+	}
+
+	.civic-form button:disabled {
+		opacity: 0.6;
+		cursor: wait;
+	}
+
+	.civic-privacy {
+		font-family: var(--font-sans);
+		font-size: 0.75rem;
+		color: var(--color-muted);
+		margin: 0.5rem 0 0;
+	}
+
+	.civic-status {
+		font-family: var(--font-sans);
+		font-size: 0.9rem;
+		font-weight: 600;
+		margin-top: 1rem;
+	}
+
+	.civic-status--error {
+		color: var(--color-accent);
+	}
+
+	.civic-note {
+		font-family: var(--font-sans);
+		font-size: 0.875rem;
+		line-height: 1.5;
+		color: var(--color-muted);
+		background: var(--color-surface);
+		border-left: 4px solid var(--color-accent);
+		padding: 0.6rem 0.8rem;
+		margin: 0.75rem 0 0;
+	}
+
+	.civic-reps {
+		list-style: none;
+		margin: 1rem 0 0;
+		padding: 0;
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+		gap: 0.75rem;
+	}
+
+	.civic-rep a {
+		display: block;
+		height: 100%;
+		border: 1px solid var(--color-border);
+		border-top: 2px solid var(--color-black);
+		padding: 0.75rem 0.9rem;
+		text-decoration: none;
+		color: inherit;
+	}
+
+	.civic-rep a:hover .civic-rep-name {
+		color: var(--color-accent);
+	}
+
+	.civic-rep--approx a {
+		border-style: dashed;
+	}
+
+	.civic-rep-office {
+		display: block;
+		font-family: var(--font-sans);
+		font-size: 0.7rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.08em;
+		color: var(--color-muted);
+	}
+
+	.civic-rep-name {
+		display: block;
+		font-family: var(--font-serif);
+		font-size: 1.1rem;
+		margin: 0.2rem 0;
+		transition: color 0.15s;
+	}
+
+	.civic-rep-district {
+		display: block;
+		font-family: var(--font-sans);
+		font-size: 0.78rem;
+		color: var(--color-muted);
+	}
+
+	.civic-rep-empty {
+		font-family: var(--font-sans);
+		font-size: 0.9rem;
+		color: var(--color-muted);
+	}
+
+	.civic-lookup :global(.civic-party) {
+		font-family: var(--font-sans);
+		font-size: 0.8rem;
+		font-weight: 700;
+	}
+
+	.civic-lookup :global(.civic-party--r) {
+		color: var(--party-republican);
+	}
+
+	.civic-lookup :global(.civic-party--d) {
+		color: var(--party-democrat);
+	}
+
+	.civic-divisions {
+		margin-top: 1rem;
+		font-family: var(--font-sans);
+		font-size: 0.875rem;
+	}
+
+	.civic-divisions summary {
+		cursor: pointer;
+		font-weight: 600;
+	}
+
+	.civic-divisions ul {
+		margin: 0.5rem 0 0;
+		padding-left: 1.25rem;
+		color: var(--color-muted);
+	}
+
+	.civic-voterinfo {
+		margin-top: 1.5rem;
+		border-top: 2px solid var(--color-black);
+		padding-top: 1rem;
+		font-family: var(--font-sans);
+	}
+
+	.civic-voterinfo :global(h3) {
+		font-family: var(--font-serif);
+		font-size: 1.25rem;
+		margin: 0 0 0.5rem;
+	}
+
+	.civic-voterinfo :global(h4) {
+		font-size: 0.78rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.08em;
+		color: var(--color-muted);
+		margin: 1rem 0 0.4rem;
+	}
+
+	.civic-voterinfo :global(.civic-election) {
+		font-size: 0.95rem;
+		margin: 0;
+	}
+
+	.civic-voterinfo :global(.civic-locations),
+	.civic-voterinfo :global(.civic-contests) {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+
+	.civic-voterinfo :global(.civic-locations li),
+	.civic-voterinfo :global(.civic-contests li) {
+		font-size: 0.875rem;
+		line-height: 1.5;
+		padding: 0.4rem 0;
+		border-top: 1px solid var(--color-border);
+	}
+
+	.civic-voterinfo :global(.civic-locations span),
+	.civic-voterinfo :global(.civic-contests span) {
+		display: block;
+		color: var(--color-muted);
+	}
+
+	.civic-voterinfo :global(.civic-admin-links) {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 1rem;
+		font-size: 0.875rem;
+		margin: 0;
+	}
+
+	.civic-voterinfo :global(.civic-admin-officials) {
+		font-size: 0.8rem;
+		color: var(--color-muted);
+		margin: 0.4rem 0 0;
+	}
+
+	.civic-voterinfo :global(.civic-loading) {
+		font-size: 0.875rem;
+		color: var(--color-muted);
+	}
+
+	.sr-only {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		padding: 0;
+		margin: -1px;
+		overflow: hidden;
+		clip: rect(0, 0, 0, 0);
+		border: 0;
+	}
+</style>
