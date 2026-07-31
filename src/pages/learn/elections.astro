@@ -94,7 +94,7 @@ const PARTY_LABEL: Record<string, string> = { R: 'Republican', D: 'Democrat', I:
 								<tbody>
 									{level.seats.map((seat) => (
 										<>
-											<tr>
+											<tr id={seat.seatSlug}>
 												<th scope="row">
 													{seat.seat}
 													{seat.note && <span class="seat-note">{seat.note}</span>}

@@ -216,7 +216,7 @@ function serviceSignal(entry: Entry): { cls: string; label: string } | null {
 													</span>
 												</a>
 												{seat?.candidates && (
-													<div class="holder-race">
+													<a class="holder-race" href={`/learn/elections/#${holder.data.seatSlug}`}>
 														<span class="holder-race-label">
 															Running in {seat.nextElection}
 															{seat.raceNote && <em> — {seat.raceNote}</em>}
@@ -240,7 +240,8 @@ function serviceSignal(entry: Entry): { cls: string; label: string } | null {
 																</li>
 															))}
 														</ul>
-													</div>
+														<span class="holder-race-more">Full race details →</span>
+													</a>
 												)}
 											</li>
 										);

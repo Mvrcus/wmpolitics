@@ -1414,12 +1414,35 @@ main > .page-header:first-child {
 	margin-top: 0.15rem;
 }
 
-/* related aside, not part of the officeholder row: tinted panel set off from the list */
+/* related aside, not part of the officeholder row: tinted panel set off from the list,
+   and a block link through to the seat's row on the elections cheat sheet */
 .holder-race {
+	display: block;
 	margin: 0.1rem 0 0.9rem 4rem;
 	padding: 0.6rem 0.8rem;
 	background: var(--color-surface);
 	border-left: 3px solid var(--color-border-strong);
+	text-decoration: none;
+	color: inherit;
+	transition: background 0.15s, border-color 0.15s;
+}
+
+.holder-race:hover {
+	background: var(--color-tarred-bg);
+	border-left-color: var(--color-accent);
+}
+
+.holder-race:hover .holder-race-more {
+	text-decoration: underline;
+}
+
+.holder-race-more {
+	display: block;
+	font-family: var(--font-sans);
+	font-size: 0.72rem;
+	font-weight: 600;
+	color: var(--color-accent);
+	margin-top: 0.5rem;
 }
 
 .holder-race-label {
