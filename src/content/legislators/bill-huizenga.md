@@ -6,6 +6,7 @@ district: "Michigan's 4th Congressional District"
 seatSlug: mi-us-house-04
 seatLabel: U.S. House MI-04
 status: current
+termStart: 2011
 party: Republican
 photo: /images/bill-huizenga.jpg
 photoIsOfficial: true
