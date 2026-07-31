@@ -1414,9 +1414,12 @@ main > .page-header:first-child {
 	margin-top: 0.15rem;
 }
 
+/* related aside, not part of the officeholder row: tinted panel set off from the list */
 .holder-race {
-	padding: 0 0 0.75rem;
-	margin-left: 4rem;
+	margin: 0.1rem 0 0.9rem 4rem;
+	padding: 0.6rem 0.8rem;
+	background: var(--color-surface);
+	border-left: 3px solid var(--color-border-strong);
 }
 
 .holder-race-label {
