@@ -396,8 +396,6 @@ main > .page-header:first-child {
 .featured-meta {
 	font-size: 0.875rem;
 	color: var(--color-muted);
-	text-transform: uppercase;
-	letter-spacing: 0.04em;
 }
 
 .featured-side {
@@ -472,8 +470,6 @@ main > .page-header:first-child {
 .article-card-meta {
 	font-size: 0.8125rem;
 	color: var(--color-muted);
-	text-transform: uppercase;
-	letter-spacing: 0.03em;
 }
 
 .article-card-image {
@@ -914,29 +910,29 @@ main > .page-header:first-child {
 
 .coverage-table thead th {
 	font-size: 0.75rem;
-	text-transform: uppercase;
-	letter-spacing: 0.08em;
+	font-weight: 700;
 }
 
 .coverage-tier {
 	display: inline-block;
-	padding: 0.1rem 0.5rem;
+	padding: 0.14rem 0.6rem;
 	font-size: 0.75rem;
-	font-weight: 700;
-	text-transform: uppercase;
-	letter-spacing: 0.05em;
-	border: 1px solid currentColor;
+	font-weight: 600;
+	border-radius: 999px;
 }
 
 .coverage-tier--documented {
-	color: #1b6b2f;
+	background: var(--color-supporter-bg);
+	color: var(--color-supporter-accent);
 }
 
 .coverage-tier--partial {
-	color: #8a6d1a;
+	background: var(--color-mixed-bg);
+	color: var(--color-mixed);
 }
 
 .coverage-tier--stub {
+	background: var(--party-nonpartisan-bg);
 	color: var(--color-text-muted, #555);
 }
 
@@ -2134,9 +2130,8 @@ main > .page-header:first-child {
 	border: 1px solid var(--color-muted);
 	color: inherit;
 	font-family: var(--font-sans);
-	font-size: 0.72rem;
-	text-transform: uppercase;
-	letter-spacing: 0.06em;
+	font-size: 0.78rem;
+	font-weight: 600;
 	padding: 0.2rem 0.6rem;
 	margin-left: 0.5rem;
 	cursor: pointer;
@@ -2254,20 +2249,20 @@ main > .page-header:first-child {
 .cc-chip {
 	display: inline-block;
 	font-family: var(--font-sans);
-	font-size: 0.62rem;
-	font-weight: 700;
-	text-transform: uppercase;
-	letter-spacing: 0.08em;
-	padding: 0.15rem 0.5rem;
+	font-size: 0.7rem;
+	font-weight: 600;
+	padding: 0.15rem 0.55rem;
 	margin-bottom: 0.4rem;
-	border: 1px solid currentColor;
+	border-radius: 999px;
 }
 
 .cc-chip--live {
-	color: #1b6b2f;
+	background: var(--color-supporter-bg);
+	color: var(--color-supporter-accent);
 }
 
 .cc-chip--editorial {
+	background: var(--color-mixed-bg);
 	color: #7a5b12;
 }
 
@@ -2361,10 +2356,8 @@ main > .page-header:first-child {
 
 .cc-county-dot span {
 	display: block;
-	font-size: 0.72rem;
+	font-size: 0.75rem;
 	font-weight: 700;
-	text-transform: uppercase;
-	letter-spacing: 0.06em;
 }
 
 .cc-county-dot em {
@@ -2419,25 +2412,26 @@ main > .page-header:first-child {
 }
 
 .track-record-position {
-	font-size: 0.7rem;
-	font-weight: 700;
-	text-transform: uppercase;
-	letter-spacing: 0.05em;
-	padding: 0.1rem 0.45rem;
-	border: 1px solid currentColor;
+	font-size: 0.72rem;
+	font-weight: 600;
+	padding: 0.12rem 0.55rem;
+	border-radius: 999px;
 	white-space: nowrap;
 }
 
 .track-record-position--yea {
-	color: #1b6b2f;
+	background: var(--color-supporter-bg);
+	color: var(--color-supporter-accent);
 }
 
 .track-record-position--nay {
-	color: var(--color-accent, #c41e3a);
+	background: var(--color-tomatoes-bg);
+	color: var(--color-accent-hover);
 }
 
 .track-record-position--present,
 .track-record-position--not-voting {
+	background: var(--party-nonpartisan-bg);
 	color: var(--color-text-muted, #555);
 }
 
@@ -2583,8 +2577,6 @@ main > .page-header:first-child {
 .article-meta {
 	color: var(--color-muted);
 	font-size: 0.875rem;
-	text-transform: uppercase;
-	letter-spacing: 0.04em;
 }
 
 .hero-image {
@@ -2608,10 +2600,23 @@ main > .page-header:first-child {
 
 .legislator-layout {
 	display: grid;
-	grid-template-columns: 1fr;
+	grid-template-columns: minmax(0, 1fr);
 	gap: clamp(1.5rem, 4vw, 2.5rem);
 	align-items: start;
 	width: 100%;
+}
+
+/* On one column, the person's record comes before related profiles & signup */
+.legislator-header {
+	order: 0;
+}
+
+.legislator-main {
+	order: 1;
+}
+
+.legislator-sidebar {
+	order: 2;
 }
 
 @media (min-width: 900px) {
@@ -2681,10 +2686,8 @@ main > .page-header:first-child {
 .legislator-at-a-glance-summary {
 	padding: 0.875rem 1rem;
 	font-family: var(--font-sans);
-	font-size: 0.75rem;
+	font-size: 0.85rem;
 	font-weight: 700;
-	text-transform: uppercase;
-	letter-spacing: 0.08em;
 	cursor: pointer;
 	list-style: none;
 }
@@ -3075,10 +3078,8 @@ main > .page-header:first-child {
 }
 
 .perspective-tab-label {
-	font-size: 0.875rem;
+	font-size: 0.9rem;
 	font-weight: 700;
-	text-transform: uppercase;
-	letter-spacing: 0.04em;
 	text-align: center;
 	line-height: 1.25;
 }
@@ -3086,8 +3087,6 @@ main > .page-header:first-child {
 .perspective-tab-badge {
 	font-size: 0.6875rem;
 	font-weight: 600;
-	text-transform: uppercase;
-	letter-spacing: 0.05em;
 	opacity: 0.75;
 }
 
@@ -3188,8 +3187,6 @@ main > .page-header:first-child {
 .point-source a {
 	font-size: 0.8125rem;
 	font-weight: 600;
-	text-transform: uppercase;
-	letter-spacing: 0.04em;
 	text-decoration: none;
 	border-bottom: 1px solid var(--color-black);
 }
@@ -3220,21 +3217,18 @@ main > .page-header:first-child {
 
 .point-badge {
 	display: inline-block;
-	font-size: 0.6875rem;
+	font-size: 0.72rem;
 	font-weight: 600;
-	text-transform: uppercase;
-	letter-spacing: 0.06em;
-	padding: 0.2rem 0.5rem;
+	padding: 0.16rem 0.55rem;
 	margin-bottom: 0.5rem;
-	border: 1px solid var(--color-border);
-	background: var(--color-surface);
-	color: var(--color-muted);
+	border-radius: 999px;
+	background: var(--color-tarred-bg);
+	color: var(--color-tarred);
 }
 
 .point-badge--editorial {
-	border-color: var(--color-black);
-	color: var(--color-black);
-	background: var(--color-white);
+	background: var(--color-black);
+	color: var(--color-white);
 }
 
 /* Public vote / Tar & Feather Score widget */
@@ -3503,22 +3497,20 @@ main > .page-header:first-child {
 }
 
 .community-badge {
-	font-size: 0.6875rem;
+	font-size: 0.72rem;
 	font-weight: 600;
-	text-transform: uppercase;
-	letter-spacing: 0.06em;
-	padding: 0.2rem 0.5rem;
-	border: 1px solid var(--color-border);
+	padding: 0.16rem 0.55rem;
+	border-radius: 999px;
+	background: var(--party-nonpartisan-bg);
+	color: var(--color-muted);
 }
 
 .community-badge--verified {
-	border-color: var(--color-tomatoes);
 	color: var(--color-tomatoes);
 	background: var(--color-tomatoes-bg);
 }
 
 .community-badge--unverified {
-	border-color: var(--color-mixed);
 	color: var(--color-mixed);
 	background: var(--color-mixed-bg);
 }
@@ -3546,10 +3538,8 @@ main > .page-header:first-child {
 }
 
 .community-submission-type {
-	font-size: 0.75rem;
+	font-size: 0.78rem;
 	font-weight: 700;
-	text-transform: uppercase;
-	letter-spacing: 0.06em;
 }
 
 .community-submission-item--highlight .community-submission-type {

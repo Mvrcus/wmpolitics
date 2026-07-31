@@ -141,8 +141,6 @@ const partyBadgeClass =
 		font-size: 0.8125rem;
 		color: var(--color-muted);
 		margin: 0 0 0.75rem;
-		text-transform: uppercase;
-		letter-spacing: 0.03em;
 	}
 
 	.summary {
@@ -155,14 +153,58 @@ const partyBadgeClass =
 
 	.read-more {
 		font-family: var(--font-sans);
-		font-size: 0.75rem;
+		font-size: 0.8rem;
 		font-weight: 700;
-		text-transform: uppercase;
-		letter-spacing: 0.06em;
 		color: var(--color-black);
 	}
 
 	.legislator-card-link:hover .read-more {
 		color: var(--color-accent);
+	}
+
+	/* Compact two-line rows on phones — the whole card already links, so the
+	   summary paragraph and read-more cue earn their keep on desktop only */
+	@media (max-width: 640px) {
+		.legislator-card {
+			padding-top: 0.85rem;
+		}
+
+		.legislator-card-link {
+			display: grid;
+			grid-template-columns: 3.4rem minmax(0, 1fr);
+			gap: 0.3rem 0.85rem;
+			align-items: start;
+		}
+
+		.legislator-card-photo {
+			grid-row: 1 / span 3;
+			margin: 0;
+			width: 3.4rem;
+			max-width: none;
+		}
+
+		.legislator-card-photo :global(.party-stamp) {
+			display: none;
+		}
+
+		.card-meta {
+			gap: 0.5rem;
+			margin-bottom: 0;
+		}
+
+		.legislator-card h3 {
+			font-size: 1.05rem;
+			margin-bottom: 0.1rem;
+		}
+
+		.district {
+			margin-bottom: 0;
+			font-size: 0.78rem;
+		}
+
+		.summary,
+		.read-more {
+			display: none;
+		}
 	}
 </style>
