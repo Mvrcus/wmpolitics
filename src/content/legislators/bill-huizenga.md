@@ -99,6 +99,23 @@ sources:
     url: https://huizenga.house.gov/news/documentsingle.aspx?DocumentID=403974
   - label: Holland Sentinel — Town hall demands
     url: https://www.hollandsentinel.com/story/news/politics/government/2025/02/28/hollanders-protest-demand-in-person-townhall-with-rep-bill-huizenga/80770694007/
+publicOpinion:
+  score: 49
+  basis: blend
+  confidence: medium
+  asOf: "2026-07"
+  detail: >-
+    60/40 blend of district job-approval polling with his November 2024 win
+    (55.1% over Jessica Swartz). The only district polls are partisan-aligned
+    on opposite sides — PPP (Democratic, Nov 2025): 26% approve / 41%
+    disapprove; Ragnar (Republican, Mar 2026): 34% / 31% — and are averaged.
+  sources:
+    - label: Public Policy Polling — MI-04 survey (Nov 2025)
+      url: https://michiganadvance.com/wp-content/uploads/2025/12/MICD4Results.pdf
+    - label: Ragnar Research — MI-04 benchmark (Mar 2026)
+      url: https://punchbowl.news/wp-content/uploads/CFA_MI-CD-4_Benchmark_Analysis_v1.0_260323.pdf
+    - label: Wikipedia — MI-04 election results
+      url: https://en.wikipedia.org/wiki/Michigan%27s_4th_congressional_district
 ---
 
 Bill Huizenga (R-Zeeland) represents Michigan's 4th District in the U.S. House. Holland residents share this federal representative with much of lakeshore and southwest Michigan.

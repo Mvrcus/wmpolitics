@@ -46,6 +46,19 @@ sources:
     url: https://www.peters.senate.gov/
   - label: Congress.gov — Gary Peters
     url: https://www.congress.gov/member/gary-peters/P000595
+publicOpinion:
+  score: 59
+  basis: polling
+  confidence: medium
+  asOf: "2026-07"
+  detail: >-
+    43% approve / 30% disapprove among Michigan registered voters in Morning
+    Consult's Q4 2024 senator rankings — the latest publicly citable figure
+    (newer data is paywalled). Retiring; his seat is on the November 2026
+    ballot.
+  sources:
+    - label: Morning Consult — Senator approval rankings (Jan 2025 chart pack)
+      url: https://yellowhammernews.com/wp-content/uploads/2025/01/Senator-Approval-Outlook-January-2025.pdf
 ---
 
 Gary Peters (D) is Michigan's senior U.S. senator. First elected to the Senate in 2014 and re-elected in 2020, he previously represented metro-Detroit districts in the U.S. House. He has announced he will not run again in 2026, making this one of the open Senate seats on next November's ballot.

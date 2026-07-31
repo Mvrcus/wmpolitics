@@ -37,6 +37,20 @@ concerns:
 sources:
   - label: Ottawa County Treasurer
     url: https://www.miottawa.org/Departments/Treasurer/
+publicOpinion:
+  score: 82
+  basis: election
+  confidence: high
+  asOf: "2026-07"
+  detail: >-
+    Appointed in December 2023 to fill a vacancy, then won the office in
+    November 2024 with 82.3% (118,817–25,577) over independent Dianne Sluiter
+    Fikse.
+  sources:
+    - label: WHTC — November 2024 lakeshore results
+      url: https://whtc.com/2024/11/06/lakeshore-election-results-nov-5-2024/
+    - label: WHTC — August 2024 primary results
+      url: https://whtc.com/2024/08/07/lakeshore-election-results-aug-6-2024/
 ---
 
 Cheryl Clark (R) has served as Ottawa County Treasurer since 2023, managing county tax collections and invested funds.

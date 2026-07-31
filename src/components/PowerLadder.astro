@@ -4,6 +4,7 @@ import type { CollectionEntry } from 'astro:content';
 import { filterLegislatorsByStatus, sortLegislators } from '../lib/legislators';
 import { partyInfo } from '../lib/party';
 import { resolveEditorialScores } from '../lib/scores';
+import { publicStandingSignal, resolvePublicOpinion } from '../lib/public-opinion';
 import { LEVELS } from '../data/election-seats';
 import type { Seat } from '../data/election-seats';
 
@@ -175,6 +176,8 @@ function serviceSignal(entry: Entry): { cls: string; label: string } | null {
 								<ul class="rung-holders">
 									{rung.holders.map((holder) => {
 										const signal = serviceSignal(holder);
+										const publicOpinion = resolvePublicOpinion(holder);
+										const pulse = publicStandingSignal(publicOpinion);
 										const identity = partyInfo(holder.data.party);
 										const seat = seatBySlug.get(holder.data.seatSlug);
 										const meta = seatMeta(holder);
@@ -211,6 +214,12 @@ function serviceSignal(entry: Entry): { cls: string; label: string } | null {
 																{signal.label}
 															</span>
 														)}
+														<span
+															class:list={['signal-chip', 'holder-pulse', `signal-chip--${pulse.cls}`]}
+															title={publicOpinion?.detail}
+														>
+															{pulse.label}
+														</span>
 													</span>
 												</a>
 												{seat?.candidates && (
@@ -265,6 +274,8 @@ function serviceSignal(entry: Entry): { cls: string; label: string } | null {
 
 	<p class="ladder-foot">
 		Scores are editorial, given only after enough sourced reporting — see{' '}
-		<a href="/coverage/">how we score</a> and cast your own on any profile.
+		<a href="/coverage/">how we score</a> and cast your own on any profile. "Public" standing
+		comes only from published approval polls or the officeholder's last contested election
+		result; appointed or unopposed officials show no number because no honest one exists.
 	</p>
 </section>
