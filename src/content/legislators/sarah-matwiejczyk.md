@@ -6,6 +6,8 @@ district: "Ottawa County Prosecuting Attorney (countywide)"
 seatSlug: ottawa-county-prosecutor
 seatLabel: Ottawa County Prosecuting Attorney
 status: current
+photo: /images/sarah-matwiejczyk.jpg
+photoIsOfficial: true
 servesHolland: true
 proximityRank: 14
 summary: >-
@@ -35,6 +37,21 @@ concerns:
 sources:
   - label: Ottawa County Prosecuting Attorney
     url: https://www.miottawa.org/Departments/Prosecutor/
+publicOpinion:
+  score: null
+  basis: insufficient
+  confidence: high
+  asOf: "2026-07"
+  detail: >-
+    Sole candidate on the November 2024 general ballot (100% of votes cast),
+    so no general-electorate measure exists; she won the contested August 2024
+    Republican primary 59.6%–40.4%, but a partisan primary is not scored as
+    public opinion.
+  sources:
+    - label: Ottawa County — official 2024 general canvass
+      url: https://app.miottawa.org/ElectionManagement/viewPublicFile.action?viewFile=/mnt/ottawa-apps/content/appImages/ElectionManagement/summaryReportFile-218.pdf&electionEle=218
+    - label: Grand Haven Tribune — primary result
+      url: https://www.grandhaventribune.com/news/elections/matwiejczyk-defeats-todd-in-race-for-county-prosecutor-post/article_38b1fcc0-5477-11ef-a985-3bdae6bedde3.html
 ---
 
 Sarah F. Matwiejczyk serves as Ottawa County Prosecuting Attorney, the county's chief criminal prosecutor.

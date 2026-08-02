@@ -132,6 +132,24 @@ Editorial **key votes**: add a `keyVotes` list to a legislator's frontmatter (`v
 
 When extending the sync to seat history, keep `seatSlug` as the join key and write `status` from the API into the same frontmatter fields (or generate the Markdown at build time).
 
+## Address lookup & voter info (Google Civic Information API)
+
+`/legislators/` and `/learn/elections/` include a street-address lookup that resolves a visitor's exact districts (not a ZIP approximation) and, during supported elections, their polling place, early-vote sites, drop boxes, and ballot. Full design notes: [docs/google-civic-api.md](docs/google-civic-api.md).
+
+Google's Representatives API was turned down in April 2025, so officials still come from `src/content/legislators/` — the Civic API only maps an address to OCD division IDs, which `src/lib/civic/divisions.ts` joins to `seatSlug`. **When profiling a legislator with a new seatSlug, add its OCD ID to `SEAT_DIVISIONS`.**
+
+Setup:
+
+1. In the [Google Cloud Console](https://console.cloud.google.com/), create a project, enable **Google Civic Information API**, and create an API key (free, 25,000 queries/day).
+2. Local: set `GOOGLE_CIVIC_API_KEY` in `.dev.vars`. Production: `wrangler secret put GOOGLE_CIVIC_API_KEY`.
+3. Without the key, the site still builds and the lookup shows a "not configured" fallback.
+
+Server routes (all keep the key server-side; address-bearing responses are `private, no-store` and addresses are never stored):
+
+- `GET /api/civic/lookup?address=...` — profiled officials for an address.
+- `GET /api/civic/elections` — upcoming Michigan/national elections in Google's feed.
+- `GET /api/civic/voterinfo?address=...` — polling place, ballot, and election officials; `{ available: false }` outside supported election windows.
+
 ## 🧞 Commands
 
 All commands are run from the root of the project, from a terminal:

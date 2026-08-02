@@ -6,6 +6,8 @@ district: "City of Holland — City Manager (appointed)"
 seatSlug: holland-city-manager
 seatLabel: Holland City Manager
 status: current
+photo: /images/keith-van-beek.jpg
+photoIsOfficial: true
 termStart: 2018
 servesHolland: true
 proximityRank: 18
@@ -36,6 +38,17 @@ concerns:
 sources:
   - label: City of Holland
     url: https://www.cityofholland.com/
+publicOpinion:
+  score: null
+  basis: insufficient
+  confidence: high
+  asOf: "2026-07"
+  detail: >-
+    Appointed by the city council, not elected — no election result or approval
+    polling exists that measures public opinion of a city manager.
+  sources:
+    - label: City of Holland — City Manager's Office
+      url: https://www.cityofholland.com/154/City-Managers-Office
 ---
 
 Keith Van Beek has been Holland's city manager since 2018. He is appointed by the elected City Council — the mayor, six ward members, and two at-large members — and runs the city's daily operations under their policy direction.

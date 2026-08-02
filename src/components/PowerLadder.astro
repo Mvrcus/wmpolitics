@@ -4,6 +4,9 @@ import type { CollectionEntry } from 'astro:content';
 import { filterLegislatorsByStatus, sortLegislators } from '../lib/legislators';
 import { partyInfo } from '../lib/party';
 import { resolveEditorialScores } from '../lib/scores';
+import { publicStandingSignal, resolvePublicOpinion } from '../lib/public-opinion';
+import { LEVELS } from '../data/election-seats';
+import type { Seat } from '../data/election-seats';
 
 type Entry = CollectionEntry<'legislators'>;
 
@@ -13,6 +16,34 @@ const all = sortLegislators(
 
 const isCity = (l: Entry) => l.data.office === 'local' && l.data.seatSlug.startsWith('holland-');
 
+// Join each officeholder to their seat's election data (term length, next
+// election, declared candidates) via the shared seatSlug.
+const seatBySlug = new Map<string, Seat>(
+	LEVELS.flatMap((level) => level.seats)
+		.filter((seat) => seat.seatSlug)
+		.map((seat) => [seat.seatSlug!, seat]),
+);
+
+function seatMeta(entry: Entry): string | null {
+	const seat = seatBySlug.get(entry.data.seatSlug);
+	const parts: string[] = [];
+	if (entry.data.termStart) parts.push(`Serving since ${entry.data.termStart}`);
+	if (seat) {
+		if (seat.term === 'Appointed') {
+			parts.push('Appointed — no election');
+		} else {
+			parts.push(`${seat.term.replace(' years', '-year')} term`);
+			if (entry.data.termEnd) parts.push(`term ends ${entry.data.termEnd}`);
+			parts.push(`on the ballot ${seat.nextElection}`);
+		}
+	} else if (entry.data.termEnd) {
+		parts.push(`term ends ${entry.data.termEnd}`);
+	}
+	return parts.length ? parts.join(' · ') : null;
+}
+
+const PARTY_LABEL: Record<string, string> = { R: 'Republican', D: 'Democrat', I: 'Independent' };
+
 const RUNGS: Array<{
 	step: number;
 	title: string;
@@ -21,6 +52,8 @@ const RUNGS: Array<{
 	reach: string;
 	decides: string[];
 	holders: Entry[];
+	/** Anchor on /learn/elections/ with this rung's full seat table. */
+	levelId: string;
 }> = [
 	{
 		step: 1,
@@ -30,15 +63,17 @@ const RUNGS: Array<{
 		reach: 'A phone call away — answers to a few thousand voters.',
 		decides: ['Streets & snow plows', 'Water & sewer', 'Police & fire', 'Zoning & housing'],
 		holders: all.filter(isCity),
+		levelId: 'city',
 	},
 	{
 		step: 2,
 		title: 'Your county',
-		place: 'Ottawa County — board & elected officers',
+		place: 'Ottawa County',
 		closeness: 4,
 		reach: 'Public meetings you can attend — and speak at.',
 		decides: ['Sheriff & jail', 'Health department', 'County parks', 'Running your elections'],
 		holders: all.filter((l) => l.data.office === 'local' && !isCity(l)),
+		levelId: 'county',
 	},
 	{
 		step: 3,
@@ -48,6 +83,7 @@ const RUNGS: Array<{
 		reach: 'District offices take your calls; town halls vary.',
 		decides: ['School funding', 'Road money', 'State laws that override cities'],
 		holders: all.filter((l) => l.data.office === 'state-house' || l.data.office === 'state-senate'),
+		levelId: 'state',
 	},
 	{
 		step: 4,
@@ -57,6 +93,7 @@ const RUNGS: Array<{
 		reach: 'One office for 10 million people.',
 		decides: ['Signs or vetoes every state law', 'Runs state agencies', 'Shapes the state budget'],
 		holders: all.filter((l) => l.data.office === 'governor'),
+		levelId: 'state',
 	},
 	{
 		step: 5,
@@ -66,12 +103,13 @@ const RUNGS: Array<{
 		reach: 'Your representative and two senators — furthest from your kitchen table.',
 		decides: ['Federal budget', 'Great Lakes funding', 'Social Security & Medicare law'],
 		holders: all.filter((l) => l.data.office === 'us-house' || l.data.office === 'us-senate'),
+		levelId: 'federal',
 	},
 ];
 
-function serviceSignal(entry: Entry): { cls: string; label: string } {
+function serviceSignal(entry: Entry): { cls: string; label: string } | null {
 	const scores = resolveEditorialScores(entry);
-	if (!scores) return { cls: 'unscored', label: 'Not yet scored' };
+	if (!scores) return null;
 	if (scores.overall >= 60) return { cls: 'good', label: `Serving well · ${scores.overall}/100` };
 	if (scores.overall >= 40) return { cls: 'mixed', label: `Mixed · ${scores.overall}/100` };
 	return { cls: 'poor', label: `Falling short · ${scores.overall}/100` };
@@ -85,94 +123,162 @@ function serviceSignal(entry: Entry): { cls: string; label: string } {
 	<header class="ladder-head">
 		<h2 id="power-ladder-heading" class="ladder-title">Where does your power actually live?</h2>
 		<p class="ladder-lead">
-			Start at your own street — that's where one voice matters most — and climb rung by rung to
-			Lansing and Washington. At every step: who holds the seat, what they decide for you, and
-			whether the record says they're serving this area.
-		</p>
-		<p class="ladder-legend" aria-hidden="true">
-			<span class="signal-dot signal-dot--good"></span> Serving well
-			<span class="signal-dot signal-dot--mixed"></span> Mixed
-			<span class="signal-dot signal-dot--poor"></span> Falling short
-			<span class="signal-dot signal-dot--unscored"></span> Not yet scored
+			Start at your own street — where one voice matters most — and climb toward Washington.
+			Open a rung to see who holds it and what they decide for you.
 		</p>
 	</header>
 
 	<ol class="ladder">
 		{
-			RUNGS.filter((rung) => rung.holders.length > 0).map((rung) => (
-				<li class="rung">
-					<div class="rung-rail" aria-hidden="true">
-						<span class="rung-step">{rung.step}</span>
-					</div>
-					<div class="rung-body">
-						<div class="rung-head">
-							<div>
-								<h2 class="rung-title">{rung.title}</h2>
-								<p class="rung-place">{rung.place}</p>
-							</div>
-							<div class="rung-closeness" title={`Closeness to your daily life: ${rung.closeness} of 5`}>
-								<span class="rung-closeness-label">Close to home</span>
-								<span class="closeness-meter" role="img" aria-label={`Closeness to your daily life: ${rung.closeness} out of 5`}>
-									{[1, 2, 3, 4, 5].map((i) => (
-										<i class:list={['closeness-seg', i <= rung.closeness && 'closeness-seg--on']} />
-									))}
+			RUNGS.filter((rung) => rung.holders.length > 0).map((rung) => {
+				const faces = rung.holders.filter((h) => h.data.photo).slice(0, 3);
+				const extra = rung.holders.length - faces.length;
+				const unscored = rung.holders.filter((h) => !serviceSignal(h)).length;
+				return (
+					<li class="rung">
+						<details class="rung-card" open={rung.step === 1}>
+							<summary class="rung-summary">
+								<span class="rung-step" aria-hidden="true">{rung.step}</span>
+								<span class="rung-sum-text">
+									<h3 class="rung-title">{rung.title}</h3>
+									<span class="rung-sum-meta">
+										{rung.place} · {rung.holders.length}{' '}
+										{rung.holders.length === 1 ? 'official' : 'officials'}
+									</span>
 								</span>
-							</div>
-						</div>
-						<p class="rung-reach">{rung.reach}</p>
-						<ul class="rung-decides">
-							{rung.decides.map((item) => (
-								<li>{item}</li>
-							))}
-						</ul>
-						<ul class="rung-holders">
-							{rung.holders.map((holder) => {
-								const signal = serviceSignal(holder);
-								const identity = partyInfo(holder.data.party);
-								return (
-									<li>
-										<a class="holder-row" href={`/legislators/${holder.data.slug}/`}>
-											{holder.data.photo && (
-												<span class="holder-photo">
-													<img
-														src={holder.data.photo}
-														alt=""
-														width={56}
-														height={70}
-														loading="lazy"
-														decoding="async"
-													/>
-													{identity && (
-														<span
-															class:list={['party-stamp', 'party-stamp--mini', `party-stamp--${identity.key}`]}
-															aria-hidden="true"
-														>
-															{identity.abbrev}
+								<span class="rung-faces" aria-hidden="true">
+									{faces.map((h) => (
+										<span class="rung-face">
+											<img src={h.data.photo} alt="" width={26} height={26} loading="lazy" decoding="async" />
+										</span>
+									))}
+									{extra > 0 && <span class="rung-face-more">+{extra}</span>}
+								</span>
+								<span class="rung-caret" aria-hidden="true">
+									<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6" /></svg>
+								</span>
+							</summary>
+							<div class="rung-body">
+								<div class="rung-meta-row">
+									<p class="rung-reach">{rung.reach}</p>
+									<div class="rung-closeness" title={`Closeness to your daily life: ${rung.closeness} of 5`}>
+										<span class="rung-closeness-label">Close to home</span>
+										<span class="closeness-meter" role="img" aria-label={`Closeness to your daily life: ${rung.closeness} out of 5`}>
+											{[1, 2, 3, 4, 5].map((i) => (
+												<i class:list={['closeness-seg', i <= rung.closeness && 'closeness-seg--on']} />
+											))}
+										</span>
+									</div>
+								</div>
+								<ul class="rung-decides">
+									{rung.decides.map((item) => (
+										<li>{item}</li>
+									))}
+								</ul>
+								<ul class="rung-holders">
+									{rung.holders.map((holder) => {
+										const signal = serviceSignal(holder);
+										const publicOpinion = resolvePublicOpinion(holder);
+										const pulse = publicStandingSignal(publicOpinion);
+										const identity = partyInfo(holder.data.party);
+										const seat = seatBySlug.get(holder.data.seatSlug);
+										const meta = seatMeta(holder);
+										return (
+											<li>
+												<a class="holder-row" href={`/legislators/${holder.data.slug}/`}>
+													{holder.data.photo && (
+														<span class="holder-photo">
+															<img
+																src={holder.data.photo}
+																alt=""
+																width={56}
+																height={70}
+																loading="lazy"
+																decoding="async"
+															/>
+															{identity && (
+																<span
+																	class:list={['party-stamp', 'party-stamp--mini', `party-stamp--${identity.key}`]}
+																	aria-hidden="true"
+																>
+																	{identity.abbrev}
+																</span>
+															)}
 														</span>
 													)}
-												</span>
-											)}
-											<span class="holder-text">
-												<strong>{holder.data.name}</strong>
-												<span class="holder-district">{holder.data.district}</span>
-											</span>
-											<span class:list={['holder-signal', `holder-signal--${signal.cls}`]}>
-												<span class:list={['signal-dot', `signal-dot--${signal.cls}`]} aria-hidden="true" />
-												{signal.label}
-											</span>
-										</a>
-									</li>
-								);
-							})}
-						</ul>
-					</div>
-				</li>
-			))
+													<span class="holder-text">
+														<strong>{holder.data.name}</strong>
+														<span class="holder-district">{holder.data.district}</span>
+														{meta && <span class="holder-term">{meta}</span>}
+														{signal && (
+															<span class:list={['signal-chip', `signal-chip--${signal.cls}`]}>
+																<span class:list={['signal-dot', `signal-dot--${signal.cls}`]} aria-hidden="true" />
+																{signal.label}
+															</span>
+														)}
+														<span
+															class:list={['signal-chip', 'holder-pulse', `signal-chip--${pulse.cls}`]}
+															title={publicOpinion?.detail}
+														>
+															{pulse.label}
+														</span>
+													</span>
+												</a>
+												{seat?.candidates && (
+													<a class="holder-race" href={`/elections/2026/#${holder.data.seatSlug}`}>
+														<span class="holder-race-label">
+															Running in {seat.nextElection}
+															{seat.raceNote && <em> — {seat.raceNote}</em>}
+														</span>
+														<ul class="race-candidates">
+															{seat.candidates.map((cand) => (
+																<li
+																	class:list={[
+																		'race-cand',
+																		cand.party && `race-cand--${cand.party.toLowerCase()}`,
+																		cand.incumbent && 'race-cand--incumbent',
+																	]}
+																	title={cand.note}
+																>
+																	{cand.name}
+																	{cand.party && (
+																		<span class="race-cand-party" aria-label={PARTY_LABEL[cand.party]}>
+																			{cand.party}
+																		</span>
+																	)}
+																</li>
+															))}
+														</ul>
+														<span class="holder-race-more">Full race details →</span>
+													</a>
+												)}
+											</li>
+										);
+									})}
+								</ul>
+								{unscored > 0 && (
+									<p class="rung-unscored">
+										{unscored} of {rung.holders.length} not yet scored —{' '}
+										<a href="/coverage/">how scoring works</a>
+									</p>
+								)}
+								<p class="rung-more">
+									<a href={`/learn/elections/#${rung.levelId}`}>
+										Full cheat sheet: terms, term limits & who runs when →
+									</a>
+								</p>
+							</div>
+						</details>
+					</li>
+				);
+			})
 		}
 	</ol>
 
 	<p class="ladder-foot">
 		Scores are editorial, given only after enough sourced reporting — see{' '}
-		<a href="/coverage/">how we score</a> and cast your own on any profile.
+		<a href="/coverage/">how we score</a> and cast your own on any profile. "Public" standing
+		comes only from published approval polls or the officeholder's last contested election
+		result; appointed or unopposed officials show no number because no honest one exists.
 	</p>
 </section>

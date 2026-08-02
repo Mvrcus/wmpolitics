@@ -49,6 +49,20 @@ sources:
     url: https://www.michigan.gov/whitmer
   - label: Ballotpedia — Gretchen Whitmer
     url: https://ballotpedia.org/Gretchen_Whitmer
+publicOpinion:
+  score: 50
+  basis: polling
+  confidence: high
+  asOf: "2026-07"
+  detail: >-
+    Approval among voters with an opinion, averaged across the two most recent
+    statewide polls: Glengariff/Detroit Regional Chamber (May 2026) 52%
+    approve / 39% disapprove, and EPIC-MRA (March 2026) 43% / 56%.
+  sources:
+    - label: Detroit Regional Chamber — May 2026 Michigan Voter Poll (Glengariff)
+      url: https://www.detroitchamber.com/may-2026-michigan-voter-poll/
+    - label: ABC12 — EPIC-MRA March 2026 poll
+      url: https://www.abc12.com/news/state/exclusive-poll-michigan-voters-sour-on-whitmer-and-trump/article_16a8fd5f-c9c9-4e16-84a6-f05b59bceb52.html
 ---
 
 Gretchen Whitmer is Michigan's 49th governor. She is term-limited and cannot run again in 2026; the seat is on the November 2026 ballot, which makes this rung of the ladder one where West Michigan votes will directly pick a new officeholder.

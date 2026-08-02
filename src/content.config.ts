@@ -21,6 +21,19 @@ const editorialScoresSchema = z.object({
 	overall: z.number().min(0).max(100),
 });
 
+const publicOpinionSchema = z.object({
+	/** 0–100 standing score, or null when no defensible public signal exists. */
+	score: z.number().min(0).max(100).nullable(),
+	/** What the score is built from. */
+	basis: z.enum(["polling", "election", "blend", "insufficient"]),
+	confidence: z.enum(["high", "medium", "low"]),
+	/** Month the underlying data was last checked, e.g. "2026-07". */
+	asOf: z.string(),
+	/** One-line, reader-facing explanation of the number (or of why there is none). */
+	detail: z.string(),
+	sources: z.array(sourceSchema),
+});
+
 const legislators = defineCollection({
 	loader: glob({ base: "./src/content/legislators", pattern: "**/*.{md,mdx}" }),
 	schema: z.object({
@@ -48,6 +61,7 @@ const legislators = defineCollection({
 		concerns: z.array(pointSchema),
 		sources: z.array(sourceSchema).optional(),
 		editorialScores: editorialScoresSchema.optional(),
+		publicOpinion: publicOpinionSchema.optional(),
 		/** Editorial framing for specific roll calls; matched by voteId against synced data. */
 		keyVotes: z
 			.array(

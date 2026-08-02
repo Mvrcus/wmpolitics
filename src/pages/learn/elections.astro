@@ -1,6 +1,7 @@
 ---
 import BaseHead from '../../components/BaseHead.astro';
 import Header from '../../components/Header.astro';
+import CivicLookup from '../../components/CivicLookup.astro';
 import Footer from '../../components/Footer.astro';
 import { SITE_TITLE } from '../../consts';
 import { LEVELS } from '../../data/election-seats';
@@ -26,7 +27,7 @@ const BALLOTS = [...upcoming.entries()]
 	.sort(([a], [b]) => a.localeCompare(b))
 	.map(([when, seats]) => ({ when, seats: [...new Set(seats)] }));
 
-const PARTY_LABEL: Record<string, string> = { R: 'Republican', D: 'Democrat' };
+const PARTY_LABEL: Record<string, string> = { R: 'Republican', D: 'Democrat', I: 'Independent' };
 ---
 
 <!doctype html>
@@ -43,7 +44,7 @@ const PARTY_LABEL: Record<string, string> = { R: 'Republican', D: 'Democrat' };
 				<p class="hero-lead">
 					Every seat that represents Holland, from City Hall to Washington: who holds it now, how
 					long a term lasts, when it's next on your ballot — and whether the officeholder can stay
-					forever.
+					forever. Voting this year? <a href="/elections/2026/">See who's running in 2026 →</a>
 				</p>
 			</header>
 
@@ -68,6 +69,14 @@ const PARTY_LABEL: Record<string, string> = { R: 'Republican', D: 'Democrat' };
 						))
 					}
 				</div>
+				<p class="live-elections" data-live-elections hidden></p>
+			</section>
+
+			<section class="section">
+				<CivicLookup
+					heading="Find your polling place and ballot"
+					lead="Enter your street address to confirm your districts. During election season this also shows your polling place, early-vote sites, drop boxes, and what's on your ballot."
+				/>
 			</section>
 
 			{
@@ -93,32 +102,61 @@ const PARTY_LABEL: Record<string, string> = { R: 'Republican', D: 'Democrat' };
 								</thead>
 								<tbody>
 									{level.seats.map((seat) => (
-										<tr>
-											<th scope="row">
-												{seat.seat}
-												{seat.note && <span class="seat-note">{seat.note}</span>}
-											</th>
-											<td data-label="Current official">
-												<span>
-													{seat.slug ? (
-														<a href={`/legislators/${seat.slug}/`}>{seat.official}</a>
-													) : (
-														seat.official
-													)}
-													{seat.party && (
-														<span
-															class:list={['party-mark', `party-mark--${seat.party.toLowerCase()}`]}
-															title={PARTY_LABEL[seat.party]}
-														>
-															({seat.party})
+										<>
+											<tr id={seat.seatSlug}>
+												<th scope="row">
+													{seat.seat}
+													{seat.note && <span class="seat-note">{seat.note}</span>}
+												</th>
+												<td data-label="Current official">
+													<span>
+														{seat.slug ? (
+															<a href={`/legislators/${seat.slug}/`}>{seat.official}</a>
+														) : (
+															seat.official
+														)}
+														{seat.party && (
+															<span
+																class:list={['party-mark', `party-mark--${seat.party.toLowerCase()}`]}
+																title={PARTY_LABEL[seat.party]}
+															>
+																({seat.party})
+															</span>
+														)}
+													</span>
+												</td>
+												<td data-label="Term">{seat.term}</td>
+												<td data-label="Next election" class="seat-next">{seat.nextElection}</td>
+												<td data-label="Term limits">{seat.termLimits}</td>
+											</tr>
+											{seat.candidates && (
+												<tr class="race-row">
+													<td colspan="5">
+														<span class="race-row-label">
+															Running in {seat.nextElection}
+															{seat.raceNote && <em> — {seat.raceNote}</em>}:
 														</span>
-													)}
-												</span>
-											</td>
-											<td data-label="Term">{seat.term}</td>
-											<td data-label="Next election" class="seat-next">{seat.nextElection}</td>
-											<td data-label="Term limits">{seat.termLimits}</td>
-										</tr>
+														<ul class="race-row-candidates">
+															{seat.candidates.map((cand) => (
+																<li title={cand.note}>
+																	{cand.name}
+																	{cand.party && (
+																		<span
+																			class:list={['party-mark', `party-mark--${cand.party.toLowerCase()}`]}
+																			title={PARTY_LABEL[cand.party]}
+																		>
+																			({cand.party})
+																		</span>
+																	)}
+																	{cand.incumbent && <span class="race-row-inc">Incumbent</span>}
+																	{cand.note && <span class="race-row-note">{cand.note}</span>}
+																</li>
+															))}
+														</ul>
+													</td>
+												</tr>
+											)}
+										</>
 									))}
 								</tbody>
 							</table>
@@ -156,6 +194,30 @@ const PARTY_LABEL: Record<string, string> = { R: 'Republican', D: 'Democrat' };
 			</section>
 		</main>
 		<Footer />
+		<script>
+			// Live supplement to the static calendar: Google's election feed only
+			// lists elections it has active data for, so this stays empty most of
+			// the year and lights up as an election approaches.
+			(async () => {
+				const target = document.querySelector<HTMLElement>('[data-live-elections]');
+				if (!target) return;
+				try {
+					const res = await fetch('/api/civic/elections');
+					if (!res.ok) return;
+					const data = (await res.json()) as {
+						elections?: { name: string; electionDay: string }[];
+					};
+					const elections = data.elections ?? [];
+					if (!elections.length) return;
+					target.textContent = `Confirmed by Google's election feed: ${elections
+						.map((e) => `${e.name} on ${e.electionDay}`)
+						.join('; ')}.`;
+					target.hidden = false;
+				} catch {
+					/* feed unavailable; static calendar stands on its own */
+				}
+			})();
+		</script>
 	</body>
 </html>
 
@@ -172,6 +234,14 @@ const PARTY_LABEL: Record<string, string> = { R: 'Republican', D: 'Democrat' };
 
 	.elections-section-lead {
 		margin-bottom: 2rem;
+	}
+
+	.live-elections {
+		font-family: var(--font-sans);
+		font-size: 0.875rem;
+		font-weight: 600;
+		color: var(--color-accent);
+		margin: 1rem 0 0;
 	}
 
 	.ballot-grid {
@@ -254,9 +324,8 @@ const PARTY_LABEL: Record<string, string> = { R: 'Republican', D: 'Democrat' };
 	}
 
 	.seat-table thead th {
-		font-size: 0.72rem;
-		text-transform: uppercase;
-		letter-spacing: 0.08em;
+		font-size: 0.75rem;
+		font-weight: 700;
 		background: var(--color-surface);
 		border-bottom: 2px solid var(--color-black);
 		white-space: nowrap;
@@ -297,6 +366,63 @@ const PARTY_LABEL: Record<string, string> = { R: 'Republican', D: 'Democrat' };
 
 	.party-mark--d {
 		color: var(--party-democrat);
+	}
+
+	.party-mark--i {
+		color: var(--party-nonpartisan);
+	}
+
+	.race-row td {
+		background: var(--color-surface);
+		font-size: 0.85rem;
+		border-top: none;
+	}
+
+	.race-row-label {
+		display: block;
+		font-family: var(--font-sans);
+		font-size: 0.7rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.06em;
+		color: var(--color-muted);
+		margin-bottom: 0.3rem;
+	}
+
+	.race-row-label em {
+		font-style: normal;
+		text-transform: none;
+		letter-spacing: normal;
+		color: var(--color-accent);
+	}
+
+	.race-row-candidates {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 0.2rem;
+	}
+
+	.race-row-candidates li {
+		font-family: var(--font-sans);
+	}
+
+	.race-row-inc {
+		margin-left: 0.4rem;
+		font-size: 0.68rem;
+		font-weight: 650;
+		padding: 0.1rem 0.45rem;
+		border-radius: 999px;
+		background: var(--color-tarred-bg);
+		color: var(--color-tarred);
+	}
+
+	.race-row-note {
+		display: block;
+		font-size: 0.78rem;
+		color: var(--color-muted);
 	}
 
 	.cycle-note {
@@ -351,7 +477,7 @@ const PARTY_LABEL: Record<string, string> = { R: 'Republican', D: 'Democrat' };
 			margin-bottom: 0.65rem;
 		}
 
-		.seat-table td {
+		.seat-table td[data-label] {
 			display: flex;
 			align-items: baseline;
 			justify-content: space-between;
@@ -362,7 +488,7 @@ const PARTY_LABEL: Record<string, string> = { R: 'Republican', D: 'Democrat' };
 			text-align: right;
 		}
 
-		.seat-table td::before {
+		.seat-table td[data-label]::before {
 			content: attr(data-label);
 			flex-shrink: 0;
 			font-size: 0.68rem;
@@ -375,6 +501,11 @@ const PARTY_LABEL: Record<string, string> = { R: 'Republican', D: 'Democrat' };
 
 		.seat-next {
 			white-space: normal;
+		}
+
+		/* The candidates row stays a full-width block, not a label/value pair. */
+		.race-row td {
+			padding: 0.65rem 0 0;
 		}
 	}
 </style>

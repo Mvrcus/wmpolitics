@@ -8,6 +8,8 @@ seatLabel: Michigan Senate District 31
 status: current
 termStart: 2019
 party: Republican
+photo: /images/roger-victory.jpg
+photoIsOfficial: true
 servesHolland: true
 proximityRank: 7
 summary: >-
@@ -38,6 +40,20 @@ sources:
     url: https://www.senatorrogervictory.com/
   - label: Ballotpedia — Roger Victory
     url: https://ballotpedia.org/Roger_Victory
+publicOpinion:
+  score: 62
+  basis: election
+  confidence: medium
+  asOf: "2026-07"
+  detail: >-
+    Won Senate District 31 in November 2022 with 62.1% (82,383 of 132,641)
+    over Democrat Kim Nagy — the seat's most recent election, now nearly four
+    years old. Term-limited in 2026; running for the MSU Board of Trustees.
+  sources:
+    - label: Ballotpedia — Roger Victory
+      url: https://ballotpedia.org/Roger_Victory
+    - label: The State News — 2026 MSU trustee nomination
+      url: https://statenews.com/article/2026/04/republicans-nominate-maday-and-victory-for-msu-trustee-seats
 ---
 
 Roger Victory (R) represents Michigan Senate District 31, which covers most of Ottawa County including Holland. He served three terms in the Michigan House before winning his Senate seat.

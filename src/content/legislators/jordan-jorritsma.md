@@ -54,6 +54,20 @@ sources:
     url: https://www.mlive.com/politics/2024/11/democrat-loses-to-republican-by-narrow-margin-in-district-2-ottawa-county-board-race.html
   - label: Holland Sentinel — Ottawa County results
     url: https://www.hollandsentinel.com/elections/results/2024-11-05/michigan/26139/ottawa-county
+publicOpinion:
+  score: 51
+  basis: election
+  confidence: high
+  asOf: "2026-07"
+  detail: >-
+    Won November 2024 by 237 votes — 50.9% (6,556–6,319) over incumbent
+    Democrat Chris Kleinjans, the closest of the county's eleven commission
+    races.
+  sources:
+    - label: WHTC — November 2024 lakeshore results
+      url: https://whtc.com/2024/11/06/lakeshore-election-results-nov-5-2024/
+    - label: Michigan Advance — District 2 result
+      url: https://michiganadvance.com/2024/11/06/democrats-lose-a-seat-on-the-ottawa-county-commission/
 ---
 
 Jordan Jorritsma (R) represents Holland Charter Township and part of Park Township on the Ottawa County Board. He was elected in November 2024 and began his term in January 2025.

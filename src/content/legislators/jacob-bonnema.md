@@ -6,6 +6,7 @@ district: "Ottawa County Board — District 4 (Zeeland & Holland Charter)"
 seatSlug: ottawa-county-district-4
 seatLabel: Ottawa County District 4
 status: current
+termStart: 2023
 party: Republican
 photo: /images/jacob-bonnema.jpg
 photoIsOfficial: true
@@ -54,6 +55,18 @@ sources:
     url: https://www.mlive.com/politics/2024/11/jacob-bonnema-reelected-to-district-4-ottawa-county-commissioner-seat.html
   - label: Holland Sentinel — Board shift
     url: https://www.hollandsentinel.com/story/news/politics/elections/county/2024/11/06/ottawa-impact-likely-to-officially-lose-power-on-ottawa-county-board/75940683007/
+publicOpinion:
+  score: 62
+  basis: election
+  confidence: high
+  asOf: "2026-07"
+  detail: >-
+    Re-elected November 2024 with 62.3% (10,370 of 16,638 votes) over Democrat
+    Chris Crothers and a registered write-in; his 2022 general was unopposed,
+    so the 2024 contested race is the measure used.
+  sources:
+    - label: WHTC — November 2024 lakeshore results
+      url: https://whtc.com/2024/11/06/lakeshore-election-results-nov-5-2024/
 ---
 
 Jacob Bonnema (R-Zeeland) represents District 4 on the Ottawa County Board, including Zeeland and selected Holland Charter Township precincts. Profile expanded as more county votes are documented.

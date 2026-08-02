@@ -6,6 +6,7 @@ district: "Ottawa County Board — District 3 (City of Holland)"
 seatSlug: ottawa-county-district-3
 seatLabel: Ottawa County District 3
 status: current
+termStart: 2019
 party: Democrat
 photo: /images/doug-zylstra.jpg
 photoIsOfficial: true
@@ -54,6 +55,20 @@ sources:
     url: https://boards.miottawa.org/commissioners/
   - label: MLive — 2024 election
     url: https://www.mlive.com/politics/2024/11/doug-zylstra-wins-ottawa-county-commission-seat-will-be-the-lone-democrat.html
+publicOpinion:
+  score: 58
+  basis: election
+  confidence: high
+  asOf: "2026-07"
+  detail: >-
+    Re-elected November 2024 with 58.2% (7,383–5,299) over Republican Orlando
+    Estrada; a 2023 recall effort against him was suspended without reaching
+    the ballot.
+  sources:
+    - label: WHTC — November 2024 lakeshore results
+      url: https://whtc.com/2024/11/06/lakeshore-election-results-nov-5-2024/
+    - label: Ballotpedia — Ottawa County recall effort (2023–2024)
+      url: https://ballotpedia.org/Ottawa_County_Board_of_Commissioners_recall,_Michigan_(2023-2024)
 ---
 
 Doug Zylstra is the county-level elected official closest to Holland city government. Profile expanded as more votes and hearings are documented.

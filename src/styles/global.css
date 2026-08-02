@@ -277,13 +277,21 @@ main > .page-header:first-child {
 	font-family: var(--font-sans);
 	font-size: 0.875rem;
 	font-weight: 600;
-	text-transform: uppercase;
-	letter-spacing: 0.04em;
 	text-decoration: none;
+	white-space: nowrap;
 }
 
 .section-header a:hover {
 	color: var(--color-accent);
+}
+
+/* On phones the side-by-side header wraps into colliding stacks — stack it deliberately */
+@media (max-width: 640px) {
+	.section-header {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 0.2rem;
+	}
 }
 
 /* Page & featured hero images */
@@ -388,8 +396,6 @@ main > .page-header:first-child {
 .featured-meta {
 	font-size: 0.875rem;
 	color: var(--color-muted);
-	text-transform: uppercase;
-	letter-spacing: 0.04em;
 }
 
 .featured-side {
@@ -464,8 +470,6 @@ main > .page-header:first-child {
 .article-card-meta {
 	font-size: 0.8125rem;
 	color: var(--color-muted);
-	text-transform: uppercase;
-	letter-spacing: 0.03em;
 }
 
 .article-card-image {
@@ -634,7 +638,7 @@ main > .page-header:first-child {
 	border-bottom-color: var(--color-black);
 }
 
-/* Buttons */
+/* Buttons — sentence case, one obvious primary per screen */
 .btn {
 	display: inline-block;
 	padding: 0.7rem 1.35rem;
@@ -643,9 +647,7 @@ main > .page-header:first-child {
 	text-decoration: none;
 	font-family: var(--font-sans);
 	font-weight: 600;
-	font-size: 0.875rem;
-	text-transform: uppercase;
-	letter-spacing: 0.05em;
+	font-size: 0.9rem;
 	border: 2px solid var(--color-black);
 	cursor: pointer;
 	transition: background 0.15s, color 0.15s;
@@ -654,6 +656,17 @@ main > .page-header:first-child {
 .btn:hover {
 	background: var(--color-white);
 	color: var(--color-black) !important;
+}
+
+.btn-primary {
+	background: var(--color-accent);
+	border-color: var(--color-accent);
+}
+
+.btn-primary:hover {
+	background: var(--color-accent-hover);
+	border-color: var(--color-accent-hover);
+	color: var(--color-white) !important;
 }
 
 .btn-outline {
@@ -666,10 +679,24 @@ main > .page-header:first-child {
 	color: var(--color-white) !important;
 }
 
+.text-link {
+	font-family: var(--font-sans);
+	font-size: 0.9rem;
+	font-weight: 600;
+	color: var(--color-black);
+	text-decoration: underline;
+	text-underline-offset: 3px;
+}
+
+.text-link:hover {
+	color: var(--color-accent);
+}
+
 .start-links {
 	display: flex;
 	flex-wrap: wrap;
-	gap: 0.75rem;
+	gap: 0.75rem 1.5rem;
+	align-items: center;
 }
 
 /* Office groups */
@@ -883,29 +910,29 @@ main > .page-header:first-child {
 
 .coverage-table thead th {
 	font-size: 0.75rem;
-	text-transform: uppercase;
-	letter-spacing: 0.08em;
+	font-weight: 700;
 }
 
 .coverage-tier {
 	display: inline-block;
-	padding: 0.1rem 0.5rem;
+	padding: 0.14rem 0.6rem;
 	font-size: 0.75rem;
-	font-weight: 700;
-	text-transform: uppercase;
-	letter-spacing: 0.05em;
-	border: 1px solid currentColor;
+	font-weight: 600;
+	border-radius: 999px;
 }
 
 .coverage-tier--documented {
-	color: #1b6b2f;
+	background: var(--color-supporter-bg);
+	color: var(--color-supporter-accent);
 }
 
 .coverage-tier--partial {
-	color: #8a6d1a;
+	background: var(--color-mixed-bg);
+	color: var(--color-mixed);
 }
 
 .coverage-tier--stub {
+	background: var(--party-nonpartisan-bg);
 	color: var(--color-text-muted, #555);
 }
 
@@ -957,77 +984,40 @@ main > .page-header:first-child {
 	font-size: 1.08rem;
 	line-height: 1.6;
 	color: var(--color-muted);
-	margin: 0 0 1.75rem;
+	max-width: 34rem;
+	margin: 0 auto 1.5rem;
 }
 
+/* pill chips — the three promises without three boxes */
 .home-intro-points {
 	list-style: none;
 	display: flex;
 	flex-wrap: wrap;
 	justify-content: center;
-	gap: 0.75rem;
-	margin: 0 0 2rem;
+	gap: 0.5rem;
+	margin: 0 0 1.75rem;
 	padding: 0;
 }
 
 .home-intro-points li {
-	flex: 1 1 12rem;
-	max-width: 15rem;
 	font-family: var(--font-sans);
+	font-size: 0.82rem;
+	font-weight: 600;
+	color: var(--color-black);
 	background: rgba(255, 255, 255, 0.82);
 	border: 1px solid var(--color-border);
-	border-top: 2px solid var(--color-accent);
-	padding: 0.85rem 1rem;
-	text-align: left;
+	border-radius: 999px;
+	padding: 0.32rem 0.85rem;
 }
 
-.home-intro-points strong {
-	display: block;
-	font-size: 0.9rem;
-	margin-bottom: 0.2rem;
+.home-intro-cta {
+	margin-top: 0.25rem;
 }
 
-.home-intro-points span {
-	font-size: 0.8rem;
-	color: var(--color-muted);
-	line-height: 1.4;
-}
-
-.home-intro-cue {
-	display: inline-flex;
-	align-items: center;
-	gap: 0.5rem;
-	font-family: var(--font-sans);
-	font-size: 0.85rem;
-	font-weight: 700;
-	text-transform: uppercase;
-	letter-spacing: 0.08em;
-	text-decoration: none;
-	color: var(--color-black);
-}
-
-.home-intro-cue:hover {
-	color: var(--color-accent);
-}
-
-.home-intro-arrow {
-	display: inline-block;
-	animation: intro-bob 1.6s ease-in-out infinite;
-}
-
-@keyframes intro-bob {
-	0%,
-	100% {
-		transform: translateY(0);
-	}
-	50% {
-		transform: translateY(4px);
-	}
-}
-
-@media (prefers-reduced-motion: reduce) {
-	.home-intro-arrow {
-		animation: none;
+@media (max-width: 640px) {
+	/* centered text past two lines loses its anchor — left-align the lead on phones */
+	.home-intro-lead {
+		text-align: left;
 	}
 }
 
@@ -1065,17 +1055,6 @@ main > .page-header:first-child {
 	margin: 0 0 1.25rem;
 }
 
-.ladder-legend {
-	font-family: var(--font-sans);
-	font-size: 0.78rem;
-	color: var(--color-muted);
-	display: flex;
-	flex-wrap: wrap;
-	justify-content: center;
-	gap: 0.35rem 1rem;
-	margin: 0;
-}
-
 .signal-dot {
 	display: inline-block;
 	width: 0.65rem;
@@ -1106,32 +1085,26 @@ main > .page-header:first-child {
 	margin: 0 auto;
 	padding: 0;
 	max-width: 52rem;
+	display: grid;
+	gap: 0.75rem;
 }
 
-.rung {
-	position: relative;
+/* each rung is a collapsed summary card; open discloses the roster */
+.rung-card {
+	background: var(--color-white);
+	border: 1px solid var(--color-black);
+}
+
+.rung-summary {
 	display: flex;
-	gap: 1.25rem;
-	padding-bottom: 2rem;
+	align-items: center;
+	gap: 0.9rem;
+	padding: 0.85rem 1rem;
+	cursor: pointer;
+	list-style: none;
 }
 
-.rung-rail {
-	position: relative;
-	flex: 0 0 2.5rem;
-	display: flex;
-	justify-content: center;
-}
-
-.rung-rail::before {
-	content: '';
-	position: absolute;
-	top: 2.5rem;
-	bottom: -0.5rem;
-	width: 2px;
-	background: var(--color-black);
-}
-
-.rung:last-child .rung-rail::before {
+.rung-summary::-webkit-details-marker {
 	display: none;
 }
 
@@ -1139,47 +1112,129 @@ main > .page-header:first-child {
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	width: 2.5rem;
-	height: 2.5rem;
+	flex: 0 0 2.1rem;
+	width: 2.1rem;
+	height: 2.1rem;
 	border-radius: 50%;
 	background: var(--color-black);
 	color: #fff;
 	font-family: var(--font-sans);
-	font-size: 1.05rem;
+	font-size: 0.95rem;
 	font-weight: 700;
-	z-index: 1;
 }
 
-.rung-body {
+.rung-sum-text {
 	flex: 1;
-	background: var(--color-white);
-	border: 1px solid var(--color-black);
-	padding: 1.25rem 1.5rem 1rem;
 	min-width: 0;
-}
-
-.rung-head {
-	display: flex;
-	justify-content: space-between;
-	align-items: flex-start;
-	gap: 1rem;
-	flex-wrap: wrap;
 }
 
 .rung-title {
 	font-family: var(--font-serif);
-	font-size: 1.35rem;
+	font-size: 1.2rem;
+	line-height: 1.2;
 	margin: 0;
 }
 
-.rung-place {
+.rung-sum-meta {
+	display: block;
 	font-family: var(--font-sans);
 	font-size: 0.75rem;
-	font-weight: 700;
-	text-transform: uppercase;
-	letter-spacing: 0.08em;
 	color: var(--color-muted);
-	margin: 0.15rem 0 0;
+	margin-top: 0.1rem;
+}
+
+.rung-faces {
+	display: flex;
+	align-items: center;
+	flex: 0 0 auto;
+}
+
+.rung-face {
+	display: block;
+	width: 1.7rem;
+	height: 1.7rem;
+	border-radius: 50%;
+	overflow: hidden;
+	border: 2px solid var(--color-white);
+	background: #e4e2da;
+	margin-left: -0.5rem;
+}
+
+.rung-face:first-child {
+	margin-left: 0;
+}
+
+.rung-face img {
+	display: block;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.rung-face-more {
+	font-family: var(--font-sans);
+	font-size: 0.7rem;
+	font-weight: 600;
+	color: var(--color-muted);
+	margin-left: 0.35rem;
+}
+
+/* the expand control must look like a control: circled chevron, filled when open */
+.rung-caret {
+	flex: 0 0 auto;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 1.9rem;
+	height: 1.9rem;
+	border: 2px solid var(--color-black);
+	border-radius: 50%;
+	color: var(--color-black);
+	transition: transform 0.15s, background 0.15s, color 0.15s;
+}
+
+.rung-summary:hover {
+	background: var(--color-surface);
+}
+
+.rung-summary:hover .rung-caret {
+	background: var(--color-black);
+	color: var(--color-white);
+}
+
+.rung-summary:focus-visible {
+	outline: 2px solid var(--color-accent);
+	outline-offset: -2px;
+}
+
+.rung-card[open] .rung-caret {
+	transform: rotate(180deg);
+	background: var(--color-black);
+	color: var(--color-white);
+}
+
+.rung-card[open] .rung-summary {
+	border-bottom: 1px solid var(--color-border);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.rung-caret {
+		transition: none;
+	}
+}
+
+.rung-body {
+	padding: 1rem 1.25rem 1.1rem;
+	min-width: 0;
+}
+
+.rung-meta-row {
+	display: flex;
+	justify-content: space-between;
+	align-items: baseline;
+	gap: 1rem;
+	flex-wrap: wrap;
+	margin-bottom: 0.6rem;
 }
 
 .rung-closeness {
@@ -1219,7 +1274,7 @@ main > .page-header:first-child {
 	font-size: 0.85rem;
 	font-style: italic;
 	color: var(--color-muted);
-	margin: 0.5rem 0 0.75rem;
+	margin: 0;
 }
 
 .rung-decides {
@@ -1250,11 +1305,12 @@ main > .page-header:first-child {
 	border-top: 1px solid var(--color-border);
 }
 
+/* two-line rows: the text column owns the width; status is a chip below the name */
 .holder-row {
 	display: flex;
-	align-items: center;
+	align-items: flex-start;
 	gap: 0.9rem;
-	padding: 0.65rem 0;
+	padding: 0.7rem 0;
 	text-decoration: none;
 	color: inherit;
 }
@@ -1304,32 +1360,196 @@ main > .page-header:first-child {
 	color: var(--color-muted);
 }
 
-.holder-signal {
+/* tinted pills, shown only when there is a score to show */
+.signal-chip {
 	display: inline-flex;
 	align-items: center;
-	gap: 0.4rem;
+	gap: 0.35rem;
+	font-family: var(--font-sans);
+	font-size: 0.73rem;
+	font-weight: 600;
+	border-radius: 999px;
+	padding: 0.16rem 0.6rem;
+	margin-top: 0.3rem;
+}
+
+.signal-chip .signal-dot {
+	width: 0.5rem;
+	height: 0.5rem;
+}
+
+.signal-chip--good {
+	background: var(--color-supporter-bg);
+	color: var(--color-supporter-accent);
+}
+
+.signal-chip--mixed {
+	background: var(--color-mixed-bg);
+	color: var(--color-mixed);
+}
+
+.signal-chip--poor {
+	background: var(--color-tomatoes-bg);
+	color: var(--color-accent-hover);
+}
+
+.signal-chip--unscored {
+	background: #f2f1ec;
+	color: var(--color-muted);
+}
+
+.rung-unscored {
+	font-family: var(--font-sans);
+	font-size: 0.78rem;
+	color: var(--color-muted);
+	border-top: 1px solid var(--color-border);
+	padding-top: 0.6rem;
+	margin: 0.25rem 0 0;
+}
+
+.holder-term {
+	display: block;
 	font-family: var(--font-sans);
 	font-size: 0.72rem;
+	color: var(--color-muted);
+	margin-top: 0.15rem;
+}
+
+/* related aside, not part of the officeholder row: tinted panel set off from the list,
+   and a block link through to the seat's row on the elections cheat sheet */
+.holder-race {
+	display: block;
+	margin: 0.1rem 0 0.9rem 4rem;
+	padding: 0.6rem 0.8rem;
+	background: var(--color-surface);
+	border-left: 3px solid var(--color-border-strong);
+	text-decoration: none;
+	color: inherit;
+	transition: background 0.15s, border-color 0.15s;
+}
+
+.holder-race:hover {
+	background: var(--color-tarred-bg);
+	border-left-color: var(--color-accent);
+}
+
+.holder-race:hover .holder-race-more {
+	text-decoration: underline;
+}
+
+.holder-race-more {
+	display: block;
+	font-family: var(--font-sans);
+	font-size: 0.72rem;
+	font-weight: 600;
+	color: var(--color-accent);
+	margin-top: 0.5rem;
+}
+
+.holder-race-label {
+	display: block;
+	font-family: var(--font-sans);
+	font-size: 0.68rem;
 	font-weight: 700;
 	text-transform: uppercase;
-	letter-spacing: 0.04em;
-	white-space: nowrap;
+	letter-spacing: 0.06em;
+	color: var(--color-muted);
+	margin-bottom: 0.35rem;
 }
 
-.holder-signal--good {
-	color: #1b6b2f;
-}
-
-.holder-signal--mixed {
-	color: #8a6d1a;
-}
-
-.holder-signal--poor {
+.holder-race-label em {
+	font-style: normal;
+	text-transform: none;
+	letter-spacing: normal;
+	font-weight: 600;
 	color: var(--color-accent);
 }
 
-.holder-signal--unscored {
-	color: var(--color-muted);
+.race-candidates {
+	list-style: none;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.35rem;
+	margin: 0;
+	padding: 0;
+}
+
+.race-cand {
+	font-family: var(--font-sans);
+	font-size: 0.72rem;
+	font-weight: 600;
+	padding: 0.2rem 0.5rem;
+	background: #f2f1ec;
+	border: 1px solid var(--color-border);
+	cursor: default;
+}
+
+.race-cand--r {
+	background: var(--party-republican-bg);
+	border-color: var(--party-republican);
+}
+
+.race-cand--d {
+	background: var(--party-democrat-bg);
+	border-color: var(--party-democrat);
+}
+
+.race-cand--i {
+	background: var(--party-nonpartisan-bg);
+	border-color: var(--party-nonpartisan);
+}
+
+.race-cand--incumbent {
+	border-width: 2px;
+}
+
+.race-cand-party {
+	margin-left: 0.3rem;
+	font-size: 0.62rem;
+	font-weight: 700;
+}
+
+.race-cand--r .race-cand-party {
+	color: var(--party-republican);
+}
+
+.race-cand--d .race-cand-party {
+	color: var(--party-democrat);
+}
+
+.race-cand--i .race-cand-party {
+	color: var(--party-nonpartisan);
+}
+
+.rung-more {
+	font-family: var(--font-sans);
+	font-size: 0.78rem;
+	font-weight: 600;
+	margin: 0.75rem 0 0;
+	padding-top: 0.65rem;
+	border-top: 1px solid var(--color-border);
+}
+
+.rung-more a {
+	text-decoration: none;
+	color: var(--color-accent);
+}
+
+.rung-more a:hover {
+	text-decoration: underline;
+}
+
+.holder-signals {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-end;
+	gap: 0.15rem;
+}
+
+.holder-pulse {
+	font-weight: 600;
+	font-size: 0.66rem;
+	opacity: 0.85;
 }
 
 .ladder-foot {
@@ -1349,6 +1569,51 @@ main > .page-header:first-child {
 	margin-bottom: 1rem;
 }
 
+/* the numbers are the story — set them as numbers, not prose */
+.vote-stats {
+	list-style: none;
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 0.6rem;
+	margin: 0 0 1rem;
+	padding: 0;
+}
+
+.vote-stat {
+	background: var(--color-surface);
+	padding: 0.7rem 0.85rem 0.6rem;
+}
+
+.vote-stat-num {
+	display: block;
+	font-family: var(--font-serif);
+	font-size: 1.45rem;
+	font-weight: 700;
+	line-height: 1.15;
+	font-variant-numeric: tabular-nums;
+}
+
+.vote-stat-num--rep {
+	color: var(--party-republican);
+}
+
+.vote-stat-cap {
+	display: block;
+	font-family: var(--font-sans);
+	font-size: 0.72rem;
+	color: var(--color-muted);
+	line-height: 1.35;
+	margin-top: 0.15rem;
+}
+
+.vote-kicker {
+	font-family: var(--font-sans);
+	font-size: 0.9rem;
+	line-height: 1.5;
+	color: var(--color-muted);
+	margin: 0;
+}
+
 @media (min-width: 900px) {
 	.vote-picture-grid {
 		grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
@@ -1359,9 +1624,359 @@ main > .page-header:first-child {
 	.rung-closeness {
 		text-align: left;
 	}
-	.holder-signal {
-		font-size: 0.65rem;
+	.holder-race {
+		margin-left: 0;
 	}
+}
+
+/* 2026 ballot page (/elections/2026/) */
+.e26-hero {
+	position: relative;
+	overflow: hidden;
+	width: 100vw;
+	margin-left: calc(50% - 50vw);
+	margin-top: calc(-1 * var(--section-gap));
+	padding: clamp(2.5rem, 5vw, 4rem) var(--content-padding) clamp(2rem, 5vw, 3rem);
+	text-align: center;
+	background:
+		radial-gradient(ellipse at 50% 30%, rgba(255, 255, 255, 0.85), transparent 70%),
+		var(--engraved-field),
+		#f5f4ee;
+}
+
+.e26-hero-inner {
+	position: relative;
+	max-width: 46rem;
+	margin: 0 auto;
+}
+
+.e26-kicker {
+	font-family: var(--font-sans);
+	font-size: 0.75rem;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.12em;
+	color: var(--color-muted);
+	margin: 0 0 0.75rem;
+}
+
+.e26-title {
+	font-family: var(--font-serif);
+	font-size: clamp(2rem, 4.5vw, 3rem);
+	line-height: 1.08;
+	margin: 0 0 1rem;
+}
+
+.e26-lead {
+	font-size: 1.05rem;
+	line-height: 1.6;
+	color: var(--color-muted);
+	max-width: 34rem;
+	margin: 0 auto 1.75rem;
+}
+
+.e26-dates {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 0.75rem;
+	max-width: 30rem;
+	margin: 0 auto 1.5rem;
+}
+
+.e26-date {
+	background: var(--color-white);
+	border: 1px solid var(--color-black);
+	padding: 0.8rem 0.9rem 0.7rem;
+	text-align: left;
+}
+
+.e26-date-label {
+	display: block;
+	font-family: var(--font-sans);
+	font-size: 0.68rem;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.08em;
+	color: var(--color-muted);
+}
+
+.e26-date-num {
+	display: block;
+	font-family: var(--font-serif);
+	font-size: 1.9rem;
+	font-weight: 700;
+	line-height: 1.15;
+}
+
+.e26-date-note {
+	display: block;
+	font-family: var(--font-sans);
+	font-size: 0.72rem;
+	color: var(--color-muted);
+	margin-top: 0.2rem;
+	line-height: 1.35;
+}
+
+.e26-stats {
+	list-style: none;
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: 0.5rem;
+	margin: 0;
+	padding: 0;
+}
+
+.e26-stats li {
+	font-family: var(--font-sans);
+	font-size: 0.8rem;
+	color: var(--color-muted);
+	background: rgba(255, 255, 255, 0.82);
+	border: 1px solid var(--color-border);
+	border-radius: 999px;
+	padding: 0.3rem 0.85rem;
+}
+
+.e26-stats strong {
+	color: var(--color-black);
+}
+
+.e26-page-lead {
+	margin: 0 auto 2rem;
+	max-width: 52rem;
+}
+
+.e26-races {
+	display: grid;
+	gap: 1.25rem;
+	max-width: 52rem;
+	margin: 0 auto;
+}
+
+.e26-race {
+	background: var(--color-white);
+	border: 1px solid var(--color-black);
+	padding: 1.1rem 1.25rem 1rem;
+}
+
+.e26-race-head {
+	display: flex;
+	justify-content: space-between;
+	align-items: flex-start;
+	gap: 0.75rem;
+	flex-wrap: wrap;
+}
+
+.e26-race-level {
+	font-family: var(--font-sans);
+	font-size: 0.68rem;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.08em;
+	color: var(--color-muted);
+	margin: 0 0 0.1rem;
+}
+
+.e26-race-seat {
+	font-family: var(--font-serif);
+	font-size: 1.2rem;
+	line-height: 1.25;
+	margin: 0;
+}
+
+.e26-status {
+	font-family: var(--font-sans);
+	font-size: 0.72rem;
+	font-weight: 600;
+	border-radius: 999px;
+	padding: 0.18rem 0.65rem;
+	white-space: nowrap;
+}
+
+.e26-status--open {
+	background: var(--color-tomatoes-bg);
+	color: var(--color-accent-hover);
+}
+
+.e26-status--set {
+	background: var(--color-tarred-bg);
+	color: var(--color-tarred);
+}
+
+.e26-status--primary {
+	background: var(--color-mixed-bg);
+	color: var(--color-mixed);
+}
+
+.e26-status--solo {
+	background: var(--party-nonpartisan-bg);
+	color: var(--color-muted);
+}
+
+.e26-race-note {
+	font-family: var(--font-sans);
+	font-size: 0.85rem;
+	font-style: italic;
+	color: var(--color-muted);
+	margin: 0.35rem 0 0;
+}
+
+.e26-field {
+	margin-top: 1rem;
+}
+
+.e26-field-label {
+	font-family: var(--font-sans);
+	font-size: 0.7rem;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.07em;
+	margin: 0 0 0.5rem;
+}
+
+.e26-field-label--r {
+	color: var(--party-republican);
+}
+
+.e26-field-label--d {
+	color: var(--party-democrat);
+}
+
+.e26-field-label--other {
+	color: var(--color-muted);
+}
+
+.e26-cands {
+	list-style: none;
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: 0.5rem;
+	margin: 0;
+	padding: 0;
+}
+
+@media (min-width: 640px) {
+	.e26-cands {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+}
+
+.e26-cand {
+	display: flex;
+	align-items: flex-start;
+	gap: 0.7rem;
+	background: var(--color-paper);
+	border: 1px solid var(--color-border);
+	padding: 0.6rem 0.7rem;
+	height: 100%;
+}
+
+.e26-cand--link {
+	text-decoration: none;
+	color: inherit;
+	transition: border-color 0.15s;
+}
+
+.e26-cand--link:hover {
+	border-color: var(--color-black);
+}
+
+.e26-cand--link:hover strong {
+	color: var(--color-accent);
+}
+
+.e26-cand-face {
+	position: relative;
+	flex: 0 0 2.9rem;
+	width: 2.9rem;
+	height: 3.6rem;
+	overflow: hidden;
+	border: 1px solid var(--color-border);
+	background: var(--party-nonpartisan-bg);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.e26-cand-face img {
+	display: block;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.e26-cand-face--r {
+	background: var(--party-republican-bg);
+	border-color: var(--party-republican);
+}
+
+.e26-cand-face--d {
+	background: var(--party-democrat-bg);
+	border-color: var(--party-democrat);
+}
+
+.e26-cand-initials {
+	font-family: var(--font-sans);
+	font-size: 0.95rem;
+	font-weight: 700;
+	color: var(--color-muted);
+}
+
+.e26-cand-face--r .e26-cand-initials {
+	color: var(--party-republican);
+}
+
+.e26-cand-face--d .e26-cand-initials {
+	color: var(--party-democrat);
+}
+
+.e26-cand-text {
+	flex: 1;
+	min-width: 0;
+	font-family: var(--font-sans);
+}
+
+.e26-cand-text strong {
+	display: block;
+	font-size: 0.92rem;
+	line-height: 1.3;
+	transition: color 0.15s;
+}
+
+.e26-cand-meta {
+	display: block;
+	font-size: 0.72rem;
+	color: var(--color-muted);
+	margin-top: 0.1rem;
+}
+
+.e26-incumbent {
+	display: inline-block;
+	font-size: 0.62rem;
+	font-weight: 650;
+	background: var(--color-tarred-bg);
+	color: var(--color-tarred);
+	border-radius: 999px;
+	padding: 0.08rem 0.45rem;
+	margin-left: 0.4rem;
+	vertical-align: 1px;
+}
+
+.e26-cand-note {
+	display: block;
+	font-size: 0.75rem;
+	color: var(--color-muted);
+	line-height: 1.4;
+	margin-top: 0.2rem;
+}
+
+.e26-race-foot {
+	font-family: var(--font-sans);
+	font-size: 0.75rem;
+	color: var(--color-muted);
+	border-top: 1px solid var(--color-border);
+	padding-top: 0.6rem;
+	margin: 1rem 0 0;
 }
 
 /* ZIP command center */
@@ -1533,9 +2148,8 @@ main > .page-header:first-child {
 	border: 1px solid var(--color-muted);
 	color: inherit;
 	font-family: var(--font-sans);
-	font-size: 0.72rem;
-	text-transform: uppercase;
-	letter-spacing: 0.06em;
+	font-size: 0.78rem;
+	font-weight: 600;
 	padding: 0.2rem 0.6rem;
 	margin-left: 0.5rem;
 	cursor: pointer;
@@ -1653,20 +2267,20 @@ main > .page-header:first-child {
 .cc-chip {
 	display: inline-block;
 	font-family: var(--font-sans);
-	font-size: 0.62rem;
-	font-weight: 700;
-	text-transform: uppercase;
-	letter-spacing: 0.08em;
-	padding: 0.15rem 0.5rem;
+	font-size: 0.7rem;
+	font-weight: 600;
+	padding: 0.15rem 0.55rem;
 	margin-bottom: 0.4rem;
-	border: 1px solid currentColor;
+	border-radius: 999px;
 }
 
 .cc-chip--live {
-	color: #1b6b2f;
+	background: var(--color-supporter-bg);
+	color: var(--color-supporter-accent);
 }
 
 .cc-chip--editorial {
+	background: var(--color-mixed-bg);
 	color: #7a5b12;
 }
 
@@ -1760,10 +2374,8 @@ main > .page-header:first-child {
 
 .cc-county-dot span {
 	display: block;
-	font-size: 0.72rem;
+	font-size: 0.75rem;
 	font-weight: 700;
-	text-transform: uppercase;
-	letter-spacing: 0.06em;
 }
 
 .cc-county-dot em {
@@ -1818,25 +2430,26 @@ main > .page-header:first-child {
 }
 
 .track-record-position {
-	font-size: 0.7rem;
-	font-weight: 700;
-	text-transform: uppercase;
-	letter-spacing: 0.05em;
-	padding: 0.1rem 0.45rem;
-	border: 1px solid currentColor;
+	font-size: 0.72rem;
+	font-weight: 600;
+	padding: 0.12rem 0.55rem;
+	border-radius: 999px;
 	white-space: nowrap;
 }
 
 .track-record-position--yea {
-	color: #1b6b2f;
+	background: var(--color-supporter-bg);
+	color: var(--color-supporter-accent);
 }
 
 .track-record-position--nay {
-	color: var(--color-accent, #c41e3a);
+	background: var(--color-tomatoes-bg);
+	color: var(--color-accent-hover);
 }
 
 .track-record-position--present,
 .track-record-position--not-voting {
+	background: var(--party-nonpartisan-bg);
 	color: var(--color-text-muted, #555);
 }
 
@@ -1887,12 +2500,12 @@ main > .page-header:first-child {
 }
 
 .what-changed-type {
-	font-size: 0.7rem;
-	font-weight: 700;
-	text-transform: uppercase;
-	letter-spacing: 0.08em;
-	border: 1px solid var(--color-border);
-	padding: 0.1rem 0.45rem;
+	font-size: 0.72rem;
+	font-weight: 600;
+	background: var(--color-tarred-bg);
+	color: var(--color-tarred);
+	border-radius: 999px;
+	padding: 0.12rem 0.55rem;
 	white-space: nowrap;
 }
 
@@ -1982,8 +2595,6 @@ main > .page-header:first-child {
 .article-meta {
 	color: var(--color-muted);
 	font-size: 0.875rem;
-	text-transform: uppercase;
-	letter-spacing: 0.04em;
 }
 
 .hero-image {
@@ -2007,10 +2618,23 @@ main > .page-header:first-child {
 
 .legislator-layout {
 	display: grid;
-	grid-template-columns: 1fr;
+	grid-template-columns: minmax(0, 1fr);
 	gap: clamp(1.5rem, 4vw, 2.5rem);
 	align-items: start;
 	width: 100%;
+}
+
+/* On one column, the person's record comes before related profiles & signup */
+.legislator-header {
+	order: 0;
+}
+
+.legislator-main {
+	order: 1;
+}
+
+.legislator-sidebar {
+	order: 2;
 }
 
 @media (min-width: 900px) {
@@ -2080,10 +2704,8 @@ main > .page-header:first-child {
 .legislator-at-a-glance-summary {
 	padding: 0.875rem 1rem;
 	font-family: var(--font-sans);
-	font-size: 0.75rem;
+	font-size: 0.85rem;
 	font-weight: 700;
-	text-transform: uppercase;
-	letter-spacing: 0.08em;
 	cursor: pointer;
 	list-style: none;
 }
@@ -2474,10 +3096,8 @@ main > .page-header:first-child {
 }
 
 .perspective-tab-label {
-	font-size: 0.875rem;
+	font-size: 0.9rem;
 	font-weight: 700;
-	text-transform: uppercase;
-	letter-spacing: 0.04em;
 	text-align: center;
 	line-height: 1.25;
 }
@@ -2485,8 +3105,6 @@ main > .page-header:first-child {
 .perspective-tab-badge {
 	font-size: 0.6875rem;
 	font-weight: 600;
-	text-transform: uppercase;
-	letter-spacing: 0.05em;
 	opacity: 0.75;
 }
 
@@ -2587,8 +3205,6 @@ main > .page-header:first-child {
 .point-source a {
 	font-size: 0.8125rem;
 	font-weight: 600;
-	text-transform: uppercase;
-	letter-spacing: 0.04em;
 	text-decoration: none;
 	border-bottom: 1px solid var(--color-black);
 }
@@ -2619,21 +3235,18 @@ main > .page-header:first-child {
 
 .point-badge {
 	display: inline-block;
-	font-size: 0.6875rem;
+	font-size: 0.72rem;
 	font-weight: 600;
-	text-transform: uppercase;
-	letter-spacing: 0.06em;
-	padding: 0.2rem 0.5rem;
+	padding: 0.16rem 0.55rem;
 	margin-bottom: 0.5rem;
-	border: 1px solid var(--color-border);
-	background: var(--color-surface);
-	color: var(--color-muted);
+	border-radius: 999px;
+	background: var(--color-tarred-bg);
+	color: var(--color-tarred);
 }
 
 .point-badge--editorial {
-	border-color: var(--color-black);
-	color: var(--color-black);
-	background: var(--color-white);
+	background: var(--color-black);
+	color: var(--color-white);
 }
 
 /* Public vote / Tar & Feather Score widget */
@@ -2902,22 +3515,20 @@ main > .page-header:first-child {
 }
 
 .community-badge {
-	font-size: 0.6875rem;
+	font-size: 0.72rem;
 	font-weight: 600;
-	text-transform: uppercase;
-	letter-spacing: 0.06em;
-	padding: 0.2rem 0.5rem;
-	border: 1px solid var(--color-border);
+	padding: 0.16rem 0.55rem;
+	border-radius: 999px;
+	background: var(--party-nonpartisan-bg);
+	color: var(--color-muted);
 }
 
 .community-badge--verified {
-	border-color: var(--color-tomatoes);
 	color: var(--color-tomatoes);
 	background: var(--color-tomatoes-bg);
 }
 
 .community-badge--unverified {
-	border-color: var(--color-mixed);
 	color: var(--color-mixed);
 	background: var(--color-mixed-bg);
 }
@@ -2945,10 +3556,8 @@ main > .page-header:first-child {
 }
 
 .community-submission-type {
-	font-size: 0.75rem;
+	font-size: 0.78rem;
 	font-weight: 700;
-	text-transform: uppercase;
-	letter-spacing: 0.06em;
 }
 
 .community-submission-item--highlight .community-submission-type {

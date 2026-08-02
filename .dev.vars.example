@@ -13,6 +13,10 @@ DEV_SKIP_TURNSTILE=false
 # OpenStates key: free at https://openstates.org/accounts/profile/
 CONGRESS_GOV_API_KEY=
 OPENSTATES_API_KEY=
+# Google Civic Information API (address → districts, polling places, ballots).
+# Create a project at https://console.cloud.google.com/, enable "Google Civic
+# Information API", and create an API key. Free: 25,000 queries/day.
+GOOGLE_CIVIC_API_KEY=
 # Bearer token for POST /api/admin/sync (manual backfill). Any long random string.
 SYNC_TRIGGER_TOKEN=local-dev-sync-token
 # 'true' = fetch and log but write only the sync_runs audit row

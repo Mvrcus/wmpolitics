@@ -6,6 +6,7 @@ district: "Michigan House District 86 (Holland area)"
 seatSlug: mi-state-house-86
 seatLabel: State House District 86
 status: current
+termStart: 2023
 party: Republican
 photo: /images/nancy-deboer.jpg
 photoIsOfficial: true
@@ -58,6 +59,18 @@ sources:
     url: https://gophouse.org/member/RepNancyDeBoer/about
   - label: Ballotpedia
     url: https://ballotpedia.org/Nancy_De_Boer
+publicOpinion:
+  score: 56
+  basis: election
+  confidence: high
+  asOf: "2026-07"
+  detail: >-
+    Re-elected November 2024 with 56.1% (27,711–21,685) over Democrat Abby
+    Klomparens, nearly matching her 56.2% in 2022; she is on the ballot again
+    in November 2026.
+  sources:
+    - label: Ballotpedia — Nancy De Boer
+      url: https://ballotpedia.org/Nancy_De_Boer
 ---
 
 Nancy DeBoer represents the City of Holland, most of Holland Township, and Park and Laketown townships in Allegan and Ottawa counties.
