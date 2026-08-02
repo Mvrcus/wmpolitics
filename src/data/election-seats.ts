@@ -44,6 +44,7 @@ export const LEVELS: Level[] = [
 			{
 				seat: 'U.S. Senate — senior seat',
 				official: 'Gary Peters',
+				slug: 'gary-peters',
 				party: 'D',
 				term: '6 years',
 				nextElection: 'Nov 2026',
@@ -53,6 +54,7 @@ export const LEVELS: Level[] = [
 			{
 				seat: 'U.S. Senate — junior seat',
 				official: 'Elissa Slotkin',
+				slug: 'elissa-slotkin',
 				party: 'D',
 				term: '6 years',
 				nextElection: 'Nov 2030',
@@ -91,6 +93,7 @@ export const LEVELS: Level[] = [
 			{
 				seat: 'State House — District 85 (Holland Twp / Zeeland)',
 				official: 'Bradley Slagh',
+				slug: 'bradley-slagh',
 				party: 'R',
 				term: '2 years',
 				nextElection: 'Nov 2026',
@@ -100,6 +103,7 @@ export const LEVELS: Level[] = [
 			{
 				seat: 'State Senate — District 31 (Ottawa County)',
 				official: 'Roger Victory',
+				slug: 'roger-victory',
 				party: 'R',
 				term: '4 years',
 				nextElection: 'Nov 2026',
@@ -118,6 +122,7 @@ export const LEVELS: Level[] = [
 			{
 				seat: 'Sheriff',
 				official: 'Eric DeBoer',
+				slug: 'eric-deboer',
 				party: 'R',
 				term: '4 years',
 				nextElection: 'Nov 2028',
@@ -126,6 +131,7 @@ export const LEVELS: Level[] = [
 			{
 				seat: 'Prosecuting Attorney',
 				official: 'Sarah F. Matwiejczyk',
+				slug: 'sarah-matwiejczyk',
 				party: 'R',
 				term: '4 years',
 				nextElection: 'Nov 2028',
@@ -134,6 +140,7 @@ export const LEVELS: Level[] = [
 			{
 				seat: 'County Clerk / Register of Deeds',
 				official: 'Justin F. Roebuck',
+				slug: 'justin-roebuck',
 				party: 'R',
 				term: '4 years',
 				nextElection: 'Nov 2028',
@@ -142,6 +149,7 @@ export const LEVELS: Level[] = [
 			{
 				seat: 'County Treasurer',
 				official: 'Cheryl Clark',
+				slug: 'cheryl-clark',
 				party: 'R',
 				term: '4 years',
 				nextElection: 'Nov 2028',
@@ -150,6 +158,7 @@ export const LEVELS: Level[] = [
 			{
 				seat: 'County Commission — District 1',
 				official: 'Jim Barry',
+				slug: 'jim-barry',
 				party: 'R',
 				term: '4 years',
 				nextElection: 'Nov 2028',
@@ -195,6 +204,7 @@ export const LEVELS: Level[] = [
 			{
 				seat: 'City Manager',
 				official: 'Keith Van Beek',
+				slug: 'keith-van-beek',
 				term: 'Appointed',
 				nextElection: '—',
 				termLimits: '—',
