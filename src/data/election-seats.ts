@@ -11,6 +11,11 @@ export interface Candidate {
 	incumbent?: boolean;
 	/** One-line context: who they are, endorsements, campaign status. */
 	note?: string;
+	/**
+	 * Candidate profile slug (links to /candidates/<slug>/). Incumbents omit
+	 * this — their name links to the officeholder profile via the seat's `slug`.
+	 */
+	slug?: string;
 }
 
 export interface Seat {
@@ -61,10 +66,10 @@ export const LEVELS: Level[] = [
 				raceNote: 'Huizenga faces a primary challenge from a former Holland mayor.',
 				candidates: [
 					{ name: 'Bill Huizenga', party: 'R', incumbent: true, note: 'Seeking a 9th term.' },
-					{ name: 'Phil Tanis', party: 'R', note: 'Former Holland mayor.' },
-					{ name: 'Sean McCann', party: 'D', note: 'Term-limited state senator from Kalamazoo; endorsed by Gov. Whitmer.' },
-					{ name: 'Richard Aaron', party: 'D' },
-					{ name: 'Diop Harris', party: 'D' },
+					{ name: 'Phil Tanis', party: 'R', note: 'Former Holland mayor.', slug: 'phil-tanis' },
+					{ name: 'Sean McCann', party: 'D', note: 'Term-limited state senator from Kalamazoo; endorsed by Gov. Whitmer.', slug: 'sean-mccann' },
+					{ name: 'Richard Aaron', party: 'D', slug: 'richard-aaron' },
+					{ name: 'Diop Harris', party: 'D', slug: 'diop-harris' },
 				],
 			},
 			{
@@ -79,9 +84,9 @@ export const LEVELS: Level[] = [
 				note: 'Class 2 seat.',
 				raceNote: 'Open seat — Peters is retiring.',
 				candidates: [
-					{ name: 'Haley Stevens', party: 'D', note: 'U.S. representative from Oakland County.' },
-					{ name: 'Abdul El-Sayed', party: 'D', note: 'Physician, former Wayne County health director.' },
-					{ name: 'Mike Rogers', party: 'R', note: 'Former U.S. representative; unopposed in the primary.' },
+					{ name: 'Haley Stevens', party: 'D', note: 'U.S. representative from Oakland County.', slug: 'haley-stevens' },
+					{ name: 'Abdul El-Sayed', party: 'D', note: 'Physician, former Wayne County health director.', slug: 'abdul-el-sayed' },
+					{ name: 'Mike Rogers', party: 'R', note: 'Former U.S. representative; unopposed in the primary.', slug: 'mike-rogers' },
 				],
 			},
 			{
@@ -116,10 +121,10 @@ export const LEVELS: Level[] = [
 				note: 'Term-limited — Nov 2026 elects a new governor.',
 				raceNote: 'Open seat — Whitmer is term-limited.',
 				candidates: [
-					{ name: 'Jocelyn Benson', party: 'D', note: 'Michigan Secretary of State.' },
-					{ name: 'Chris Swanson', party: 'D', note: 'Genesee County sheriff.' },
-					{ name: 'John James', party: 'R', note: 'U.S. representative; endorsed by President Trump.' },
-					{ name: 'Perry Johnson', party: 'R', note: 'Businessman.' },
+					{ name: 'Jocelyn Benson', party: 'D', note: 'Michigan Secretary of State.', slug: 'jocelyn-benson' },
+					{ name: 'Chris Swanson', party: 'D', note: 'Genesee County sheriff.', slug: 'chris-swanson' },
+					{ name: 'John James', party: 'R', note: 'U.S. representative; endorsed by President Trump.', slug: 'john-james' },
+					{ name: 'Perry Johnson', party: 'R', note: 'Businessman.', slug: 'perry-johnson' },
 				],
 			},
 			{
@@ -135,7 +140,7 @@ export const LEVELS: Level[] = [
 				raceNote: 'Both candidates are unopposed in the primary — the November matchup is set.',
 				candidates: [
 					{ name: 'Nancy DeBoer', party: 'R', incumbent: true, note: 'Seeking a 3rd term.' },
-					{ name: 'Joseph McClusky', party: 'D', note: 'Managed the 2022 campaign against DeBoer.' },
+					{ name: 'Joseph McClusky', party: 'D', note: 'Managed the 2022 campaign against DeBoer.', slug: 'joseph-mcclusky' },
 				],
 			},
 			{
@@ -164,11 +169,11 @@ export const LEVELS: Level[] = [
 				note: 'Runs in the same years as the governor.',
 				raceNote: 'Open seat — Victory is term-limited.',
 				candidates: [
-					{ name: 'Kevin Maas', party: 'R' },
-					{ name: 'Michael Markey Jr.', party: 'R' },
-					{ name: 'John Wetzel', party: 'R' },
-					{ name: 'Chris Kleinjans', party: 'D' },
-					{ name: 'Keagan Host', party: 'D' },
+					{ name: 'Kevin Maas', party: 'R', slug: 'kevin-maas' },
+					{ name: 'Michael Markey Jr.', party: 'R', slug: 'michael-markey' },
+					{ name: 'John Wetzel', party: 'R', slug: 'john-wetzel' },
+					{ name: 'Chris Kleinjans', party: 'D', slug: 'chris-kleinjans' },
+					{ name: 'Keagan Host', party: 'D', slug: 'keagan-host' },
 				],
 			},
 		],

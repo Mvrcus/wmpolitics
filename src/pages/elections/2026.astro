@@ -6,6 +6,7 @@ import Footer from '../../components/Footer.astro';
 import { SITE_TITLE } from '../../consts';
 import { LEVELS } from '../../data/election-seats';
 import type { Seat, Candidate } from '../../data/election-seats';
+import { candidateHref } from '../../lib/elections';
 
 const title = `The 2026 Ballot | ${SITE_TITLE}`;
 const description =
@@ -151,10 +152,11 @@ function incumbentPhoto(seat: Seat, cand: Candidate): string | undefined {
 															</span>
 														</>
 													);
+													const href = candidateHref(cand, seat);
 													return (
 														<li>
-															{cand.incumbent && seat.slug ? (
-																<a class="e26-cand e26-cand--link" href={`/legislators/${seat.slug}/`}>
+															{href ? (
+																<a class="e26-cand e26-cand--link" href={href}>
 																	{body}
 																</a>
 															) : (

@@ -75,6 +75,23 @@ const legislators = defineCollection({
 	}),
 });
 
+const candidates = defineCollection({
+	loader: glob({ base: "./src/content/candidates", pattern: "**/*.{md,mdx}" }),
+	schema: z.object({
+		name: z.string(),
+		slug: z.string(),
+		party: z.string().optional(),
+		/** Joins the candidate to their race in src/data/election-seats.ts. */
+		seatSlug: z.string(),
+		/** One-line who-they-are, used on cards and as the page description. */
+		summary: z.string(),
+		website: z.string().optional(),
+		sources: z.array(sourceSchema).optional(),
+		/** Date the profile content was last editorially reviewed. */
+		lastReviewed: z.coerce.date().optional(),
+	}),
+});
+
 const articles = defineCollection({
 	loader: glob({ base: "./src/content/articles", pattern: "**/*.{md,mdx}" }),
 	schema: z.object({
@@ -89,4 +106,4 @@ const articles = defineCollection({
 	}),
 });
 
-export const collections = { legislators, articles };
+export const collections = { legislators, candidates, articles };

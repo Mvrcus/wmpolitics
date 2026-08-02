@@ -5,6 +5,7 @@ import CivicLookup from '../../components/CivicLookup.astro';
 import Footer from '../../components/Footer.astro';
 import { SITE_TITLE } from '../../consts';
 import { LEVELS } from '../../data/election-seats';
+import { candidateHref } from '../../lib/elections';
 
 const title = `Who Runs When | ${SITE_TITLE}`;
 const description =
@@ -139,7 +140,11 @@ const PARTY_LABEL: Record<string, string> = { R: 'Republican', D: 'Democrat', I:
 														<ul class="race-row-candidates">
 															{seat.candidates.map((cand) => (
 																<li title={cand.note}>
-																	{cand.name}
+																	{candidateHref(cand, seat) ? (
+																		<a href={candidateHref(cand, seat)}>{cand.name}</a>
+																	) : (
+																		cand.name
+																	)}
 																	{cand.party && (
 																		<span
 																			class:list={['party-mark', `party-mark--${cand.party.toLowerCase()}`]}
@@ -153,6 +158,9 @@ const PARTY_LABEL: Record<string, string> = { R: 'Republican', D: 'Democrat', I:
 																</li>
 															))}
 														</ul>
+														<a class="race-row-more" href={`/elections/2026/#${seat.seatSlug}`}>
+															Full race guide →
+														</a>
 													</td>
 												</tr>
 											)}
@@ -376,6 +384,14 @@ const PARTY_LABEL: Record<string, string> = { R: 'Republican', D: 'Democrat', I:
 		background: var(--color-surface);
 		font-size: 0.85rem;
 		border-top: none;
+	}
+
+	.race-row-more {
+		display: inline-block;
+		margin-top: 0.5rem;
+		font-family: var(--font-sans);
+		font-size: 0.8rem;
+		font-weight: 700;
 	}
 
 	.race-row-label {

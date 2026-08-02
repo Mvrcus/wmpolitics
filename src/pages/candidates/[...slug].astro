@@ -1,0 +1,386 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseHead from '../../components/BaseHead.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import StructuredData from '../../components/StructuredData.astro';
+import { SITE_TITLE, SITE_URL } from '../../consts';
+import { findRace, candidateHref } from '../../lib/elections';
+import { partyInfo } from '../../lib/party';
+
+export async function getStaticPaths() {
+	const candidates = await getCollection('candidates');
+	return candidates.map((entry) => ({
+		params: { slug: entry.data.slug },
+		props: { entry },
+	}));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const d = entry.data;
+const pageTitle = `${d.name} | ${SITE_TITLE}`;
+const pageUrl = new URL(`/candidates/${d.slug}/`, SITE_URL).href;
+const partyIdentity = partyInfo(d.party);
+
+const race = findRace(d.seatSlug);
+const seat = race?.seat;
+const me = seat?.candidates?.find((c) => c.slug === d.slug);
+
+// Everyone else in the race, split into "your primary" and "the other side".
+const rivals = (seat?.candidates ?? []).filter((c) => c.slug !== d.slug);
+const sameParty = rivals.filter((c) => c.party && me?.party && c.party === me.party);
+const otherParty = rivals.filter((c) => !c.party || !me?.party || c.party !== me.party);
+
+// The current holder of the seat being contested (may also be a candidate).
+const legislators = await getCollection('legislators');
+const holder = legislators.find(
+	(l) => l.data.seatSlug === d.seatSlug && l.data.status === 'current',
+);
+const holderIsRunning = (seat?.candidates ?? []).some((c) => c.incumbent);
+
+const primaryLabel = d.party === 'Republican' ? 'Republican' : 'Democratic';
+
+function initials(name: string): string {
+	return name
+		.split(/\s+/)
+		.filter((w) => /^[A-Z]/.test(w))
+		.slice(0, 2)
+		.map((w) => w[0])
+		.join('');
+}
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<BaseHead title={pageTitle} description={d.summary} />
+		<StructuredData
+			data={{
+				'@context': 'https://schema.org',
+				'@type': 'Person',
+				name: d.name,
+				description: d.summary,
+				url: pageUrl,
+				...(d.party && {
+					affiliation: { '@type': 'Organization', name: `${d.party} Party` },
+				}),
+			}}
+		/>
+	</head>
+	<body>
+		<Header />
+		<main>
+			<header class="page-header candidate-header">
+				<div
+					class:list={['candidate-face', partyIdentity && `candidate-face--${partyIdentity.key}`]}
+					aria-hidden="true"
+				>
+					{initials(d.name)}
+				</div>
+				<div class="candidate-header-text">
+					<div class="card-meta">
+						<span class="category-label">2026 candidate</span>
+						{d.party && (
+							<span
+								class:list={[
+									'category-label',
+									partyIdentity?.key === 'democrat' && 'badge-party-d',
+									partyIdentity?.key === 'republican' && 'badge-party-r',
+								]}
+							>
+								{d.party}
+							</span>
+						)}
+						{race && <span class="category-label">{race.level.label}</span>}
+					</div>
+					<h1>{d.name}</h1>
+					<p class="hero-lead">{d.summary}</p>
+					{seat && (
+						<p class="candidate-running-for">
+							Running for <a href={`/elections/2026/#${seat.seatSlug}`}>{seat.seat}</a>
+							{me?.note && <span class="candidate-note"> · {me.note}</span>}
+						</p>
+					)}
+				</div>
+			</header>
+
+			<section class="section">
+				<div class="prose">
+					<Content />
+				</div>
+			</section>
+
+			{
+				seat && (
+					<section class="section">
+						<div class="section-header">
+							<h2>The race</h2>
+							<a href={`/elections/2026/#${seat.seatSlug}`}>Full race guide</a>
+						</div>
+						<div class="race-facts">
+							<div class="race-fact">
+								<span class="race-fact-label">Seat</span>
+								<a href={`/learn/elections/#${seat.seatSlug}`}>{seat.seat}</a>
+							</div>
+							<div class="race-fact">
+								<span class="race-fact-label">Currently held by</span>
+								{holder ? (
+									<a href={`/legislators/${holder.data.slug}/`}>{seat.official}</a>
+								) : (
+									seat.official
+								)}
+								{holderIsRunning
+									? ' — running for re-election'
+									: seat.raceNote?.toLowerCase().includes('open seat')
+										? ' — not running again'
+										: ''}
+							</div>
+							<div class="race-fact">
+								<span class="race-fact-label">Term</span>
+								{seat.term} · term limits: {seat.termLimits.toLowerCase()}
+							</div>
+							{seat.raceNote && (
+								<div class="race-fact">
+									<span class="race-fact-label">The story</span>
+									{seat.raceNote}
+								</div>
+							)}
+						</div>
+
+						{sameParty.length > 0 && (
+							<div class="rival-group">
+								<h3>{me?.party ? `Also in the ${primaryLabel} primary` : 'Also running'}</h3>
+								<ul class="rival-list">
+									{sameParty.map((c) => {
+										const href = candidateHref(c, seat);
+										return (
+											<li>
+												{href ? <a href={href}>{c.name}</a> : c.name}
+												{c.incumbent && <span class="rival-inc">Incumbent</span>}
+												{c.note && <span class="rival-note">{c.note}</span>}
+											</li>
+										);
+									})}
+								</ul>
+							</div>
+						)}
+						{otherParty.length > 0 && (
+							<div class="rival-group">
+								<h3>Possible November opponents</h3>
+								<ul class="rival-list">
+									{otherParty.map((c) => {
+										const href = candidateHref(c, seat);
+										return (
+											<li>
+												{href ? <a href={href}>{c.name}</a> : c.name}
+												{c.party && <span class="rival-party">({c.party})</span>}
+												{c.incumbent && <span class="rival-inc">Incumbent</span>}
+												{c.note && <span class="rival-note">{c.note}</span>}
+											</li>
+										);
+									})}
+								</ul>
+							</div>
+						)}
+					</section>
+				)
+			}
+
+			<section class="section">
+				<div class="candidate-dates">
+					<div class="candidate-date">
+						<span class="candidate-date-label">Primary</span>
+						<span class="candidate-date-num">Aug 4, 2026</span>
+					</div>
+					<div class="candidate-date">
+						<span class="candidate-date-label">General</span>
+						<span class="candidate-date-num">Nov 3, 2026</span>
+					</div>
+					<div class="candidate-date-links">
+						<a href="/elections/2026/" class="btn btn-primary">See the full 2026 ballot</a>
+						<a
+							href="https://mvic.sos.state.mi.us/"
+							class="text-link"
+							target="_blank"
+							rel="noopener noreferrer"
+						>
+							Register / check your ballot
+						</a>
+					</div>
+				</div>
+				<p class="cc-source candidate-disclaimer">
+					Candidate profiles are non-endorsements: every candidate in a covered race gets one, and we
+					publish only what we can verify — <a href="/about/">how we cover races</a>.
+				</p>
+			</section>
+		</main>
+		<Footer />
+	</body>
+</html>
+
+<style>
+	.candidate-header {
+		display: flex;
+		gap: 1.5rem;
+		align-items: flex-start;
+	}
+
+	.candidate-face {
+		flex-shrink: 0;
+		width: 5.5rem;
+		height: 5.5rem;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		border: 2px solid var(--color-black);
+		background: var(--color-surface);
+		font-family: var(--font-serif);
+		font-size: 1.8rem;
+		font-weight: 700;
+		box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.1);
+	}
+
+	.candidate-face--republican {
+		color: var(--party-republican);
+	}
+
+	.candidate-face--democrat {
+		color: var(--party-democrat);
+	}
+
+	.candidate-header-text {
+		min-width: 0;
+	}
+
+	.candidate-running-for {
+		font-family: var(--font-sans);
+		font-size: 0.95rem;
+		font-weight: 600;
+		margin: 0.75rem 0 0;
+	}
+
+	.candidate-note {
+		font-weight: 400;
+		color: var(--color-muted);
+	}
+
+	.race-facts {
+		border: 2px solid var(--color-black);
+		background: var(--color-white);
+		padding: 1.25rem;
+		display: grid;
+		gap: 0.85rem;
+		max-width: 44rem;
+		font-family: var(--font-sans);
+		font-size: 0.95rem;
+	}
+
+	.race-fact-label {
+		display: block;
+		font-size: 0.7rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.08em;
+		color: var(--color-muted);
+		margin-bottom: 0.15rem;
+	}
+
+	.rival-group {
+		margin-top: 1.5rem;
+	}
+
+	.rival-group h3 {
+		font-family: var(--font-sans);
+		font-size: 0.8125rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.06em;
+		color: var(--color-accent);
+		margin: 0 0 0.6rem;
+	}
+
+	.rival-list {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 0.4rem;
+		font-family: var(--font-sans);
+		font-size: 0.95rem;
+	}
+
+	.rival-list a {
+		font-weight: 600;
+	}
+
+	.rival-party {
+		margin-left: 0.35rem;
+		color: var(--color-muted);
+	}
+
+	.rival-inc {
+		margin-left: 0.5rem;
+		font-size: 0.65rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.06em;
+		border: 1px solid var(--color-black);
+		padding: 0.1rem 0.35rem;
+	}
+
+	.rival-note {
+		display: block;
+		font-size: 0.85rem;
+		color: var(--color-muted);
+	}
+
+	.candidate-dates {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 1.5rem;
+		border: 2px solid var(--color-black);
+		background: var(--color-surface);
+		padding: 1.25rem;
+	}
+
+	.candidate-date-label {
+		display: block;
+		font-family: var(--font-sans);
+		font-size: 0.7rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.08em;
+		color: var(--color-muted);
+	}
+
+	.candidate-date-num {
+		font-family: var(--font-serif);
+		font-size: 1.3rem;
+		font-weight: 700;
+	}
+
+	.candidate-date-links {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 1rem;
+		margin-left: auto;
+	}
+
+	.candidate-disclaimer {
+		margin-top: 1rem;
+	}
+
+	@media (max-width: 720px) {
+		.candidate-header {
+			flex-direction: column;
+		}
+
+		.candidate-date-links {
+			margin-left: 0;
+		}
+	}
+</style>
