@@ -1,15 +1,37 @@
 ---
+import BallotReminder from '../../components/BallotReminder.astro';
 import BaseHead from '../../components/BaseHead.astro';
 import Header from '../../components/Header.astro';
 import CivicLookup from '../../components/CivicLookup.astro';
 import Footer from '../../components/Footer.astro';
+import StructuredData from '../../components/StructuredData.astro';
 import { SITE_TITLE } from '../../consts';
 import { LEVELS } from '../../data/election-seats';
 import { candidateHref } from '../../lib/elections';
 
-const title = `Who Runs When | ${SITE_TITLE}`;
+const title = `Election Dates, Terms & Term Limits — Holland & Ottawa County, MI | ${SITE_TITLE}`;
 const description =
-	'Every seat that represents Holland — who holds it, how long the term is, when it is next on your ballot, and the term-limit rules, from City Hall to Washington.';
+	'When is the next election in Holland, Michigan? Every seat that represents Holland and Ottawa County — who holds it, term lengths, the next election date for each, and Michigan term-limit rules, from City Hall to Washington.';
+
+// Visible FAQ below; the FAQPage JSON-LD must mirror it word for word.
+const FAQ = [
+	{
+		q: 'When is the next election in Holland, Michigan?',
+		a: 'The next elections are in 2026: the Michigan primary on Tuesday, August 4 and the general election on Tuesday, November 3. Federal and state seats — governor, U.S. Senate, U.S. House, and both Holland-area state legislative districts — are on that ballot. Holland city offices (mayor and council) run in odd-numbered years, next in November 2027.',
+	},
+	{
+		q: 'When is the Ottawa County sheriff next up for election?',
+		a: 'November 2028. Most key Ottawa County offices — sheriff, prosecutor, clerk, treasurer, and county commissioners — serve 4-year terms aligned with presidential election years.',
+	},
+	{
+		q: 'What are Michigan’s term limits for state legislators?',
+		a: 'Under Proposal 1 (2022), Michigan lawmakers may serve a combined maximum of 12 years in the Legislature, split any way between the State House and State Senate. The governor is separately limited to two 4-year terms.',
+	},
+	{
+		q: 'Why is the August primary such a big deal here?',
+		a: 'In areas where one party wins the general election consistently, the primary effectively decides who holds the seat — and Michigan August primaries historically draw only about a fifth of registered voters. A primary vote here often carries more weight than a November one.',
+	},
+];
 
 // Roll the seat data up into "next chances to vote" — one card per upcoming
 // November, listing what's on that ballot.
@@ -35,6 +57,17 @@ const PARTY_LABEL: Record<string, string> = { R: 'Republican', D: 'Democrat', I:
 <html lang="en">
 	<head>
 		<BaseHead title={title} description={description} />
+		<StructuredData
+			data={{
+				'@context': 'https://schema.org',
+				'@type': 'FAQPage',
+				mainEntity: FAQ.map((item) => ({
+					'@type': 'Question',
+					name: item.q,
+					acceptedAnswer: { '@type': 'Answer', text: item.a },
+				})),
+			}}
+		/>
 	</head>
 	<body>
 		<Header />
@@ -175,6 +208,24 @@ const PARTY_LABEL: Record<string, string> = { R: 'Republican', D: 'Democrat', I:
 					</section>
 				))
 			}
+
+			<section class="section">
+				<div class="section-header">
+					<h2>Quick answers</h2>
+				</div>
+				<dl class="faq-list">
+					{
+						FAQ.map((item) => (
+							<div class="faq-item">
+								<dt>{item.q}</dt>
+								<dd>{item.a}</dd>
+							</div>
+						))
+					}
+				</dl>
+			</section>
+
+			<BallotReminder />
 
 			<section class="section">
 				<div class="prose">
@@ -455,6 +506,35 @@ const PARTY_LABEL: Record<string, string> = { R: 'Republican', D: 'Democrat', I:
 
 	.cycle-note strong {
 		color: var(--color-black);
+	}
+
+	.faq-list {
+		margin: 0;
+		max-width: 48rem;
+	}
+
+	.faq-item {
+		border-bottom: 1px solid var(--color-border);
+		padding: 1rem 0;
+	}
+
+	.faq-item:first-child {
+		border-top: 2px solid var(--color-black);
+	}
+
+	.faq-item dt {
+		font-family: var(--font-serif);
+		font-size: 1.05rem;
+		font-weight: 700;
+		margin: 0 0 0.4rem;
+	}
+
+	.faq-item dd {
+		font-family: var(--font-sans);
+		font-size: 0.9rem;
+		line-height: 1.6;
+		color: var(--color-muted);
+		margin: 0;
 	}
 
 	/* On narrow screens the table stacks: each row becomes a card — seat name

@@ -1,5 +1,6 @@
 ---
 import { getCollection, render } from 'astro:content';
+import BallotReminder from '../../components/BallotReminder.astro';
 import BaseHead from '../../components/BaseHead.astro';
 import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
@@ -19,12 +20,14 @@ export async function getStaticPaths() {
 const { entry } = Astro.props;
 const { Content } = await render(entry);
 const d = entry.data;
-const pageTitle = `${d.name} | ${SITE_TITLE}`;
 const pageUrl = new URL(`/candidates/${d.slug}/`, SITE_URL).href;
 const partyIdentity = partyInfo(d.party);
 
 const race = findRace(d.seatSlug);
 const seat = race?.seat;
+const pageTitle = seat
+	? `${d.name} — 2026 Candidate, ${seat.seat} | ${SITE_TITLE}`
+	: `${d.name} | ${SITE_TITLE}`;
 const me = seat?.candidates?.find((c) => c.slug === d.slug);
 
 // Everyone else in the race, split into "your primary" and "the other side".
@@ -250,6 +253,8 @@ function initials(name: string): string {
 					publish only what we can verify — <a href="/about/">how we cover races</a>.
 				</p>
 			</section>
+
+			<BallotReminder />
 		</main>
 		<Footer />
 	</body>

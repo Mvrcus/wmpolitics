@@ -3,14 +3,16 @@ import { getCollection } from 'astro:content';
 import BaseHead from '../../components/BaseHead.astro';
 import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
-import { SITE_TITLE } from '../../consts';
+import StructuredData from '../../components/StructuredData.astro';
+import BallotReminder from '../../components/BallotReminder.astro';
+import { SITE_TITLE, SITE_URL } from '../../consts';
 import { LEVELS } from '../../data/election-seats';
 import type { Seat, Candidate } from '../../data/election-seats';
 import { candidateHref } from '../../lib/elections';
 
-const title = `The 2026 Ballot | ${SITE_TITLE}`;
+const title = `2026 Holland & Ottawa County Ballot: Who's Running | ${SITE_TITLE}`;
 const description =
-	'Every seat Holland and Ottawa County vote on in 2026, who is running for each, and the two dates that decide it — the Aug 4 primary and the Nov 3 general.';
+	'Who is running in the 2026 Michigan elections in Holland and Ottawa County — every race for governor, U.S. Senate, Congress, and the state legislature, plus the Aug 4 primary and Nov 3 general election dates.';
 
 // Every 2026 race with a declared field, in ladder order (federal → state).
 const races: Array<{ levelLabel: string; seat: Seat }> = LEVELS.flatMap((level) =>
@@ -73,6 +75,50 @@ function candidatePhoto(seat: Seat, cand: Candidate): string | undefined {
 <html lang="en">
 	<head>
 		<BaseHead title={title} description={description} />
+		<StructuredData
+			data={[
+				{
+					'@context': 'https://schema.org',
+					'@type': 'Event',
+					name: 'Michigan Primary Election 2026 (Holland / Ottawa County)',
+					startDate: '2026-08-04',
+					eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
+					eventStatus: 'https://schema.org/EventScheduled',
+					location: {
+						'@type': 'Place',
+						name: 'Polling places in Ottawa County, Michigan',
+						address: { '@type': 'PostalAddress', addressRegion: 'MI', addressCountry: 'US' },
+					},
+					description:
+						'Primary election deciding each party’s nominees for governor, U.S. Senate, U.S. House, and the Michigan Legislature.',
+					url: new URL('/elections/2026/', SITE_URL).href,
+				},
+				{
+					'@context': 'https://schema.org',
+					'@type': 'Event',
+					name: 'Michigan General Election 2026 (Holland / Ottawa County)',
+					startDate: '2026-11-03',
+					eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
+					eventStatus: 'https://schema.org/EventScheduled',
+					location: {
+						'@type': 'Place',
+						name: 'Polling places in Ottawa County, Michigan',
+						address: { '@type': 'PostalAddress', addressRegion: 'MI', addressCountry: 'US' },
+					},
+					description:
+						'General election for Michigan governor, U.S. Senate, U.S. House, and the Michigan Legislature.',
+					url: new URL('/elections/2026/', SITE_URL).href,
+				},
+				{
+					'@context': 'https://schema.org',
+					'@type': 'BreadcrumbList',
+					itemListElement: [
+						{ '@type': 'ListItem', position: 1, name: 'Home', item: SITE_URL },
+						{ '@type': 'ListItem', position: 2, name: '2026 Ballot', item: new URL('/elections/2026/', SITE_URL).href },
+					],
+				},
+			]}
+		/>
 	</head>
 	<body>
 		<Header />
@@ -184,6 +230,8 @@ function candidatePhoto(seat: Seat, cand: Candidate): string | undefined {
 					}
 				</div>
 			</section>
+
+			<BallotReminder />
 
 			<section class="section">
 				<div class="section-header">

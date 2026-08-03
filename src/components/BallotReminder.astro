@@ -1,0 +1,120 @@
+---
+/**
+ * High-salience subscribe block for election pages. The persuasion here is
+ * deliberate but honest: a live countdown (urgency), real turnout context
+ * (loss aversion — primaries are decided by the few who show up), a narrow
+ * concrete promise (one email per election, not a newsletter firehose), and
+ * an explicit exit (unsubscribe anytime). No fake scarcity, no invented
+ * subscriber counts.
+ */
+import NewsletterSignup from './NewsletterSignup.astro';
+---
+
+<section class="section" aria-label="Election reminder signup">
+	<div class="ballot-reminder">
+		<p class="ballot-reminder-countdown" data-election-countdown>
+			The Aug 4 primary and Nov 3 general decide every race on this page.
+		</p>
+		<h2>Don't let 1 in 5 neighbors decide for you</h2>
+		<p class="ballot-reminder-copy">
+			August primaries in Michigan historically draw only around a fifth of registered voters —
+			and in races this one-sided, the primary usually <em>is</em> the election. The people who
+			show up pick for everyone else.
+		</p>
+		<p class="ballot-reminder-promise">
+			<strong>One short email before each election you can vote in.</strong> Your dates, your
+			races, what changed since you last looked. No daily noise, no fundraising asks, unsubscribe
+			anytime.
+		</p>
+		<NewsletterSignup compact />
+		<p class="ballot-reminder-return">
+			Between emails, this page keeps moving: candidates drop out, filings close, and winners get
+			marked as results come in. Worth a bookmark.
+		</p>
+	</div>
+</section>
+
+<script>
+	// Sharpen the countdown line with live urgency; falls back to static copy.
+	const el = document.querySelector<HTMLElement>('[data-election-countdown]');
+	if (el) {
+		const now = Date.now();
+		const primary = new Date('2026-08-04T00:00:00').getTime();
+		const general = new Date('2026-11-03T00:00:00').getTime();
+		const days = (t: number) => Math.ceil((t - now) / 86_400_000);
+		if (now < primary) {
+			const d = days(primary);
+			el.textContent =
+				d === 0
+					? 'The primary is TODAY. Polls are open 7am–8pm.'
+					: `The primary is ${d === 1 ? 'tomorrow' : `${d} days away`} — most of your neighbors haven't looked at this ballot yet.`;
+		} else if (now < general) {
+			el.textContent = `Primary results are in — the November matchups are set. The general election is ${days(general)} days away.`;
+		} else {
+			el.textContent = 'The 2026 races are decided — see who won, and when each seat is up next.';
+		}
+	}
+</script>
+
+<style>
+	.ballot-reminder {
+		border: 2px solid var(--color-black);
+		background: var(--color-surface-dark, #111);
+		color: var(--color-white);
+		padding: 2rem clamp(1.25rem, 4vw, 2.5rem);
+		box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.15);
+	}
+
+	.ballot-reminder-countdown {
+		font-family: var(--font-sans);
+		font-size: 0.75rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.1em;
+		color: var(--color-accent);
+		margin: 0 0 0.6rem;
+	}
+
+	.ballot-reminder h2 {
+		font-family: var(--font-serif);
+		color: var(--color-white);
+		font-size: clamp(1.4rem, 3.5vw, 1.9rem);
+		margin: 0 0 0.75rem;
+	}
+
+	.ballot-reminder-copy,
+	.ballot-reminder-promise {
+		font-family: var(--font-sans);
+		font-size: 0.95rem;
+		line-height: 1.6;
+		max-width: 46rem;
+		margin: 0 0 0.9rem;
+		color: rgba(255, 255, 255, 0.85);
+	}
+
+	.ballot-reminder-promise strong {
+		color: var(--color-white);
+	}
+
+	.ballot-reminder-return {
+		font-family: var(--font-sans);
+		font-size: 0.85rem;
+		line-height: 1.5;
+		margin: 1rem 0 0;
+		color: rgba(255, 255, 255, 0.6);
+	}
+
+	.ballot-reminder :global(.newsletter) {
+		max-width: 34rem;
+	}
+
+	.ballot-reminder :global(.newsletter input[type='email']),
+	.ballot-reminder :global(.newsletter input[type='text']) {
+		border-color: transparent;
+	}
+
+	.ballot-reminder :global(.newsletter.compact .newsletter-fields) {
+		flex-direction: row;
+		flex-wrap: wrap;
+	}
+</style>
