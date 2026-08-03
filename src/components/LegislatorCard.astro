@@ -78,21 +78,25 @@ const partyBadgeClass =
 
 <style>
 	.legislator-card {
+		--card-accent: var(--color-accent);
 		border-top: 2px solid var(--color-black);
 		padding-top: 1.25rem;
 		height: 100%;
 	}
 
 	.legislator-card--republican {
+		--card-accent: var(--party-republican);
 		border-top-color: var(--party-republican);
 	}
 
 	.legislator-card--democrat {
+		--card-accent: var(--party-democrat);
 		border-top-color: var(--party-democrat);
 	}
 
 	.legislator-card--nonpartisan,
 	.legislator-card--other {
+		--card-accent: var(--party-nonpartisan-light);
 		border-top-color: var(--party-nonpartisan);
 	}
 
@@ -121,7 +125,7 @@ const partyBadgeClass =
 	}
 
 	.legislator-card-link:hover h3 {
-		color: var(--color-accent);
+		color: var(--card-accent);
 	}
 
 	.card-meta {
@@ -159,7 +163,7 @@ const partyBadgeClass =
 	}
 
 	.legislator-card-link:hover .read-more {
-		color: var(--color-accent);
+		color: var(--card-accent);
 	}
 
 	/* Compact two-line rows on phones — the whole card already links, so the
