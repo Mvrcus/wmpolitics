@@ -3,6 +3,10 @@ name: Chris Swanson
 slug: chris-swanson
 party: Democrat
 seatSlug: mi-governor
+photo: /images/candidates/chris-swanson.jpg
+photoIsOfficial: true
+photoCredit: "Michigan Sheriffs' Association"
+photoCreditUrl: https://www.misheriff.org/sheriffs-offices/genesee-county/
 summary: "Genesee County sheriff running in the 2026 Democratic primary for governor."
 lastReviewed: 2026-07-15
 ---

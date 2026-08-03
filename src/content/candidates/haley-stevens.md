@@ -3,6 +3,8 @@ name: Haley Stevens
 slug: haley-stevens
 party: Democrat
 seatSlug: mi-us-senate-class-2
+photo: /images/candidates/haley-stevens.jpg
+photoIsOfficial: true
 summary: "U.S. representative from Oakland County running for the open U.S. Senate seat being vacated by Gary Peters."
 lastReviewed: 2026-07-15
 ---

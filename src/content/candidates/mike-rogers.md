@@ -3,6 +3,8 @@ name: Mike Rogers
 slug: mike-rogers
 party: Republican
 seatSlug: mi-us-senate-class-2
+photo: /images/candidates/mike-rogers.jpg
+photoIsOfficial: true
 summary: "Former U.S. representative, unopposed in the 2026 Republican primary for Michigan’s open U.S. Senate seat."
 lastReviewed: 2026-07-15
 ---

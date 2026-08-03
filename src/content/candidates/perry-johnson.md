@@ -3,6 +3,9 @@ name: Perry Johnson
 slug: perry-johnson
 party: Republican
 seatSlug: mi-governor
+photo: /images/candidates/perry-johnson.jpg
+photoCredit: "PandaExp via Wikimedia Commons, CC BY-SA 4.0"
+photoCreditUrl: https://commons.wikimedia.org/wiki/File:Perry_Johnson_Portrait.jpg
 summary: "Businessman running in the 2026 Republican primary for governor."
 lastReviewed: 2026-07-15
 ---

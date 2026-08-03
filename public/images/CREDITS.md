@@ -17,6 +17,20 @@ All images are stored locally under `/images/`. Sources and licenses:
 | `article-capitol.jpg` | Article: communication policies | [Pexels](https://www.pexels.com/photo/208733/) | Pexels License (free use) |
 | `og-default.jpg` | Default Open Graph / Twitter card | Same as `lake-michigan-beach.jpg` | See above |
 
+## 2026 candidates (`/images/candidates/`)
+
+| File | Used on | Source | License / notes |
+|------|---------|--------|-----------------|
+| `haley-stevens.jpg` | Haley Stevens candidate page, 2026 ballot | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Haley_Stevens,_official_portrait,_116th_Congress.jpg) — U.S. House official portrait (116th Congress) | **Public domain** (official U.S. House portrait) |
+| `mike-rogers.jpg` | Mike Rogers candidate page, 2026 ballot | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Mike-Rogers-Head-Shot-2_(3x4_cropped).jpg) — U.S. Congress | **Public domain** (official congressional photo) |
+| `john-james.jpg` | John James candidate page, 2026 ballot | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Rep._John_James_official_photo,_118th_Congress.jpg) — official House photo (118th Congress) | **CC BY-SA 4.0** — attribution on page |
+| `jocelyn-benson.jpg` | Jocelyn Benson candidate page, 2026 ballot | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:SOS_Jocelyn_Benson_web.jpg) by JFM Photo 73 | **CC BY 4.0** — attribution on page |
+| `abdul-el-sayed.jpg` | Abdul El-Sayed candidate page, 2026 ballot | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Abdul_El-Sayed_meet-and-greet_by_Conlan_Houston_5_(cropped).jpg) by Conlan Houston (Oct 2025) | **CC BY-SA 4.0** — attribution on page. Campaign event photo, not an official portrait |
+| `perry-johnson.jpg` | Perry Johnson candidate page, 2026 ballot | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Perry_Johnson_Portrait.jpg) by PandaExp | **CC BY-SA 4.0** — attribution on page |
+| `chris-swanson.jpg` | Chris Swanson candidate page, 2026 ballot | [Michigan Sheriffs' Association — Genesee County](https://www.misheriff.org/sheriffs-offices/genesee-county/) official sheriff portrait | © MSA / Genesee County Sheriff's Office; no explicit license. Editorial use; credit on page (same terms as `eric-deboer.jpg`) |
+
+Candidates without a sourced photo (Tanis, McCann, Aaron, Harris, McClusky, and the SD-31 field) render an initials placeholder until a usable public image is found. McCann's official Senate portrait was not retrievable from the caucus site at review time — worth revisiting.
+
 ## Official portraits (state & local officials)
 
 | File | Used on | Source | License / notes |

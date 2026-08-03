@@ -3,6 +3,10 @@ name: Jocelyn Benson
 slug: jocelyn-benson
 party: Democrat
 seatSlug: mi-governor
+photo: /images/candidates/jocelyn-benson.jpg
+photoIsOfficial: true
+photoCredit: "JFM Photo 73 via Wikimedia Commons, CC BY 4.0"
+photoCreditUrl: https://commons.wikimedia.org/wiki/File:SOS_Jocelyn_Benson_web.jpg
 summary: "Michigan Secretary of State running for the Democratic nomination for governor in the open 2026 race."
 lastReviewed: 2026-07-15
 ---

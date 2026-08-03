@@ -3,6 +3,10 @@ name: John James
 slug: john-james
 party: Republican
 seatSlug: mi-governor
+photo: /images/candidates/john-james.jpg
+photoIsOfficial: true
+photoCredit: "U.S. Congress via Wikimedia Commons, CC BY-SA 4.0"
+photoCreditUrl: https://commons.wikimedia.org/wiki/File:Rep._John_James_official_photo,_118th_Congress.jpg
 summary: "U.S. representative running for the 2026 Republican nomination for governor; endorsed by President Trump."
 lastReviewed: 2026-07-15
 ---

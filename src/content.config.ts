@@ -85,6 +85,12 @@ const candidates = defineCollection({
 		seatSlug: z.string(),
 		/** One-line who-they-are, used on cards and as the page description. */
 		summary: z.string(),
+		photo: z.string().optional(),
+		/** True when `photo` is an official portrait (affects alt text). */
+		photoIsOfficial: z.boolean().optional(),
+		/** Short attribution shown under the photo (required for CC-licensed images). */
+		photoCredit: z.string().optional(),
+		photoCreditUrl: z.string().optional(),
 		website: z.string().optional(),
 		sources: z.array(sourceSchema).optional(),
 		/** Date the profile content was last editorially reviewed. */
