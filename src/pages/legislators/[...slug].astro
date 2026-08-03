@@ -18,6 +18,7 @@ import {
 	seatLabel,
 } from '../../lib/legislators';
 import { getArticlesForLegislator } from '../../lib/content';
+import { candidateHref, raceFieldForSeat } from '../../lib/elections';
 import { partyInfo } from '../../lib/party';
 import { resolveEditorialScores } from '../../lib/scores';
 import CommunitySubmissions from '../../components/CommunitySubmissions.astro';
@@ -47,6 +48,11 @@ const currentHolder = !isCurrent ? getCurrentHolderForSeat(allLegislators, d.sea
 const termDisplay = formatTermRange(d.termStart, d.termEnd);
 const label = seatLabel(entry);
 const partyIdentity = partyInfo(d.party);
+
+// The 2026 race for this seat, when we track one with a declared field.
+const race2026 = isCurrent ? raceFieldForSeat(d.seatSlug) : undefined;
+const seekingReelection = race2026?.seat.candidates?.some((c) => c.incumbent) ?? false;
+const challengers2026 = (race2026?.seat.candidates ?? []).filter((c) => !c.incumbent);
 ---
 
 <!doctype html>
@@ -130,6 +136,37 @@ const partyIdentity = partyInfo(d.party);
 
 				<div class="legislator-main">
 					<p class="hero-lead legislator-lead">{d.summary}</p>
+
+					{
+						race2026 && (
+							<aside class="seat-race-box" aria-label="This seat in the 2026 election">
+								<p class="seat-race-kicker">This seat in 2026</p>
+								<p class="seat-race-status">
+									{seekingReelection
+										? `${d.name} is running for re-election.`
+										: race2026.seat.raceNote ?? 'This seat is on the 2026 ballot.'}
+								</p>
+								{challengers2026.length > 0 && (
+									<p class="seat-race-field">
+										{seekingReelection ? 'Also running: ' : 'Running: '}
+										{challengers2026.map((cand, i) => {
+											const href = candidateHref(cand, race2026.seat);
+											return (
+												<>
+													{i > 0 && ', '}
+													{href ? <a href={href}>{cand.name}</a> : cand.name}
+													{cand.party && ` (${cand.party})`}
+												</>
+											);
+										})}
+									</p>
+								)}
+								<a class="seat-race-link" href={`/elections/2026/#${race2026.seat.seatSlug}`}>
+									Full race guide →
+								</a>
+							</aside>
+						)
+					}
 
 					{
 						isCurrent && (

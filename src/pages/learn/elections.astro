@@ -5,6 +5,7 @@ import CivicLookup from '../../components/CivicLookup.astro';
 import Footer from '../../components/Footer.astro';
 import { SITE_TITLE } from '../../consts';
 import { LEVELS } from '../../data/election-seats';
+import { candidateHref } from '../../lib/elections';
 
 const title = `Who Runs When | ${SITE_TITLE}`;
 const description =
@@ -108,24 +109,26 @@ const PARTY_LABEL: Record<string, string> = { R: 'Republican', D: 'Democrat', I:
 													{seat.seat}
 													{seat.note && <span class="seat-note">{seat.note}</span>}
 												</th>
-												<td>
-													{seat.slug ? (
-														<a href={`/legislators/${seat.slug}/`}>{seat.official}</a>
-													) : (
-														seat.official
-													)}
-													{seat.party && (
-														<span
-															class:list={['party-mark', `party-mark--${seat.party.toLowerCase()}`]}
-															title={PARTY_LABEL[seat.party]}
-														>
-															({seat.party})
-														</span>
-													)}
+												<td data-label="Current official">
+													<span>
+														{seat.slug ? (
+															<a href={`/legislators/${seat.slug}/`}>{seat.official}</a>
+														) : (
+															seat.official
+														)}
+														{seat.party && (
+															<span
+																class:list={['party-mark', `party-mark--${seat.party.toLowerCase()}`]}
+																title={PARTY_LABEL[seat.party]}
+															>
+																({seat.party})
+															</span>
+														)}
+													</span>
 												</td>
-												<td>{seat.term}</td>
-												<td class="seat-next">{seat.nextElection}</td>
-												<td>{seat.termLimits}</td>
+												<td data-label="Term">{seat.term}</td>
+												<td data-label="Next election" class="seat-next">{seat.nextElection}</td>
+												<td data-label="Term limits">{seat.termLimits}</td>
 											</tr>
 											{seat.candidates && (
 												<tr class="race-row">
@@ -137,7 +140,11 @@ const PARTY_LABEL: Record<string, string> = { R: 'Republican', D: 'Democrat', I:
 														<ul class="race-row-candidates">
 															{seat.candidates.map((cand) => (
 																<li title={cand.note}>
-																	{cand.name}
+																	{candidateHref(cand, seat) ? (
+																		<a href={candidateHref(cand, seat)}>{cand.name}</a>
+																	) : (
+																		cand.name
+																	)}
 																	{cand.party && (
 																		<span
 																			class:list={['party-mark', `party-mark--${cand.party.toLowerCase()}`]}
@@ -151,6 +158,9 @@ const PARTY_LABEL: Record<string, string> = { R: 'Republican', D: 'Democrat', I:
 																</li>
 															))}
 														</ul>
+														<a class="race-row-more" href={`/elections/2026/#${seat.seatSlug}`}>
+															Full race guide →
+														</a>
 													</td>
 												</tr>
 											)}
@@ -376,6 +386,14 @@ const PARTY_LABEL: Record<string, string> = { R: 'Republican', D: 'Democrat', I:
 		border-top: none;
 	}
 
+	.race-row-more {
+		display: inline-block;
+		margin-top: 0.5rem;
+		font-family: var(--font-sans);
+		font-size: 0.8rem;
+		font-weight: 700;
+	}
+
 	.race-row-label {
 		display: block;
 		font-family: var(--font-sans);
@@ -437,5 +455,73 @@ const PARTY_LABEL: Record<string, string> = { R: 'Republican', D: 'Democrat', I:
 
 	.cycle-note strong {
 		color: var(--color-black);
+	}
+
+	/* On narrow screens the table stacks: each row becomes a card — seat name
+	   as the heading, then label/value pairs — so nothing hides off-screen. */
+	@media (max-width: 720px) {
+		.seat-table thead {
+			display: none;
+		}
+
+		.seat-table,
+		.seat-table tbody,
+		.seat-table tr,
+		.seat-table tbody th,
+		.seat-table td {
+			display: block;
+		}
+
+		.seat-table tr {
+			padding: 1rem 0.9rem 1.1rem;
+			border-bottom: 1px solid var(--color-border);
+		}
+
+		.seat-table tr:last-child {
+			border-bottom: none;
+		}
+
+		.seat-table tbody th,
+		.seat-table td {
+			padding: 0;
+			border-bottom: none;
+			min-width: 0;
+		}
+
+		.seat-table tbody th {
+			font-size: 1rem;
+			margin-bottom: 0.65rem;
+		}
+
+		.seat-table td[data-label] {
+			display: flex;
+			align-items: baseline;
+			justify-content: space-between;
+			gap: 1rem;
+			padding: 0.4rem 0;
+			border-top: 1px solid var(--color-border);
+			font-size: 0.875rem;
+			text-align: right;
+		}
+
+		.seat-table td[data-label]::before {
+			content: attr(data-label);
+			flex-shrink: 0;
+			font-size: 0.68rem;
+			font-weight: 700;
+			text-transform: uppercase;
+			letter-spacing: 0.08em;
+			color: var(--color-muted);
+			text-align: left;
+		}
+
+		.seat-next {
+			white-space: normal;
+		}
+
+		/* The candidates row stays a full-width block, not a label/value pair. */
+		.race-row td {
+			padding: 0.65rem 0.75rem 0.75rem;
+		}
 	}
 </style>

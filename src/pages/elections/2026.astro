@@ -6,6 +6,7 @@ import Footer from '../../components/Footer.astro';
 import { SITE_TITLE } from '../../consts';
 import { LEVELS } from '../../data/election-seats';
 import type { Seat, Candidate } from '../../data/election-seats';
+import { candidateHref } from '../../lib/elections';
 
 const title = `The 2026 Ballot | ${SITE_TITLE}`;
 const description =
@@ -24,6 +25,10 @@ const openSeats = races.filter((r) => r.seat.raceNote?.toLowerCase().includes('o
 // Incumbents on this page have site profiles — reuse their real portraits.
 const legislators = await getCollection('legislators');
 const photoBySlug = new Map(legislators.map((l) => [l.data.slug, l.data.photo]));
+
+// Challengers with sourced portraits get them too (see candidate profiles).
+const candidateEntries = await getCollection('candidates');
+const candidatePhotoBySlug = new Map(candidateEntries.map((c) => [c.data.slug, c.data.photo]));
 
 const PARTY_LABEL: Record<string, string> = { R: 'Republican', D: 'Democrat', I: 'Independent' };
 
@@ -57,9 +62,10 @@ function initials(name: string): string {
 		.join('');
 }
 
-function incumbentPhoto(seat: Seat, cand: Candidate): string | undefined {
-	if (!cand.incumbent || !seat.slug) return undefined;
-	return photoBySlug.get(seat.slug);
+function candidatePhoto(seat: Seat, cand: Candidate): string | undefined {
+	if (cand.incumbent && seat.slug) return photoBySlug.get(seat.slug);
+	if (cand.slug) return candidatePhotoBySlug.get(cand.slug);
+	return undefined;
 }
 ---
 
@@ -131,7 +137,7 @@ function incumbentPhoto(seat: Seat, cand: Candidate): string | undefined {
 											</h3>
 											<ul class="e26-cands">
 												{field.candidates.map((cand) => {
-													const photo = incumbentPhoto(seat, cand);
+													const photo = candidatePhoto(seat, cand);
 													const body = (
 														<>
 															<span class:list={['e26-cand-face', cand.party && `e26-cand-face--${cand.party.toLowerCase()}`]}>
@@ -151,10 +157,11 @@ function incumbentPhoto(seat: Seat, cand: Candidate): string | undefined {
 															</span>
 														</>
 													);
+													const href = candidateHref(cand, seat);
 													return (
 														<li>
-															{cand.incumbent && seat.slug ? (
-																<a class="e26-cand e26-cand--link" href={`/legislators/${seat.slug}/`}>
+															{href ? (
+																<a class="e26-cand e26-cand--link" href={href}>
 																	{body}
 																</a>
 															) : (

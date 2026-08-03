@@ -2827,6 +2827,44 @@ main > .page-header:first-child {
 	max-width: none;
 }
 
+/* "This seat in 2026" callout on profiles whose seat has a declared field. */
+.seat-race-box {
+	border: 2px solid var(--color-black);
+	border-left-width: 6px;
+	border-left-color: var(--color-accent);
+	background: var(--color-surface);
+	padding: 1rem 1.25rem;
+	margin: 0 0 2rem;
+	font-family: var(--font-sans);
+}
+
+.seat-race-kicker {
+	font-size: 0.7rem;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.1em;
+	color: var(--color-accent);
+	margin: 0 0 0.35rem;
+}
+
+.seat-race-status {
+	font-size: 0.95rem;
+	font-weight: 600;
+	margin: 0 0 0.35rem;
+}
+
+.seat-race-field {
+	font-size: 0.9rem;
+	line-height: 1.55;
+	color: var(--color-muted);
+	margin: 0 0 0.5rem;
+}
+
+.seat-race-link {
+	font-size: 0.8rem;
+	font-weight: 700;
+}
+
 .legislator-header {
 	margin-bottom: 0;
 	padding-bottom: 0;

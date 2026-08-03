@@ -5,6 +5,8 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
 const pathname = Astro.url.pathname.replace(import.meta.env.BASE_URL, '');
 const path = pathname.endsWith('/') ? pathname : `${pathname}/`;
 const isLegislatorsSection = path === '/legislators/' || path.startsWith('/legislators/');
+const isElectionsSection =
+	path.startsWith('/elections/') || path.startsWith('/candidates/') || path === '/learn/elections/';
 ---
 
 <header class="site-header">
@@ -38,6 +40,23 @@ const isLegislatorsSection = path === '/legislators/' || path.startsWith('/legis
 				<li role="none">
 					<a href="/legislators/past/" role="menuitem" class:list={[{ active: path.startsWith('/legislators/past/') }]}>
 						Past
+					</a>
+				</li>
+			</ul>
+		</div>
+		<div class="nav-dropdown" data-nav-dropdown>
+			<HeaderLink href="/elections/2026/" class:list={[{ 'nav-dropdown-trigger': true, active: isElectionsSection }]}>
+				Elections
+			</HeaderLink>
+			<ul class="nav-dropdown-menu" role="menu">
+				<li role="none">
+					<a href="/elections/2026/" role="menuitem" class:list={[{ active: path.startsWith('/elections/2026/') }]}>
+						2026 Ballot
+					</a>
+				</li>
+				<li role="none">
+					<a href="/learn/elections/" role="menuitem" class:list={[{ active: path === '/learn/elections/' }]}>
+						Who Runs When
 					</a>
 				</li>
 			</ul>
